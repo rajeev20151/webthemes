@@ -1,0 +1,191 @@
+/* ---=========== Tailwind-CSS ============--- */
+@import "tailwindcss";
+
+/* ---======== commens style ========------- */
+/* ---=================================----- */
+body{ display:block; background: var(--color5); transition: background 0.4s ease, color 0.4s ease;}
+a{text-decoration:none !important; }
+
+:root {
+    /* ---======= web-color =======---- */
+    /* ---========================----- */
+    --color1:#d2e6f9;
+    --color2:linear-gradient(to right, #434343 0%, black 100%);
+    --color3:linear-gradient(90deg,#fdc830,#f37335);
+    --color4:#818181; 
+    --color5:#fff;
+    --color6:#000;  
+    --color7:#000;  
+    --color8:#494949;
+    --color9:#232323;
+    --color10:rgba(255, 255, 255, 0.4);
+    --color11: rgba(0,0,0,0.03);
+
+   /* ---======== Auth CSS Variables ========----- */
+    --auth-bg: #f5f5f5;
+    --auth-muted: rgba(255,255,255,0.45);
+    --auth-muted-soft: rgba(255,255,255,0.3);
+    --auth-divider: rgba(255,255,255,0.1);
+    --auth-hr: rgba(0,0,0,0.08);
+    --auth-icon-bg: rgba(255,255,255,0.12);
+    --auth-icon-default: #aaa;
+    --auth-feature-text: rgba(255,255,255,0.75);
+    --auth-badge-border: rgba(255,255,255,0.2);
+    --auth-badge-text: rgba(255,255,255,0.6);
+    --auth-shape-border: rgba(255,255,255,0.12);
+    --auth-shape-border-soft: rgba(255,255,255,0.08);
+    --auth-shape-border-accent: rgba(255,255,255,0.2);
+    --auth-shape-fill: rgba(255,255,255,0.18);
+    --auth-input-bg: #fafafa;
+    --auth-input-border: rgba(0,0,0,0.12);
+    --auth-placeholder: #aaa;
+    --auth-strength-empty: rgba(0,0,0,0.08);
+    --auth-checkbox-border: rgba(0,0,0,0.2);
+    --auth-card-bg: rgba(255,255,255,0.06);
+    --auth-card-border: rgba(255,255,255,0.1);
+    --auth-testimonial-text: rgba(255,255,255,0.65);
+    --auth-avatar-bg: rgba(255,255,255,0.15);
+
+    /* ---========= web-fontsize ========----- */
+    /* ---===============================----- */
+    --fontStyle1: 8rem/110% "BBH Bartle", sans-serif;  
+    --fontStyle2: 6rem/110% "BBH Bartle", sans-serif;
+    --fontStyle3: 3rem/120% "BBH Bartle", sans-serif;
+    --fontStyle4: 3rem / 120% "Google Sans", sans-serif;
+    --fontStyle5: 1.5rem / 130% "Google Sans", sans-serif;
+    --fontStyle6: 1.3rem / 120% "Google Sans", sans-serif;
+    --fontStyle7: 1rem / 120% "Google Sans", sans-serif;
+    --fontStyle8: 0.95rem / 130% "Google Sans", sans-serif;
+    --fontStyle9: 0.88rem / 130% "Google Sans", sans-serif;
+    --fontStyle10: 0.8rem / 130% "Google Sans", sans-serif;
+}
+
+/* ================= DARK MODE ================= */
+
+.dark {
+    --color1:#1e293b;
+    --color2:linear-gradient(to right, #0f172a 0%, #020617 100%);
+    --color3:linear-gradient(90deg,#6366f1,#0ea5e9);
+    --color4:#cbd5e1;
+    --color5:#0f172a;   /* main background */
+    --color6:#ffffff;   /* main text */
+    --color7:#e2e8f0;
+    --color8:#94a3b8;
+    --color9:#f1f5f9;
+    --color10:rgba(0,0,0,0.4);
+    --color11: rgba(255,255,255,0.05);
+    --auth-bg: #0f172a;
+    --auth-input-bg: #1e293b;
+    --auth-input-border: rgba(255,255,255,0.1);
+    --auth-placeholder: #94a3b8;
+}
+
+/* ----====== web-fontsize =======----- */
+/* ---============================----- */  
+.fontStyle1 {font: var(--fontStyle1);}
+.fontStyle2 {font: var(--fontStyle2);}
+.fontStyle3 {font: var(--fontStyle3);}  
+.fontStyle4 {font: var(--fontStyle4);}
+.fontStyle5 {font: var(--fontStyle5);}
+.fontStyle6 {font: var(--fontStyle6);}
+.fontStyle7 {font: var(--fontStyle7);}
+.fontStyle8 {font: var(--fontStyle8);}
+.fontStyle9 {font: var(--fontStyle9);}
+.fontStyle10 {font: var(--fontStyle10);}
+
+/* ---======== commen class ========----- */
+/* ---==============================----- */
+.w-width{width:90%; margin: 0 auto;}
+.bg-blur{backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);}
+
+/* ---======== Hero section style ========----- */
+/* ---======================================----- */
+
+@keyframes gridFloat {
+    0% {transform: rotateX(55deg) rotateZ(-45deg) translateY(0px);}
+    50% {transform: rotateX(55deg) rotateZ(-45deg) translateY(-120px);}
+    100% {transform: rotateX(55deg) rotateZ(-45deg) translateY(0px);}
+}
+.animate-grid {animation: gridFloat 8s ease-in-out infinite; transform-style: preserve-3d;}
+
+@keyframes colMove1 {
+    0% { transform: translateY(750px); }
+    100% { transform: translateY(-750px); }
+}
+
+@keyframes colMove2 {
+    0% { transform: translateY(900px); }
+    100% { transform: translateY(-900px); }
+}
+
+@keyframes colMove3 {
+    0% { transform: translateY(800px); }
+    100% { transform: translateY(-800px); }
+}
+
+@keyframes colMove4 {
+    0% { transform: translateY(1400px); }
+    100% { transform: translateY(-1400px); }
+}
+
+.animate-col1 { animation: colMove1 20s linear infinite; }
+.animate-col2 { animation: colMove2 25s linear infinite; }
+.animate-col3 { animation: colMove3 22s linear infinite; }
+.animate-col4 { animation: colMove4 30s linear infinite; }
+
+/* ---======== header section style ========----- */
+/* ---======================================----- */
+.header{z-index: 9999;}
+.header nav ul li a{padding:1.8rem 0; cursor: pointer;display:inline-block;}
+
+/* ---======== scroll-icon section section style ========----- */
+/* ---===================================================----- */
+.scroll_icon_section {overflow: hidden;position: relative;}
+.scroll_icon_section::before,
+.scroll_icon_section::after {content: "";position: absolute;top: 0;width: 120px;height: 100%;z-index: 5;pointer-events: none;}
+.scroll_icon_section::before {left: 0; background: linear-gradient(to right, var(--color5), transparent);}
+.scroll_icon_section::after {right: 0; background: linear-gradient(to left, var(--color5), transparent);}
+.scroll_icon_section .scroll_track {width: max-content;animation: scrollMove 4s linear infinite;}
+.scroll_icon_section .scroll_track2 {width: max-content;animation: scrollMove2 4s linear infinite;}
+.scroll_icon_section .scroll_item {flex-shrink: 0;}
+/* .scroll_icon_section .scroll_item .scroll_icon {background: var(--color2);}  */  
+.scroll_icon_section .scroll_track .scroll_list .scroll_item{box-shadow: rgba(0, 0, 0, 0.05) 0px 6px 24px 0px, rgba(0, 0, 0, 0.08) 0px 0px 0px 1px;}
+/* ANIMATION - RIGHT - SIDE */
+@keyframes scrollMove { 
+0% {transform: translateX(0);}
+100% {transform: translateX(-10%);}
+}
+
+/* ANIMATION - LEFT - SIDE */
+@keyframes scrollMove2 {
+0% {transform: translateX(-10%);}
+100% {transform: translateX(0%);}
+}
+
+/* ---========= reviews section style ==============----- */
+/* ---==============================================----- */
+.reviews_section {overflow: hidden;position: relative;}
+.reviews_section::before,
+.reviews_section::after {content: ""; position: absolute; left: 0;  width: 100%; height: 880px; z-index: 5; pointer-events: none;}
+.reviews_section::before {bottom: 0; background: linear-gradient(to top,var(--color5), transparent);}
+.reviews_section::after {bottom: 0; background: linear-gradient(to top,var(--color5), transparent);}
+
+/* ---========= footer section style =========----- */
+/* ---=======================================----- */
+.footer_section {position: relative;}
+.footer_section .footer_col h3,
+.footer_section .footer_col h4,
+.footer_section .footer_col h5 {position: relative;padding-bottom: 12px;}
+.footer_section .footer_col h3::after,
+.footer_section .footer_col h4::after,
+.footer_section .footer_col h5::after {content: ''; position: absolute; bottom: 0; left: 0; width: 50px; height: 3px;background: var(--color5);}
+
+/* ---======== status section style ========----- */
+/* ---======================================----- */
+.stats_section{background-image: url('../images/background6.jpg'); background-repeat: no-repeat; background-size: cover;
+width:100%; height:auto; background-position: center; background-attachment: fixed;}
+
+/* ---======== Auth Pages (Login & Signup) ========----- */
+/* ---=============================================----- */
+
+

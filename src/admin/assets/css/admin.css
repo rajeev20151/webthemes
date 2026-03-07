@@ -1,0 +1,165 @@
+/* ---=========== Tailwind CSS ============--- */
+@import "tailwindcss";
+
+/* ---======== Admin CSS Variables ========--- */
+/* ---======================================--- */
+
+:root {
+    /* ---======= Admin Surface Colors =======---- */
+    --admin-white:        #fff;
+    --admin-bg:           #f1f5f9;
+    --admin-surface:      #ffffff;
+    --admin-border:       rgba(0,0,0,0.07);
+    --admin-hover:        rgba(0,0,0,0.04);
+    --admin-shadow:       rgba(0,0,0,0.08);
+
+    /* ---======= Admin Text Colors =======---- */
+    --admin-text:         #0f172a;
+    --admin-subtext:      #334155;
+    --admin-muted:        #94a3b8;
+
+    /* ---======= Admin Accent Colors =======---- */
+    --admin-accent:       #6366f1;
+    --admin-accent-soft:  rgba(99,102,241,0.1);
+    --admin-accent-grad:  linear-gradient(135deg, #6366f1 0%, #0ea5e9 100%);
+
+    /* ---======= Admin Status Colors =======---- */
+    --admin-success:      #34d399;
+    --admin-success-soft: rgba(52,211,153,0.1);
+    --admin-warning:      #fbbf24;
+    --admin-warning-soft: rgba(251,191,36,0.1);
+    --admin-danger:       #f87171;
+    --admin-danger-soft:  rgba(248,113,113,0.1);
+
+    /* ---======= Admin Font Sizes =======---- */
+    --fs5:  1.5rem / 130% "Google Sans", sans-serif;
+    --fs6:  1.25rem / 130% "Google Sans", sans-serif;
+    --fs7:  1.05rem / 130% "Google Sans", sans-serif;
+    --fs8:  0.95rem / 130% "Google Sans", sans-serif;
+    --fs9:  0.875rem / 130% "Google Sans", sans-serif;
+    --fs10: 0.78rem  / 130% "Google Sans", sans-serif;
+}
+
+/* =============================================== */
+/* ===== DARK MODE — .dark class on <html> ======= */
+/* =============================================== */
+
+.dark {
+    --admin-bg:           #0f172a;
+    --admin-surface:      #1e293b;
+    --admin-border:       rgba(255,255,255,0.07);
+    --admin-hover:        rgba(255,255,255,0.04);
+    --admin-shadow:       rgba(0,0,0,0.4);
+    --admin-text:         #f1f5f9;
+    --admin-subtext:      #cbd5e1;
+    --admin-muted:        #64748b;
+    --admin-accent-soft:  rgba(99,102,241,0.15);
+    --admin-success-soft: rgba(52,211,153,0.12);
+    --admin-warning-soft: rgba(251,191,36,0.12);
+    --admin-danger-soft:  rgba(248,113,113,0.12);
+}
+
+/* =============================================== */
+/* ===== DARK/LIGHT MODE — Global Admin Apply ==== */
+/* =============================================== */
+
+/* --- Dashboard Body Background --- */
+.admin-layout {
+    background: var(--admin-bg);
+    color: var(--admin-text);
+    transition: background 0.3s ease, color 0.3s ease;
+    min-height: 100vh;
+}
+
+/* --- Sidebar --- */
+.admin-sidebar {
+    background: var(--admin-surface);
+    border-right: 1px solid var(--admin-border);
+    transition: background 0.3s ease, border-color 0.3s ease;
+}
+
+/* --- Header --- */
+.admin-header {
+    background: var(--admin-surface);
+    border-bottom: 1px solid var(--admin-border);
+    box-shadow: 0 1px 4px var(--admin-shadow);
+    transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* --- Cards / Surface Panels --- */
+.admin-card {
+    background: var(--admin-surface);
+    border: 1px solid var(--admin-border);
+    box-shadow: 0 1px 6px var(--admin-shadow);
+    border-radius: 14px;
+    transition: background 0.3s ease, border-color 0.3s ease;
+}
+
+/* --- Text Utilities --- */
+.admin-text        { color: var(--admin-text); }
+.admin-subtext     { color: var(--admin-subtext); }
+.admin-muted       { color: var(--admin-muted); }
+
+/* --- Border Utility --- */
+.admin-border      { border-color: var(--admin-border); }
+
+/* --- Hover Utility --- */
+.admin-hover:hover { background: var(--admin-hover); }
+
+/* --- Status Badge Utilities --- */
+.admin-badge-success { background: var(--admin-success-soft); color: var(--admin-success); }
+.admin-badge-warning { background: var(--admin-warning-soft); color: var(--admin-warning); }
+.admin-badge-danger  { background: var(--admin-danger-soft);  color: var(--admin-danger);  }
+
+/* =============================================== */
+/* ===== DARK MODE TOGGLE BUTTON ================ */
+/* =============================================== */
+
+/* Toggle Track */
+.theme-toggle {
+    position: relative;
+    width: 44px;
+    height: 24px;
+    border-radius: 999px;
+    background: var(--admin-border);
+    border: 1px solid var(--admin-border);
+    cursor: pointer;
+    transition: background 0.3s ease, border-color 0.3s ease;
+    flex-shrink: 0;
+    outline: none;
+}
+
+/* Toggle Thumb */
+.theme-toggle::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--admin-muted);
+    transition: transform 0.3s ease, background 0.3s ease;
+}
+
+/* When dark mode is ON — thumb slides right + accent color */
+.dark .theme-toggle {
+    background: var(--admin-accent-soft);
+    border-color: var(--admin-accent);
+}
+
+.dark .theme-toggle::after {
+    transform: translateX(20px);
+    background: var(--admin-accent);
+}
+
+/* =============================================== */
+/* ===== FONT UTILITIES ========================= */
+/* =============================================== */
+
+.fs5  { font: var(--fs5); }
+.fs6  { font: var(--fs6); }
+.fs7  { font: var(--fs7); }
+.fs8  { font: var(--fs8); }
+.fs9  { font: var(--fs9); }
+.fs10 { font: var(--fs10); }
