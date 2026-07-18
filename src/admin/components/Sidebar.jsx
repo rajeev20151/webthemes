@@ -13,10 +13,9 @@ const menuItems = [
       </svg>
     ),
     children: [
-      { label: "Home", to: "/admin"},
-      { label: "Templates", to: "/admin/add-template"},
-      { label: "Manage Templates", to: "/admin/manage-templates"},
-      { label: "Manage Pricing", to: "/admin/manage-pricing"},
+      { label: "Home", to: "/admin" },
+      { label: "Manage Templates", to: "/admin/manage-templates" },
+      { label: "Manage Pricing", to: "/admin/manage-pricing" },
       { label: "Manage Content", to: "/admin/manage-content" },
     ],
   },
@@ -29,7 +28,7 @@ const menuItems = [
       </svg>
     ),
     children: [
-      { label: "Overview", to: "/analytics" },
+      { label: "Overview", to: "/analytics"},
       { label: "Reports", to: "/reports" },
     ],
   },
@@ -44,7 +43,10 @@ const menuItems = [
       </svg>
     ),
     children: [
-      { label: "All Users", to: "/admin/users" },   
+      { label: "All Users", to: "/admin/users"},
+      { label: "Manage Chats", to: "/admin/manage-chats", icon: "bx-chat" },
+      { label: "Manage Reviews", to: "/admin/manage-reviews", icon: "bx-star" },
+      { label: "Manage Contact", to: "/admin/manage-contact", icon: "bx-mail-send"}
     ],
   },
   {
@@ -55,16 +57,11 @@ const menuItems = [
         <path d="M12 2V4M12 20V22M4.22 4.22L5.64 5.64M18.36 18.36L19.78 19.78M2 12H4M20 12H22M4.22 19.78L5.64 18.36M18.36 5.64L19.78 4.22" stroke="currentColor" strokeWidth="2" strokeLinecap="round" opacity="0.5"/>
       </svg>
     ),
-    to: "/settings",
+    to: "/admin/setting",
   },
 ];
 
-/* ─────────────────────────────────────────────────────────
-   All colours come from admin.css CSS variables.
-   When .dark is toggled on <html>, variables auto-update
-   and every inline style here reacts instantly.
-───────────────────────────────────────────────────────── */
-function MenuItem({ item }) {
+function MenuItem({ item, onClose }) {
   const location = useLocation();
   const hasChildren = item.children && item.children.length > 0;
   const isActive = hasChildren
@@ -73,48 +70,29 @@ function MenuItem({ item }) {
 
   const [open, setOpen] = useState(isActive);
 
-  const rowStyle = {
-    background: isActive ? "var(--admin-accent-soft)" : "transparent",
-    color: isActive ? "var(--admin-accent)" : "var(--admin-subtext)",
-    transition: "background 0.2s ease, color 0.2s ease",
-  };
+  const rowBase = "group flex items-center gap-3 px-3 py-2.5 rounded-lg fontStyle9 w-full transition-all duration-200 relative";
+  const rowActive = "bg-[var(--admin-accent-soft)] text-[var(--admin-accent)] font-medium";
+  const rowIdle = "bg-transparent text-[var(--admin-subtext)] hover:bg-[var(--admin-hover)] hover:text-[var(--admin-text)]";
 
-  const hoverOn = (e) => {
-    if (!isActive) {
-      e.currentTarget.style.background = "var(--admin-hover)";
-      e.currentTarget.style.color = "var(--admin-text)";
-    }
-  };
-  const hoverOff = (e) => {
-    if (!isActive) {
-      e.currentTarget.style.background = "transparent";
-      e.currentTarget.style.color = "var(--admin-subtext)";
-    }
-  };
+  const iconClass = isActive
+    ? "text-[var(--admin-accent)] transition-colors duration-200"
+    : "text-[var(--admin-muted)] group-hover:text-[var(--admin-text)] transition-colors duration-200";
 
-  const iconStyle = {
-    color: isActive ? "var(--admin-accent)" : "var(--admin-muted)",
-    transition: "color 0.2s ease",
-  };
-
-  const chevronStyle = {
-    color: open ? "var(--admin-accent)" : "var(--admin-muted)",
-    transform: open ? "rotate(180deg)" : "rotate(0deg)",
-    transition: "transform 0.2s ease, color 0.2s ease",
-  };
+  const chevronClass = `transition-transform duration-300 ease-out text-[var(--admin-muted)] ${open ? "rotate-180 text-[var(--admin-accent)]" : "rotate-0"}`;
 
   if (!hasChildren) {
     return (
       <li>
         <Link
           to={item.to}
-          className="flex items-center gap-3 px-3 py-2.5 rounded-xl fontStyle9 w-full"
-          style={rowStyle}
-          onMouseEnter={hoverOn}
-          onMouseLeave={hoverOff}
+          onClick={onClose}
+          className={`${rowBase} ${isActive ? rowActive : rowIdle}`}
         >
-          <span style={iconStyle}>{item.icon}</span>
-          <span>{item.label}</span>
+          {isActive && (
+            <span className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-6 bg-[var(--admin-accent)] rounded-r-full" />
+          )}
+          <span className={iconClass}>{item.icon}</span>
+          <span className="truncate">{item.label}</span>
         </Link>
       </li>
     );
@@ -124,48 +102,39 @@ function MenuItem({ item }) {
     <li>
       <button
         onClick={() => setOpen(!open)}
-        className="flex items-center justify-between w-full px-3 py-2.5 rounded-xl fontStyle9"
-        style={rowStyle}
-        onMouseEnter={hoverOn}
-        onMouseLeave={hoverOff}
+        className={`${rowBase} justify-between ${isActive ? rowActive : rowIdle}`}
       >
         <span className="flex items-center gap-3">
-          <span style={iconStyle}>{item.icon}</span>
-          {item.label}
+          <span className={iconClass}>{item.icon}</span>
+          <span className="truncate">{item.label}</span>
         </span>
-        <svg width="16" height="16" viewBox="0 0 20 20" fill="none" style={chevronStyle}>
+        <svg width="14" height="14" viewBox="0 0 20 20" fill="none" className={chevronClass}>
           <path d="M4.79175 7.396L10.0001 12.6043L15.2084 7.396" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
         </svg>
       </button>
 
-      {/* ── Dropdown children ── */}
-      <div
-        style={{
-          maxHeight: open ? "200px" : "0px",
-          overflow: "hidden",
-          transition: "max-height 0.3s ease",
-        }}
-      >
-        <ul
-          className="mt-1 ml-9 pl-3 space-y-0.5"
-          style={{ borderLeft: "1px solid var(--admin-border)" }}
-        >
+      <div className={`overflow-hidden transition-all duration-300 ease-in-out ${open ? "max-h-[300px] opacity-100 mt-1" : "max-h-0 opacity-0"}`}>
+        <ul className="ml-9 pl-3 space-y-0.5 border-l-2 border-[var(--admin-border)]">
           {item.children.map((child) => {
             const childActive = location.pathname === child.to;
             return (
               <li key={child.to}>
                 <Link
                   to={child.to}
-                  className="block py-2 fontStyle10"
-                  style={{
-                    color: childActive ? "var(--admin-accent)" : "var(--admin-muted)",
-                    fontWeight: childActive ? "600" : "400",
-                    transition: "color 0.15s ease",
-                  }}
-                  onMouseEnter={(e) => { if (!childActive) e.currentTarget.style.color = "var(--admin-text)"; }}
-                  onMouseLeave={(e) => { if (!childActive) e.currentTarget.style.color = "var(--admin-muted)"; }}
+                  onClick={onClose}
+                  className={`group/child flex items-center gap-2.5 py-2 pl-3 pr-2 rounded-md fontStyle10 transition-all duration-150 ${
+                    childActive
+                      ? "text-[var(--admin-accent)] font-semibold bg-[var(--admin-accent-soft)]/50"
+                      : "text-[var(--admin-muted)] font-normal hover:text-[var(--admin-text)] hover:bg-[var(--admin-hover)]/50"
+                  }`}
                 >
-                  {child.label}
+                  {childActive && (
+                    <span className="w-1.5 h-1.5 rounded-full bg-[var(--admin-accent)] flex-shrink-0" />
+                  )}
+                  {!childActive && (
+                    <span className="w-1.5 h-1.5 rounded-full bg-[var(--admin-border)] group-hover/child:bg-[var(--admin-muted)] flex-shrink-0 transition-colors duration-150" />
+                  )}
+                  <span className="truncate">{child.label}</span>
                 </Link>
               </li>
             );
@@ -176,76 +145,52 @@ function MenuItem({ item }) {
   );
 }
 
-export default function Sidebar() {
+export default function Sidebar({ isOpen, onClose }) {
   return (
-    <div
-      className="fixed flex flex-col top-0 left-0 h-screen z-50 w-[290px] -translate-x-full xl:translate-x-0 transition-transform duration-300 ease-in-out"
-      style={{
-        background: "var(--admin-surface)",
-        borderRight: "1px solid var(--admin-border)",
-        color: "var(--admin-text)",
-        transition: "background 0.3s ease, border-color 0.3s ease",
-      }}
-    >
-      {/* ===== Logo ===== */}
-      <div className="py-8 px-5 flex justify-start flex-shrink-0">
-        <a href="/">
-          <img alt="Logo" width="150" height="40" src="/images/logo/logo.svg" />
+    <div className={`fixed flex flex-col top-0 left-0 h-screen z-50 w-[280px] transition-transform duration-300 ease-in-out bg-[var(--admin-surface)] border-r border-[var(--admin-border)] text-[var(--admin-text)] shadow-sm ${isOpen ? "translate-x-0" : "-translate-x-full"} xl:translate-x-0 xl:shadow-none`}>
+
+      {/* Logo */}
+      <div className="h-16 px-6 flex items-center flex-shrink-0 border-b border-[var(--admin-border)]/50">
+        <a href="/" className="flex items-center gap-2.5 hover:opacity-80 transition-opacity">
+          <img alt="Logo" width="140" height="36" src="/images/logo/logo.svg" className="h-8 w-auto" />
         </a>
       </div>
 
-      {/* ===== Section Label ===== */}
-      <div className="px-5 mb-2">
-        <p
-          className="fontStyle10 uppercase tracking-widest font-semibold"
-          style={{ color: "var(--admin-muted)" }}
-        >
+      {/* Section Label */}
+      <div className="px-6 pt-6 pb-2">
+        <p className="fontStyle10 uppercase tracking-[0.15em] font-semibold text-[var(--admin-muted)]/70 text-[11px]">
           Main Menu
         </p>
       </div>
 
-      {/* ===== Menu ===== */}
-      <div className="flex flex-col overflow-y-auto flex-1 px-5 pb-6 no-scrollbar">
+      {/* Menu */}
+      <div className="flex flex-col overflow-y-auto flex-1 px-4 pb-6 no-scrollbar">
         <nav>
-          <ul className="flex flex-col gap-1">
+          <ul className="flex flex-col gap-0.5">
             {menuItems.map((item) => (
-              <MenuItem key={item.label} item={item} />
+              <MenuItem key={item.label} item={item} onClose={onClose} />
             ))}
           </ul>
         </nav>
       </div>
 
-      {/* ===== Bottom User Card ===== */}
-      <div
-        className="px-5 py-4 flex-shrink-0"
-        style={{ borderTop: "1px solid var(--admin-border)" }}
-      >
-        <div
-          className="flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer"
-          style={{ transition: "background 0.2s ease" }}
-          onMouseEnter={(e) => e.currentTarget.style.background = "var(--admin-hover)"}
-          onMouseLeave={(e) => e.currentTarget.style.background = "transparent"}
-        >
-          <span
-            className="w-9 h-9 rounded-full overflow-hidden flex-shrink-0"
-            style={{ outline: "2px solid var(--admin-border)", outlineOffset: "1px" }}
-          >
+      {/* Bottom User Card */}
+      <div className="px-4 py-3 flex-shrink-0 border-t border-[var(--admin-border)]/50 bg-[var(--admin-surface)]">
+        <div className="flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer transition-all duration-200 hover:bg-[var(--admin-hover)] group">
+          <span className="w-9 h-9 rounded-full overflow-hidden flex-shrink-0 ring-2 ring-[var(--admin-border)] ring-offset-2 ring-offset-[var(--admin-surface)] transition-all duration-200 group-hover:ring-[var(--admin-accent)]/30">
             <img src="/images/user/owner.png" alt="User" className="w-full h-full object-cover" />
           </span>
           <div className="flex-1 min-w-0">
-            <p
-              className="fontStyle9 font-semibold truncate"
-              style={{ color: "var(--admin-text)" }}
-            >
+            <p className="fontStyle9 font-semibold truncate text-[var(--admin-text)] leading-tight">
               Musharof
             </p>
-            <p className="fontStyle10 truncate" style={{ color: "var(--admin-muted)" }}>
+            <p className="fontStyle10 truncate text-[var(--admin-muted)] text-[11px] mt-0.5">
               Admin
             </p>
           </div>
           <svg
-            width="16" height="16" viewBox="0 0 20 20" fill="none"
-            style={{ color: "var(--admin-muted)", flexShrink: 0 }}
+            width="14" height="14" viewBox="0 0 20 20" fill="none"
+            className="text-[var(--admin-muted)] flex-shrink-0 transition-transform duration-200 group-hover:translate-y-0.5"
           >
             <path d="M4.79175 7.396L10.0001 12.6043L15.2084 7.396" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
           </svg>

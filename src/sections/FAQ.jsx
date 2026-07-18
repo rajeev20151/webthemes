@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Link } from "react-router-dom";
+// import { Link } from "react-router-dom";
 
 // ─────────────────────────────────────────────
 // DATA
@@ -93,7 +93,7 @@ function FaqRow({ q, a, index }) {
 export default function FAQ() {
   return (
     <section
-      className="py-24"
+      className="py-20"
       style={{ background: "var(--color11)" }}
       aria-labelledby="faq-heading"
     >

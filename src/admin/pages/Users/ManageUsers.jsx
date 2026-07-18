@@ -1,16 +1,5 @@
-import { useState } from "react";
-
-/* ════════════════════════════════════════
-   INITIAL DATA
-════════════════════════════════════════ */
-const initialUsers = [
-  { id: 1, name: "Musharof Chy",   email: "musharof@example.com",  role: "Admin",   status: "Active",   avatar: "MC", joined: "12 Jan 2024" },
-  { id: 2, name: "Ayesha Khan",    email: "ayesha@example.com",    role: "Editor",  status: "Active",   avatar: "AK", joined: "28 Feb 2024" },
-  { id: 3, name: "Rahul Sharma",   email: "rahul@example.com",     role: "Viewer",  status: "Inactive", avatar: "RS", joined: "05 Mar 2024" },
-  { id: 4, name: "Sara Ahmed",     email: "sara@example.com",      role: "Editor",  status: "Active",   avatar: "SA", joined: "19 Apr 2024" },
-  { id: 5, name: "John Doe",       email: "john@example.com",      role: "Viewer",  status: "Banned",   avatar: "JD", joined: "02 May 2024" },
-  { id: 6, name: "Priya Patel",    email: "priya@example.com",     role: "Editor",  status: "Active",   avatar: "PP", joined: "14 Jun 2024" },
-];
+import { useState, useEffect } from "react";
+import { getUsersAPI,updateUserAPI, deleteUserAPI} from "../../services/adminApi";
 
 const emptyForm = { name: "", email: "", role: "Viewer", status: "Active" };
 
@@ -21,7 +10,17 @@ const AVATAR_COLORS = [
   "bg-indigo-500", "bg-sky-500", "bg-emerald-500",
   "bg-violet-500", "bg-rose-500", "bg-amber-500",
 ];
-const avatarColor = (id) => AVATAR_COLORS[(id - 1) % AVATAR_COLORS.length];
+const avatarColor = (index) => AVATAR_COLORS[index % AVATAR_COLORS.length];
+
+const getInitials = (name = "") =>
+  name.split(" ").map((w) => w[0]).join("").toUpperCase().slice(0, 2);
+
+const getStatus = (user) => {
+  if (user.status) return user.status;
+  if (user.isBanned) return "Banned";
+  if (user.isVerified) return "Active";
+  return "Inactive";
+};
 
 /* ── Status badge ── */
 function StatusBadge({ status }) {
@@ -39,14 +38,15 @@ function StatusBadge({ status }) {
 
 /* ── Role badge ── */
 function RoleBadge({ role }) {
+  const display = role ? role.charAt(0).toUpperCase() + role.slice(1).toLowerCase() : role;
   const map = {
     Admin:  "bg-indigo-500/10 text-indigo-500",
     Editor: "bg-sky-500/10 text-sky-500",
     Viewer: "bg-slate-500/10 text-slate-500 dark:bg-slate-400/10 dark:text-slate-400",
   };
   return (
-    <span className={`${map[role] || ""} px-2.5 py-1 rounded-full fs10 font-semibold`}>
-      {role}
+    <span className={`${map[display] || "bg-slate-500/10 text-slate-500"} px-2.5 py-1 rounded-full fs10 font-semibold`}>
+      {display}
     </span>
   );
 }
@@ -103,8 +103,6 @@ function UserModal({ mode, data, onClose, onSave }) {
 
         {/* Body */}
         <div className="px-6 py-5 flex flex-col gap-4">
-
-          {/* Name */}
           <div>
             <label className={lbl}>Full Name</label>
             <input
@@ -114,8 +112,6 @@ function UserModal({ mode, data, onClose, onSave }) {
               placeholder="e.g. Musharof Chy"
             />
           </div>
-
-          {/* Email */}
           <div>
             <label className={lbl}>Email Address</label>
             <input
@@ -126,8 +122,6 @@ function UserModal({ mode, data, onClose, onSave }) {
               placeholder="e.g. user@example.com"
             />
           </div>
-
-          {/* Role + Status */}
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className={lbl}>Role</label>
@@ -142,7 +136,6 @@ function UserModal({ mode, data, onClose, onSave }) {
               </select>
             </div>
           </div>
-
         </div>
 
         {/* Footer */}
@@ -185,7 +178,7 @@ function DeleteConfirm({ name, onClose, onConfirm }) {
         </div>
         <p className="fs7 font-bold m-0 mb-2 text-(--admin-text)">Delete User?</p>
         <p className="fs9 m-0 mb-6 text-(--admin-muted)">
-          "<strong className="text-(--admin-subtext)">{name}</strong>" permanently delete ho jayega.
+          "<strong className="text-(--admin-subtext)">{name}</strong>" will be permanently deleted.
         </p>
         <div className="flex items-center justify-center gap-3">
           <button
@@ -210,11 +203,55 @@ function DeleteConfirm({ name, onClose, onConfirm }) {
    MAIN PAGE
 ════════════════════════════════════════ */
 export default function ManageUsers() {
-  const [users, setUsers]               = useState(initialUsers);
+  const [users, setUsers]               = useState([]);
   const [search, setSearch]             = useState("");
   const [filterRole, setFilterRole]     = useState("All");
   const [modal, setModal]               = useState(null);
   const [deleteTarget, setDeleteTarget] = useState(null);
+
+  useEffect(() => {
+    loadUsers();
+  }, []);
+
+  const loadUsers = async () => {
+    try {
+      const res = await getUsersAPI();
+      if (res.success) {
+        // Normalize DB fields to UI fields
+        const normalized = res.users.map((u) => ({
+          ...u,
+          id:     u._id || u.id,
+          role:   u.role
+                    ? u.role.charAt(0).toUpperCase() + u.role.slice(1).toLowerCase()
+                    : "Viewer",
+          status: u.status
+                    ? u.status
+                    : u.isBanned
+                    ? "Banned"
+                    : u.isVerified
+                    ? "Active"
+                    : "Inactive",
+          avatar: getInitials(u.name),
+          joined: u.createdAt
+                    ? new Date(u.createdAt).toLocaleDateString("en-GB", {
+                        day: "2-digit", month: "short", year: "numeric",
+                      })
+                    : "—",
+          location: [u.city, u.state, u.country].filter(Boolean).join(", ") || "—",
+          ip: u.ip || "—",
+          lastLogin: u.lastLogin
+                    ? new Date(u.lastLogin).toLocaleString("en-GB", {
+                        day: "2-digit", month: "short", year: "numeric",
+                        hour: "2-digit", minute: "2-digit",
+                      })
+                    : "Never",
+        }));
+        setUsers(normalized);
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
   /* ── Filter ── */
   const filtered = users.filter((u) => {
@@ -230,20 +267,51 @@ export default function ManageUsers() {
   const inactive = users.filter((u) => u.status === "Inactive").length;
   const banned   = users.filter((u) => u.status === "Banned").length;
 
-  /* ── Save ── */
-  const handleSave = (form) => {
+/* ── Save ── */
+  const handleSave = async (form) => {
     if (modal.mode === "add") {
-      const initials = form.name.split(" ").map((w) => w[0]).join("").toUpperCase().slice(0, 2);
-      setUsers((prev) => [...prev, { ...form, id: Date.now(), avatar: initials, joined: new Date().toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" }) }]);
+      setUsers((prev) => [
+        ...prev,
+        {
+          ...form,
+          id:     `${Date.now()}-${Math.random().toString(36).slice(2)}`,
+          avatar: getInitials(form.name),
+          joined: new Date().toLocaleDateString("en-GB", {
+            day: "2-digit", month: "short", year: "numeric",
+          }),
+          location: "—",
+          ip: "—",
+          lastLogin: "Never",
+        },
+      ]);
     } else {
-      setUsers((prev) => prev.map((u) => (u.id === form.id ? { ...u, ...form } : u)));
+      try {
+        await updateUserAPI(form.id, {
+          name:   form.name,
+          email:  form.email,
+          role:   form.role.toLowerCase(),
+          status: form.status,
+        });
+        setUsers((prev) =>
+          prev.map((u) =>
+            u.id === form.id ? { ...u, ...form, avatar: getInitials(form.name) } : u
+          )
+        );
+      } catch (err) {
+        console.log("Update failed:", err);
+      }
     }
     setModal(null);
   };
 
   /* ── Delete ── */
-  const handleDelete = () => {
-    setUsers((prev) => prev.filter((u) => u.id !== deleteTarget.id));
+  const handleDelete = async () => {
+    try {
+      await deleteUserAPI(deleteTarget.id);
+      setUsers((prev) => prev.filter((u) => u.id !== deleteTarget.id));
+    } catch (err) {
+      console.log("Delete failed:", err);
+    }
     setDeleteTarget(null);
   };
 
@@ -268,10 +336,10 @@ export default function ManageUsers() {
       {/* ── Stat Cards ── */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         {[
-          { label: "Total Users",    value: total,    cls: "text-(--admin-accent)"  },
-          { label: "Active",         value: active,   cls: "text-(--admin-success)" },
-          { label: "Inactive",       value: inactive, cls: "text-(--admin-warning)" },
-          { label: "Banned",         value: banned,   cls: "text-(--admin-danger)"  },
+          { label: "Total Users", value: total,    cls: "text-(--admin-accent)"  },
+          { label: "Active",      value: active,   cls: "text-(--admin-success)" },
+          { label: "Inactive",    value: inactive, cls: "text-(--admin-warning)" },
+          { label: "Banned",      value: banned,   cls: "text-(--admin-danger)"  },
         ].map((s) => (
           <div key={s.label} className="admin-card p-4 flex items-center gap-4">
             <div className="flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center bg-(--admin-accent-soft)">
@@ -290,8 +358,6 @@ export default function ManageUsers() {
 
         {/* Toolbar */}
         <div className="flex items-center justify-between flex-wrap gap-3 px-5 py-4 border-b border-(--admin-border)">
-
-          {/* Search */}
           <div className="relative" style={{ minWidth: 220 }}>
             <span className="absolute left-3 top-1/2 -translate-y-1/2 text-(--admin-muted) pointer-events-none flex items-center">
               <IconSearch />
@@ -303,8 +369,6 @@ export default function ManageUsers() {
               placeholder="Search name or email..."
             />
           </div>
-
-          {/* Role filter */}
           <div className="flex items-center gap-2 flex-wrap">
             {["All", ...ROLES].map((r) => (
               <button
@@ -327,7 +391,7 @@ export default function ManageUsers() {
           <table className="w-full border-collapse">
             <thead>
               <tr className="border-b border-(--admin-border)">
-                {["User", "Email", "Role", "Status", "Joined", "Actions"].map((h) => (
+                {["User", "Email", "Role", "Status", "Location", "IP", "Last Login", "Joined", "Actions"].map((h) => (
                   <th
                     key={h}
                     className="text-left px-5 py-3 fs10 font-semibold uppercase tracking-wider text-(--admin-muted)"
@@ -340,7 +404,7 @@ export default function ManageUsers() {
             <tbody>
               {filtered.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="text-center py-14 fs9 text-(--admin-muted)">
+                  <td colSpan={9} className="text-center py-14 fs9 text-(--admin-muted)">
                     No users found.
                   </td>
                 </tr>
@@ -353,30 +417,23 @@ export default function ManageUsers() {
                     {/* Avatar + Name */}
                     <td className="px-5 py-3.5">
                       <div className="flex items-center gap-3">
-                        <span className={`w-9 h-9 rounded-full flex items-center justify-center text-white fs10 font-bold flex-shrink-0 ${avatarColor(user.id)}`}>
+                        <span className={`w-9 h-9 rounded-full flex items-center justify-center text-white fs10 font-bold flex-shrink-0 ${avatarColor(idx)}`}>
                           {user.avatar}
                         </span>
                         <span className="fs9 font-semibold text-(--admin-text)">{user.name}</span>
                       </div>
                     </td>
-
-                    {/* Email */}
                     <td className="px-5 py-3.5 fs9 text-(--admin-muted)">{user.email}</td>
-
-                    {/* Role */}
                     <td className="px-5 py-3.5">
                       <RoleBadge role={user.role} />
                     </td>
-
-                    {/* Status */}
                     <td className="px-5 py-3.5">
                       <StatusBadge status={user.status} />
                     </td>
-
-                    {/* Joined */}
+                    <td className="px-5 py-3.5 fs9 text-(--admin-muted)">{user.location}</td>
+                    <td className="px-5 py-3.5 fs9 text-(--admin-muted)">{user.ip}</td>
+                    <td className="px-5 py-3.5 fs10 text-(--admin-muted)">{user.lastLogin}</td>
                     <td className="px-5 py-3.5 fs10 text-(--admin-muted)">{user.joined}</td>
-
-                    {/* Actions */}
                     <td className="px-5 py-3.5">
                       <div className="flex items-center gap-2">
                         <button

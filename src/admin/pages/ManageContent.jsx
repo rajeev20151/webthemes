@@ -1,33 +1,16 @@
-import { useState } from "react";
-
-/* ════════════════════════════════════════
-   INITIAL DATA
-════════════════════════════════════════ */
-const initialContent = [
-  {
-    _id: "1",
-    section: "hero",
-    title: "Build Your Website Easily",
-    description: "Create modern websites with our templates",
-    buttonText: "Get Started",
-    buttonLink: "/signup",
-  },
-  {
-    _id: "2",
-    section: "about",
-    title: "About Our Company",
-    description: "We create professional web templates",
-    buttonText: "Read More",
-    buttonLink: "/about",
-  },
-];
+import { useState, useEffect } from "react";
+import {
+  adminGetContentsAPI,
+  adminCreateContentAPI,
+  adminUpdateContentAPI,
+  adminDeleteContentAPI,
+} from "../services/adminApi";
 
 const emptyForm = {
-  section: "",
-  title: "",
-  description: "",
-  buttonText: "",
-  buttonLink: "",
+  section: "", title: "", description: "",
+  buttonText: "", buttonLink: "",
+  footerText: "", copyrightText: "",
+  socialLinks: [],
 };
 
 /* ── Section color map ── */
@@ -51,6 +34,8 @@ const IconSearch = () => <svg width="15" height="15" viewBox="0 0 24 24" fill="n
 const IconLink   = () => <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/></svg>;
 const IconJson   = () => <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/><path d="M14 2v6h6M9 13h1c.5 0 1 .5 1 1v1c0 .5.5 1 1 1h0c.5 0 1-.5 1-1v-1c0-.5.5-1 1-1h1" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/></svg>;
 const IconCopy   = () => <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><rect x="9" y="9" width="13" height="13" rx="2" stroke="currentColor" strokeWidth="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/></svg>;
+const IconMinus  = () => <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 12h14" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/></svg>;
+const IconSocial = () => <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M18 8a3 3 0 100-6 3 3 0 000 6zM6 15a3 3 0 100-6 3 3 0 000 6zM18 22a3 3 0 100-6 3 3 0 000 6zM8.59 13.51l6.83 3.98M15.41 6.51l-6.82 3.98" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/></svg>;
 
 /* ── Shared input ── */
 const inp = [
@@ -62,12 +47,32 @@ const inp = [
 
 const lbl = "block fs10 font-semibold uppercase tracking-wider text-(--admin-muted) mb-1.5";
 
+/* Social platform options */
+const platformOptions = [
+  "facebook", "twitter", "instagram", "linkedin", "youtube",
+  "github", "discord", "tiktok", "pinterest", "telegram",
+];
+
 /* ════════════════════════════════════════
    CONTENT MODAL  (Add / Edit)
 ════════════════════════════════════════ */
-function ContentModal({ mode, data, onClose, onSave }) {
-  const [form, setForm] = useState({ ...data });
+function ContentModal({ mode, data, onClose, onSave, saving }) {
+  const [form, setForm] = useState({ ...data, socialLinks: data.socialLinks || [] });
   const set = (k, v) => setForm((p) => ({ ...p, [k]: v }));
+
+  /* Social link helpers */
+  const addSocialLink = () => {
+    set("socialLinks", [...form.socialLinks, { platform: "", url: "" }]);
+  };
+  const updateSocialLink = (index, field, value) => {
+    const updated = form.socialLinks.map((link, i) =>
+      i === index ? { ...link, [field]: value } : link
+    );
+    set("socialLinks", updated);
+  };
+  const removeSocialLink = (index) => {
+    set("socialLinks", form.socialLinks.filter((_, i) => i !== index));
+  };
 
   const handleSave = () => {
     if (!form.section.trim() || !form.title.trim()) return;
@@ -95,7 +100,7 @@ function ContentModal({ mode, data, onClose, onSave }) {
         </div>
 
         {/* Body */}
-        <div className="px-6 py-5 flex flex-col gap-4">
+        <div className="px-6 py-5 flex flex-col gap-4 max-h-[70vh] overflow-y-auto">
 
           {/* Section Key */}
           <div>
@@ -104,7 +109,7 @@ function ContentModal({ mode, data, onClose, onSave }) {
               className={inp}
               value={form.section}
               onChange={(e) => set("section", e.target.value.toLowerCase().replace(/\s+/g, "-"))}
-              placeholder="e.g. hero, about, features"
+              placeholder="e.g. hero, about, features, footer"
             />
             <p className="fs10 text-(--admin-muted) mt-1 m-0">Lowercase only, no spaces (use dash)</p>
           </div>
@@ -154,6 +159,78 @@ function ContentModal({ mode, data, onClose, onSave }) {
             </div>
           </div>
 
+          {/* ════ Footer Section ════ */}
+          <div className="flex items-center gap-2 pt-2">
+            <span className="fs10 font-bold uppercase tracking-widest text-(--admin-accent)">
+              Footer &amp; Branding
+            </span>
+            <div className="flex-1 h-px bg-(--admin-border)" />
+          </div>
+
+          {/* Copyright Text */}
+          <div>
+            <label className={lbl}>Copyright Text</label>
+            <input
+              className={inp}
+              value={form.copyrightText || ""}
+              onChange={(e) => set("copyrightText", e.target.value)}
+              placeholder="e.g. © 2026 TemplateHub. All rights reserved."
+            />
+          </div>
+
+          {/* Footer Text */}
+          <div>
+            <label className={lbl}>Footer Text</label>
+            <input
+              className={inp}
+              value={form.footerText || ""}
+              onChange={(e) => set("footerText", e.target.value)}
+              placeholder="e.g. Crafted with ♥ for developers."
+            />
+          </div>
+
+          {/* ════ Social Links Section ════ */}
+          <div className="flex items-center gap-2 pt-2">
+            <span className="fs10 font-bold uppercase tracking-widest text-(--admin-accent)">
+              Social Links
+            </span>
+            <div className="flex-1 h-px bg-(--admin-border)" />
+          </div>
+
+          {form.socialLinks.map((link, i) => (
+            <div key={i} className="flex items-center gap-2">
+              <select
+                className={`${inp} w-36 shrink-0`}
+                value={link.platform}
+                onChange={(e) => updateSocialLink(i, "platform", e.target.value)}
+              >
+                <option value="">Platform</option>
+                {platformOptions.map((p) => (
+                  <option key={p} value={p}>{p.charAt(0).toUpperCase() + p.slice(1)}</option>
+                ))}
+              </select>
+              <input
+                className={inp}
+                value={link.url}
+                onChange={(e) => updateSocialLink(i, "url", e.target.value)}
+                placeholder="https://..."
+              />
+              <button
+                onClick={() => removeSocialLink(i)}
+                className="w-9 h-9 shrink-0 rounded-lg flex items-center justify-center cursor-pointer border-0 bg-(--admin-danger-soft) text-(--admin-danger) hover:opacity-75 transition-opacity"
+              >
+                <IconMinus />
+              </button>
+            </div>
+          ))}
+
+          <button
+            onClick={addSocialLink}
+            className="flex items-center gap-1.5 px-4 py-2 rounded-xl fs10 font-semibold cursor-pointer border border-dashed border-(--admin-border) bg-transparent text-(--admin-muted) hover:border-(--admin-accent) hover:text-(--admin-accent) transition-colors w-fit"
+          >
+            <IconPlus /> Add Social Link
+          </button>
+
         </div>
 
         {/* Footer */}
@@ -166,10 +243,11 @@ function ContentModal({ mode, data, onClose, onSave }) {
           </button>
           <button
             onClick={handleSave}
+            disabled={saving}
             className="px-6 py-2 rounded-xl fs9 font-bold text-white border-0 cursor-pointer hover:opacity-90 transition-opacity"
-            style={{ background: "var(--admin-accent-grad)", boxShadow: "0 4px 14px rgba(99,102,241,0.25)" }}
+            style={{ background: "var(--admin-accent-grad)", boxShadow: "0 4px 14px rgba(99,102,241,0.25)", opacity: saving ? 0.6 : 1 }}
           >
-            {mode === "add" ? "Add Section" : "Save Changes"}
+            {saving ? "Saving..." : mode === "add" ? "Add Section" : "Save Changes"}
           </button>
         </div>
 
@@ -197,8 +275,6 @@ function JsonModal({ item, onClose }) {
       onClick={(e) => e.target === e.currentTarget && onClose()}
     >
       <div className="w-full max-w-lg rounded-2xl overflow-hidden shadow-2xl bg-(--admin-surface) border border-(--admin-border)">
-
-        {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-(--admin-border)">
           <div className="flex items-center gap-2">
             <span className="text-(--admin-accent)"><IconJson /></span>
@@ -214,8 +290,6 @@ function JsonModal({ item, onClose }) {
             <IconClose />
           </button>
         </div>
-
-        {/* Code block */}
         <div className="px-6 py-5">
           <div className="relative rounded-xl overflow-hidden" style={{ background: "#0d1117" }}>
             <button
@@ -236,7 +310,6 @@ function JsonModal({ item, onClose }) {
             </pre>
           </div>
         </div>
-
       </div>
     </div>
   );
@@ -285,6 +358,9 @@ function DeleteConfirm({ section, onClose, onConfirm }) {
    CONTENT CARD
 ════════════════════════════════════════ */
 function ContentCard({ item, onEdit, onDelete, onViewJson }) {
+  const hasSocial = item.socialLinks?.length > 0;
+  const hasFooter = item.copyrightText || item.footerText;
+
   return (
     <div className="admin-card p-5 flex flex-col gap-4 hover:-translate-y-0.5 transition-transform duration-200">
 
@@ -293,7 +369,7 @@ function ContentCard({ item, onEdit, onDelete, onViewJson }) {
         <span className={`px-3 py-1 rounded-full fs10 font-bold tracking-wider uppercase ${sectionColor(item.section)}`}>
           {item.section}
         </span>
-        <span className="fs10 text-(--admin-muted)">ID: {item._id}</span>
+        <span className="fs10 text-(--admin-muted)">ID: {item._id?.slice(-6)}</span>
       </div>
 
       {/* Title */}
@@ -304,9 +380,7 @@ function ContentCard({ item, onEdit, onDelete, onViewJson }) {
 
       {/* Button info */}
       {(item.buttonText || item.buttonLink) && (
-        <div
-          className="flex items-center gap-2 px-3 py-2 rounded-xl border border-(--admin-border) bg-(--admin-bg)"
-        >
+        <div className="flex items-center gap-2 px-3 py-2 rounded-xl border border-(--admin-border) bg-(--admin-bg)">
           <span className="text-(--admin-accent) flex-shrink-0"><IconLink /></span>
           <span className="fs10 font-semibold text-(--admin-subtext)">{item.buttonText}</span>
           {item.buttonLink && (
@@ -315,6 +389,35 @@ function ContentCard({ item, onEdit, onDelete, onViewJson }) {
               <span className="fs10 text-(--admin-muted)">{item.buttonLink}</span>
             </>
           )}
+        </div>
+      )}
+
+      {/* Footer info */}
+      {hasFooter && (
+        <div className="px-3 py-2 rounded-xl border border-(--admin-border) bg-(--admin-bg)">
+          {item.copyrightText && (
+            <p className="fs10 m-0 text-(--admin-subtext)">{item.copyrightText}</p>
+          )}
+          {item.footerText && (
+            <p className="fs10 m-0 mt-1 text-(--admin-muted)">{item.footerText}</p>
+          )}
+        </div>
+      )}
+
+      {/* Social links pills */}
+      {hasSocial && (
+        <div className="flex flex-wrap gap-1.5">
+          {item.socialLinks.map((s, i) => (
+            <a
+              key={i}
+              href={s.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-2.5 py-1 rounded-lg fs10 font-semibold no-underline capitalize bg-(--admin-accent-soft) text-(--admin-accent) hover:opacity-75 transition-opacity"
+            >
+              {s.platform}
+            </a>
+          ))}
         </div>
       )}
 
@@ -331,7 +434,7 @@ function ContentCard({ item, onEdit, onDelete, onViewJson }) {
         </button>
         <button
           onClick={() => onViewJson(item)}
-          className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl fs10 font-semibold cursor-pointer border-0 bg-(--admin-hover) text-(--admin-subtext) hover:opacity-75 transition-opacity border border-(--admin-border)"
+          className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl fs10 font-semibold cursor-pointer border border-(--admin-border) bg-(--admin-hover) text-(--admin-subtext) hover:opacity-75 transition-opacity"
         >
           <IconJson /> JSON
         </button>
@@ -351,11 +454,27 @@ function ContentCard({ item, onEdit, onDelete, onViewJson }) {
    MAIN PAGE
 ════════════════════════════════════════ */
 export default function ManageContent() {
-  const [items, setItems]               = useState(initialContent);
+  const [items, setItems]               = useState([]);
+  const [loading, setLoading]           = useState(true);
   const [search, setSearch]             = useState("");
   const [modal, setModal]               = useState(null);
+  const [saving, setSaving]             = useState(false);
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [jsonTarget, setJsonTarget]     = useState(null);
+
+  /* ── Fetch on mount ── */
+  const fetchContents = async () => {
+    try {
+      const res = await adminGetContentsAPI();
+      if (res.success) setItems(res.contents);
+    } catch (err) {
+      console.error("Failed to fetch contents", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => { fetchContents(); }, []);
 
   /* ── Filter ── */
   const filtered = items.filter((item) => {
@@ -363,23 +482,50 @@ export default function ManageContent() {
     return (
       item.section.toLowerCase().includes(q) ||
       item.title.toLowerCase().includes(q) ||
-      item.description.toLowerCase().includes(q)
+      (item.description || "").toLowerCase().includes(q)
     );
   });
 
-  /* ── Save ── */
-  const handleSave = (form) => {
-    if (modal.mode === "add") {
-      setItems((prev) => [...prev, { ...form, _id: String(Date.now()) }]);
-    } else {
-      setItems((prev) => prev.map((i) => (i._id === form._id ? { ...form } : i)));
+  /* ── Save (Create / Update) ── */
+  const handleSave = async (form) => {
+    setSaving(true);
+    try {
+      const payload = {
+        ...form,
+        socialLinks: JSON.stringify(form.socialLinks || []),
+      };
+
+      let res;
+      if (modal.mode === "add") {
+        res = await adminCreateContentAPI(payload);
+      } else {
+        res = await adminUpdateContentAPI(form._id, payload);
+      }
+
+      if (res.success) {
+        await fetchContents();
+        setModal(null);
+      } else {
+        alert(res.message || "Something went wrong");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Request failed");
+    } finally {
+      setSaving(false);
     }
-    setModal(null);
   };
 
   /* ── Delete ── */
-  const handleDelete = () => {
-    setItems((prev) => prev.filter((i) => i._id !== deleteTarget._id));
+  const handleDelete = async () => {
+    try {
+      const res = await adminDeleteContentAPI(deleteTarget._id);
+      if (res.success) {
+        setItems((prev) => prev.filter((i) => i._id !== deleteTarget._id));
+      }
+    } catch (err) {
+      console.error(err);
+    }
     setDeleteTarget(null);
   };
 
@@ -417,7 +563,9 @@ export default function ManageContent() {
       </div>
 
       {/* ── Cards Grid ── */}
-      {filtered.length === 0 ? (
+      {loading ? (
+        <div className="text-center py-16 fs9 text-(--admin-muted)">Loading content...</div>
+      ) : filtered.length === 0 ? (
         <div className="admin-card p-16 text-center">
           <p className="fs9 text-(--admin-muted) m-0">No sections found.</p>
         </div>
@@ -442,6 +590,7 @@ export default function ManageContent() {
           data={modal.data}
           onClose={() => setModal(null)}
           onSave={handleSave}
+          saving={saving}
         />
       )}
       {deleteTarget && (

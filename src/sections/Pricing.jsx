@@ -94,7 +94,7 @@ function BillingToggle({ value, onChange }) {
     <div
       role="group"
       aria-label="Billing cycle"
-      className="inline-flex items-center gap-1 p-1 rounded-full border border-[var(--color6)]/12 bg-[var(--color6)]/4">
+      className="inline-flex items-center gap-1 p-1 mb-10 rounded-full border border-[var(--color6)]/12 bg-[var(--color6)]/4">
       {["monthly", "yearly"].map((opt) => {
         const active = value === opt;
         return (
@@ -102,7 +102,7 @@ function BillingToggle({ value, onChange }) {
             key={opt}
             onClick={() => onChange(opt)}
             aria-pressed={active}
-            className={`flex items-center gap-2 px-5 py-2 rounded-full fontStyle9 font-semibold capitalize
+            className={`flex items-center gap-2 px-4 sm:px-5 py-2 rounded-full fontStyle9 font-semibold capitalize
               select-none transition-all duration-250
               ${active
                 ? "bg-[var(--color6)] text-[var(--color5)] shadow-sm"
@@ -153,11 +153,11 @@ function PlanCard({ plan, billing }) {
         </div>
       )}
 
-      <div className="flex flex-col flex-1 p-8">
+      <div className="flex flex-col flex-1 p-6 sm:p-8">
 
         {/* Badge */}
         <span
-          className={`self-start fontStyle10 font-bold uppercase tracking-widest px-3 py-1 rounded-full border mb-5
+          className={`self-start fontStyle10 font-bold uppercase tracking-widest px-3 py-1 rounded-full border mb-4 sm:mb-5
             ${plan.highlight
               ? "border-white/25 text-white/60"
               : "border-[var(--color6)]/18 text-[var(--color4)]"
@@ -169,19 +169,19 @@ function PlanCard({ plan, billing }) {
         <h3 className={`fontStyle5 font-bold mb-1.5 ${plan.highlight ? "text-white" : "text-[var(--color6)]"}`}>
           {plan.name}
         </h3>
-        <p className={`fontStyle9 mb-7 ${plan.highlight ? "text-white/55" : "text-[var(--color4)]"}`}>
+        <p className={`fontStyle9 mb-5 sm:mb-7 ${plan.highlight ? "text-white/55" : "text-[var(--color4)]"}`}>
           {plan.tagline}
         </p>
 
         {/* Price */}
-        <div className="mb-7 pb-7 border-b border-dashed border-[var(--color6)]/12">
+        <div className="mb-5 sm:mb-7 pb-5 sm:pb-7 border-b border-dashed border-[var(--color6)]/12">
           <div className="flex items-end gap-1.5">
             <span className={`fontStyle6 font-semibold self-start mt-1.5 ${plan.highlight ? "text-white/55" : "text-[var(--color4)]"}`}>
               Rs.
             </span>
             <span
               className={`font-extrabold leading-none tracking-tight ${plan.highlight ? "text-white" : "text-[var(--color6)]"}`}
-              style={{ font: "2.8rem/1 'Google Sans', sans-serif" }}
+              style={{ font: "2.4rem/1 'Google Sans', sans-serif" }}
             >
               {formatINR(price)}
             </span>
@@ -198,7 +198,7 @@ function PlanCard({ plan, billing }) {
         </div>
 
         {/* Features */}
-        <ul className="flex flex-col gap-3 flex-1 mb-8" role="list">
+        <ul className="flex flex-col gap-2.5 sm:gap-3 flex-1 mb-6 sm:mb-8" role="list">
           {plan.features.map((f) => (
             <li key={f.label} className="flex items-center gap-3">
               <span
@@ -226,7 +226,7 @@ function PlanCard({ plan, billing }) {
           to="#"
           aria-label={`${plan.cta} — ${plan.name}`}
           className={`group/btn fontStyle8 font-semibold w-full flex items-center justify-center gap-2.5
-            px-6 py-3.5 rounded-xl border-[2px] transition-all duration-300
+            px-6 py-3 sm:py-3.5 rounded-xl border-[2px] transition-all duration-300
             ${plan.highlight
               ? "bg-white text-[var(--color6)] border-white hover:bg-transparent hover:text-white"
               : "bg-[var(--color6)] text-[var(--color5)] border-[var(--color6)] hover:bg-transparent hover:text-[var(--color6)]"
@@ -248,25 +248,27 @@ export default function Pricing() {
   const [billing, setBilling] = useState("monthly");
 
   return (
-    <section className="py-24 overflow-hidden" aria-labelledby="pricing-heading">
+    <section className="py-12 sm:py-20 md:py-20 overflow-hidden" aria-labelledby="pricing-heading">
       <div className="w-width">
-      <BreadCrumb_Nav
-      items={[
-      { label: "Home", path: "/" },
-      { label: "Pricing", path: "/pricing" },
-      ]}/>
+        <BreadCrumb_Nav
+          items={[
+            { label: "Home", path: "/" },
+            { label: "Pricing", path: "/pricing" },
+          ]}
+        />
+
         {/* Header */}
-        <div className="text-center mb-14">
-          <span className="inline-block fontStyle10 font-bold uppercase tracking-widest text-[var(--color4)] border border-[var(--color6)]/18 px-4 py-1.5 rounded-full mb-5">
+        <div className="text-center">
+          <span className="inline-block fontStyle10 font-bold uppercase tracking-widest text-[var(--color4)] border border-[var(--color6)]/18 px-4 py-1.5 rounded-full mb-4 sm:mb-5">
             Pricing Plans
           </span>
           <h2
             id="pricing-heading"
-            className="fontStyle4 text-[var(--color6)] font-bold leading-tight mb-4"
+            className="fontStyle4 text-[var(--color6)] font-bold leading-tight mb-3 sm:mb-4"
           >
             Simple, Transparent Pricing
           </h2>
-          <p className="fontStyle8 text-[var(--color4)] max-w-lg mx-auto mb-8">
+          <p className="fontStyle8 text-[var(--color4)] max-w-lg mx-auto mb-6 sm:mb-8 px-2">
             Choose the plan that fits your workflow — no hidden charges, no surprises.
             Upgrade or downgrade at any time.
           </p>
@@ -274,18 +276,18 @@ export default function Pricing() {
         </div>
 
         {/* Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-7 lg:gap-8 items-stretch">
           {PLANS.map((plan) => (
             <PlanCard key={plan.id} plan={plan} billing={billing} />
           ))}
         </div>
 
         {/* Trust bar */}
-        <div className="mt-10 flex flex-wrap items-center justify-center gap-x-7 gap-y-2">
+        <div className="mt-8 sm:mt-10 flex flex-wrap items-center justify-center gap-x-5 sm:gap-x-7 gap-y-3">
           {TRUST_ITEMS.map((item) => (
             <div key={item.text} className="flex items-center gap-1.5 text-[var(--color4)]">
               <i className={`bx ${item.icon} text-base`}></i>
-              <span className="fontStyle10">{item.text}</span>
+              <span className="fontStyle10 text-sm sm:text-base">{item.text}</span>
             </div>
           ))}
         </div>

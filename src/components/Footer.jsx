@@ -1,51 +1,71 @@
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import CTA from "../sections/CTA";
+import { getContentsAPI } from "../services/api";
 
 
 export default function Footer(){
+  
+  const [contents, setContents] = useState(null);
+  
+  useEffect(() => {
+    const fetchContent = async () => {
+      try {
+        const res = await getContentsAPI();
+        if (res.success && res.contents.length > 0) {
+          setContents(res.contents[0]);
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    fetchContent();
+  }, []);
+
    return(
       /// ============ footer section =============== ///
       /// ==========================================  ///
       <>
       <CTA />
-      <footer className="footer_section py-20 bg-[var(--color6)]">
-      <div className="w-width">
+      <footer className="footer_section py-12 sm:py-16 md:py-20 bg-[var(--color6)]">
+      <div className="w-width px-4 sm:px-6 lg:px-1">
          
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 sm:gap-10 lg:gap-12 mb-12 sm:mb-14 md:mb-16">
+          
+          {/* Col 1 - Brand + Social */}
           <div className="footer_col">
-            <div className="mb-6">
-              <h3 className="fontStyle5 text-[var(--color5)] font-bold mb-4">TemplateHub</h3>
-              <p className="fontStyle8 text-gray-400 leading-relaxed">
+            <div className="mb-5 sm:mb-6">
+              <h3 className="fontStyle5 text-[var(--color5)] font-bold mb-3 sm:mb-4">TemplateHub</h3>
+              <p className="fontStyle8 text-gray-400 leading-relaxed text-sm sm:text-base">
                 Premium business templates and website solutions ready to deploy instantly. 
                 Built for modern businesses and creative professionals.
               </p>
             </div>
          
-            <div className="flex gap-3">
-              <Link to="#" className="w-10 h-10 rounded-full bg-[var(--color5)] flex items-center justify-center
-              hover:bg-[var(--color9)] hover:scale-110 transition-all duration-300 group">
-                <i className="bx bxl-facebook text-[var(--color6)] text-xl group-hover:text-[var(--color5)]"></i>
-              </Link>
-              <Link to="#" className="w-10 h-10 rounded-full bg-[var(--color5)] flex items-center justify-center
-              hover:bg-[var(--color9)] hover:scale-110 transition-all duration-300 group">
-                <i className="bx bxl-twitter text-[var(--color6)] text-xl group-hover:text-[var(--color5)]"></i>
-              </Link>
-              <Link to="#" className="w-10 h-10 rounded-full bg-[var(--color5)] flex items-center justify-center
-              hover:bg-[var(--color9)] hover:scale-110 transition-all duration-300 group">
-                <i className="bx bxl-instagram text-[var(--color6)] text-xl group-hover:text-[var(--color5)]"></i>
-              </Link>
-              <Link to="#" className="w-10 h-10 rounded-full bg-[var(--color5)] flex items-center justify-center
-              hover:bg-[var(--color9)] hover:scale-110 transition-all duration-300 group">
-                <i className="bx bxl-linkedin text-[var(--color6)] text-xl group-hover:text-[var(--color5)]"></i>
-              </Link>
+            <div className="flex gap-3 flex-wrap">
+            {contents?.socialLinks?.map((social) => (
+            <a
+            key={social._id}
+            href={social.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-[var(--color5)] flex items-center justify-center
+            hover:bg-[var(--color9)] hover:scale-110 transition-all duration-300 group"
+            >
+            <i
+            className={`bx bxl-${social.platform} text-[var(--color6)] text-lg sm:text-xl group-hover:text-[var(--color5)]`}
+            ></i>
+            </a>
+            ))}
             </div>
           </div>
 
+          {/* Col 2 - Templates */}
           <div className="footer_col">
-            <h4 className="fontStyle6 text-[var(--color5)] font-bold mb-6">Templates</h4>
-            <ul className="space-y-3">  
+            <h4 className="fontStyle6 text-[var(--color5)] font-bold mb-4 sm:mb-6">Templates</h4>
+            <ul className="space-y-2 sm:space-y-3">  
               <li className="text-gray-400">
-                <Link to="#" className="fontStyle8 inline-block  hover:text-[var(--color5)] hover:pl-2 
+                <Link to="#" className="fontStyle8 inline-block hover:text-[var(--color5)] hover:pl-2 
                 transition-all duration-300">Business Websites</Link>
               </li>
               <li className="text-gray-400">
@@ -71,9 +91,10 @@ export default function Footer(){
             </ul>
           </div>
          
+          {/* Col 3 - Company */}
           <div className="footer_col">
-            <h4 className="fontStyle6 text-[var(--color5)] font-bold mb-6">Company</h4>
-            <ul className="space-y-3">
+            <h4 className="fontStyle6 text-[var(--color5)] font-bold mb-4 sm:mb-6">Company</h4>
+            <ul className="space-y-2 sm:space-y-3">
               <li className="text-gray-400">
                 <Link to="about" className="fontStyle8 hover:text-[var(--color5)] hover:pl-2 
                 transition-all duration-300 inline-block">About Us</Link>
@@ -86,41 +107,40 @@ export default function Footer(){
                 <Link to="#" className="fontStyle8 hover:text-[var(--color5)] hover:pl-2 
                 transition-all duration-300 inline-block">Reviews</Link>
               </li>
-              <li className="text-gray-400">
+              {/* <li className="text-gray-400">
                 <Link to="blog" className="fontStyle8 hover:text-[var(--color5)] hover:pl-2 
                 transition-all duration-300 inline-block">Blog</Link>
-              </li>
+              </li> */}
               <li className="text-gray-400">
-                <Link to="#" className="fontStyle8 hover:text-[var(--color5)] hover:pl-2 
+                <Link to="contact" className="fontStyle8 hover:text-[var(--color5)] hover:pl-2 
                 transition-all duration-300 inline-block">Contact</Link>
               </li>
             </ul>
           </div>
 
-          <div className="footer_col">
-            <h4 className="fontStyle6 text-[var(--color5)] font-bold mb-6">Stay Updated</h4>
-            <p className="fontStyle8 text-gray-400 mb-4">
+          {/* Col 4 - Newsletter + Support */}
+          <div className="footer_col sm:col-span-2 lg:col-span-1">
+            <h4 className="fontStyle6 text-[var(--color5)] font-bold mb-4 sm:mb-6">Stay Updated</h4>
+            <p className="fontStyle8 text-gray-400 mb-4 text-sm sm:text-base">
               Subscribe to get updates about new templates and exclusive offers.
             </p>
             
-            <div className="newsletter_form">
-              <div className="flex gap-2">
-                <input type="email" placeholder="Your email" className="flex-1 px-4 py-3 rounded-full  bg-[var(--color9)] text-[var(--color5)] fontStyle8
-                border-2 focus:border-[var(--color5)] focus:border-[var(--color5)] !placeholder:text-[var(--color4)] outline-none transition-all duration-300" />
-                <button className="w-12 h-12 rounded-full bg-[var(--color5)] !flex items-center justify-center
-                hover:scale-110 transition-all duration-300 flex-shrink-0">
-                  <i className="bx bx-right-arrow-alt text-[var(--color6)] text-2xl"></i>
-                </button>
-              </div>
+            <div className="flex items-center gap-2 max-w-sm lg:max-w-full bg-[var(--color9)] rounded-full p-1">
+            <input 
+            type="email" 
+            placeholder="Your email" 
+            className="flex-1 min-w-0 px-4 py-2.5 bg-transparent text-[var(--color5)] fontStyle8
+            border-none placeholder:text-gray-400 outline-none text-sm sm:text-base" 
+            />
+            <button className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-[var(--color5)] flex items-center justify-center
+            hover:scale-110 transition-all duration-300 flex-shrink-0">
+            <i className="bx bx-right-arrow-alt text-[var(--color6)] text-xl sm:text-2xl"></i>
+            </button>
             </div>
             
-            <div className="mt-6">
-              <h5 className="fontStyle7 text-[var(--color5)] font-semibold mb-3">Support</h5>
-              <ul className="space-y-2">
-                {/* <li className="text-gray-400">
-                  <Link to="#" className="fontStyle8 hover:text-[var(--color5)] 
-                  transition-colors duration-300">Help Center</Link>
-                </li> */}
+            <div className="mt-5 sm:mt-6">
+              <h5 className="fontStyle7 text-[var(--color5)] font-semibold mb-2 sm:mb-3">Support</h5>
+              <ul className="space-y-1.5 sm:space-y-2">
                 <li className="text-gray-400">
                   <Link to="#" className="fontStyle8 hover:text-[var(--color5)] 
                   transition-colors duration-300">Documentation</Link>
@@ -130,7 +150,7 @@ export default function Footer(){
                   transition-colors duration-300">Terms of Service</Link>
                 </li>
                 <li className="text-gray-400">
-                  <Link to="#" className="fontStyle8 hover:text-[var(--color5)] 
+                  <Link to="privacy-policy" className="fontStyle8 hover:text-[var(--color5)] 
                   transition-colors duration-300">Privacy Policy</Link>
                 </li>
               </ul>
@@ -138,18 +158,19 @@ export default function Footer(){
           </div>
         </div>
         
-        <div className="pt-8 border-t-2 border-gray-800">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <p className="fontStyle8 text-gray-400 text-center md:text-left">
-              © 2026 TemplateHub. All rights reserved. Crafted with <span className="text-red-500">♥</span> for developers.
+        {/* Bottom Bar */}
+        <div className="pt-6 sm:pt-8 border-t-2 border-gray-800">
+          <div className="flex flex-col sm:flex-row justify-between items-center gap-3 sm:gap-4">
+            <p className="fontStyle8 text-gray-400 text-center sm:text-left text-sm sm:text-base">
+              {contents?.copyrightText}
             </p>
-            <div className="flex gap-6 text-gray-400 hover:text-[var(--color5)] 
-              transition-colors duration-300">
-              <Link to="#" className="fontStyle8 ">Privacy</Link>
+            <div className="flex gap-4 sm:gap-6">
               <Link to="#" className="fontStyle8 text-gray-400 hover:text-[var(--color5)] 
-              transition-colors duration-300">Terms</Link>
+                transition-colors duration-300 text-sm sm:text-base">Privacy</Link>
               <Link to="#" className="fontStyle8 text-gray-400 hover:text-[var(--color5)] 
-              transition-colors duration-300">Cookies</Link>
+              transition-colors duration-300 text-sm sm:text-base">Terms</Link>
+              <Link to="#" className="fontStyle8 text-gray-400 hover:text-[var(--color5)] 
+              transition-colors duration-300 text-sm sm:text-base">Cookies</Link>
             </div>
           </div>
         </div>

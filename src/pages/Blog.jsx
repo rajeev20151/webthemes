@@ -129,7 +129,7 @@ export default function Blog() {
     <div className="bg-[var(--color5)]">
 
       {/* ─────────────── HEADER ─────────────── */}
-      <section className="pt-20 pb-14 overflow-hidden relative">
+      <section className="py-12 sm:py-12 md:py-20 pb-14 overflow-hidden relative">
         {/* Dot grid bg */}
         <div
           aria-hidden="true"

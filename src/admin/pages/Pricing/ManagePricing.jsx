@@ -87,24 +87,17 @@ const IconXMark  = () => <svg width="9" height="9" viewBox="0 0 24 24" fill="non
 const IconArrow  = () => <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>;
 const IconStar   = () => <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>;
 
-/* ────────────────────────────────────────────────
-   Tailwind v4 — CSS variables work directly as:
-   bg-(--admin-surface)  text-(--admin-text)
-   border-(--admin-border)  etc.
-   .dark swaps the variables → everything updates
-──────────────────────────────────────────────── */
-
-/* shared input */
+/* ── Shared class strings ── */
 const inp = [
   "w-full px-3 py-2 rounded-xl outline-none transition-colors fs9 box-border",
-  "bg-(--admin-bg)",
-  "border border-(--admin-border)",
-  "text-(--admin-text)",
-  "placeholder:text-(--admin-muted)",
-  "focus:border-(--admin-accent)",
+  "bg-[var(--admin-bg)]",
+  "border border-[var(--admin-border)]",
+  "text-[var(--admin-text)]",
+  "placeholder:text-[var(--admin-muted)]",
+  "focus:border-[var(--admin-accent)]",
 ].join(" ");
 
-const lbl = "block fs10 font-semibold uppercase tracking-wider text-(--admin-muted) mb-1";
+const lbl = "block fs10 font-semibold uppercase tracking-wider text-[var(--admin-muted)] mb-1";
 
 /* ════════════════════════════════════════════
    PLAN MODAL
@@ -127,32 +120,29 @@ function PlanModal({ mode, data, onClose, onSave }) {
 
   return (
     <div
-      className="fixed inset-0 z-9999 flex items-center justify-center p-4 backdrop-blur-sm"
+      className="fixed inset-0 z-[9999] flex items-center justify-center p-4 backdrop-blur-sm"
       onClick={(e) => e.target === e.currentTarget && onClose()}
     >
-      <div
-        className="w-full max-w-2xl rounded-2xl overflow-hidden shadow-2xl flex flex-col bg-(--admin-surface) border border-(--admin-border)"
-        style={{ maxHeight: "90vh" }}
-      >
+      <div className="w-full max-w-2xl max-h-[90vh] rounded-2xl overflow-hidden shadow-2xl flex flex-col bg-[var(--admin-surface)] border border-[var(--admin-border)]">
 
-        {/* ── Header ── */}
-        <div className="flex items-center justify-between px-6 py-4 flex-shrink-0 border-b border-(--admin-border)">
-          <p className="fs7 font-bold m-0 text-(--admin-text)">
+        {/* Header */}
+        <div className="flex items-center justify-between px-6 py-4 flex-shrink-0 border-b border-[var(--admin-border)]">
+          <p className="fs7 font-bold m-0 text-[var(--admin-text)]">
             {mode === "add" ? "Add New Plan" : "Edit Plan"}
           </p>
           <button
             onClick={onClose}
-            className="w-8 h-8 rounded-lg flex items-center justify-center cursor-pointer border-0 bg-(--admin-hover) text-(--admin-muted) hover:bg-(--admin-border) transition-colors"
+            className="w-8 h-8 rounded-lg flex items-center justify-center cursor-pointer border-0 bg-[var(--admin-hover)] text-[var(--admin-muted)] hover:bg-[var(--admin-border)] transition-colors"
           >
             <IconClose />
           </button>
         </div>
 
-        {/* ── Body ── */}
+        {/* Body */}
         <div className="overflow-y-auto flex-1 px-6 py-5 flex flex-col gap-4">
 
           {/* Badge + Name */}
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label className={lbl}>Badge Label</label>
               <input className={inp} value={form.badge} onChange={(e) => set("badge", e.target.value)} placeholder="e.g. STARTER" />
@@ -170,7 +160,7 @@ function PlanModal({ mode, data, onClose, onSave }) {
           </div>
 
           {/* Monthly + Yearly Price */}
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label className={lbl}>Monthly Price (Rs.)</label>
               <input className={inp} value={form.monthlyPrice} onChange={(e) => set("monthlyPrice", e.target.value)} placeholder="e.g. 499" />
@@ -182,7 +172,7 @@ function PlanModal({ mode, data, onClose, onSave }) {
           </div>
 
           {/* Period + CTA */}
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label className={lbl}>Price Period</label>
               <select className={inp} value={form.period} onChange={(e) => set("period", e.target.value)}>
@@ -201,13 +191,11 @@ function PlanModal({ mode, data, onClose, onSave }) {
           <div className="flex items-center gap-3 py-1">
             <button
               onClick={() => set("highlight", !form.highlight)}
-              className={`relative w-11 h-6 rounded-full border-0 cursor-pointer flex-shrink-0 transition-colors duration-200 ${form.highlight ? "bg-(--admin-accent)" : "bg-(--admin-border)"}`}
+              className={`relative w-11 h-6 rounded-full border-0 cursor-pointer flex-shrink-0 transition-colors duration-200 ${form.highlight ? "bg-[var(--admin-accent)]" : "bg-[var(--admin-border)]"}`}
             >
-              <span
-                className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow-sm transition-all duration-200 ${form.highlight ? "left-[22px]" : "left-0.5"}`}
-              />
+              <span className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow-sm transition-all duration-200 ${form.highlight ? "left-[22px]" : "left-0.5"}`} />
             </button>
-            <span className="fs9 font-semibold text-(--admin-text)">
+            <span className="fs9 font-semibold text-[var(--admin-text)]">
               Mark as "Best Value" (highlighted card)
             </span>
           </div>
@@ -225,7 +213,7 @@ function PlanModal({ mode, data, onClose, onSave }) {
               <label className={`${lbl} mb-0`}>Features</label>
               <button
                 onClick={addFeature}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg fs10 font-bold cursor-pointer border-0 bg-(--admin-accent-soft) text-(--admin-accent) hover:opacity-80 transition-opacity"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg fs10 font-bold cursor-pointer border-0 bg-[var(--admin-accent-soft)] text-[var(--admin-accent)] hover:opacity-80 transition-opacity"
               >
                 <IconPlus /> Add Feature
               </button>
@@ -234,29 +222,26 @@ function PlanModal({ mode, data, onClose, onSave }) {
             <div className="flex flex-col gap-2">
               {form.features.map((f, i) => (
                 <div key={i} className="flex items-center gap-2">
-                  {/* included toggle */}
                   <button
                     onClick={() => setFeature(i, "included", !f.included)}
                     className={`flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center border-0 cursor-pointer transition-colors ${
                       f.included
-                        ? "bg-(--admin-success-soft) text-(--admin-success)"
-                        : "bg-(--admin-danger-soft) text-(--admin-danger)"
+                        ? "bg-[var(--admin-success-soft)] text-[var(--admin-success)]"
+                        : "bg-[var(--admin-danger-soft)] text-[var(--admin-danger)]"
                     }`}
                   >
                     {f.included ? <IconCheck /> : <IconXMark />}
                   </button>
-
                   <input
                     className={`${inp} flex-1`}
                     value={f.text}
                     onChange={(e) => setFeature(i, "text", e.target.value)}
                     placeholder="e.g. Full Source Code"
                   />
-
                   {form.features.length > 1 && (
                     <button
                       onClick={() => removeFeature(i)}
-                      className="flex-shrink-0 w-7 h-7 rounded-lg flex items-center justify-center border-0 cursor-pointer bg-(--admin-danger-soft) text-(--admin-danger) hover:opacity-80 transition-opacity"
+                      className="flex-shrink-0 w-7 h-7 rounded-lg flex items-center justify-center border-0 cursor-pointer bg-[var(--admin-danger-soft)] text-[var(--admin-danger)] hover:opacity-80 transition-opacity"
                     >
                       <IconDelete />
                     </button>
@@ -267,18 +252,17 @@ function PlanModal({ mode, data, onClose, onSave }) {
           </div>
         </div>
 
-        {/* ── Footer ── */}
-        <div className="flex items-center justify-end gap-3 px-6 py-4 flex-shrink-0 border-t border-(--admin-border)">
+        {/* Footer */}
+        <div className="flex items-center justify-end gap-3 px-6 py-4 flex-shrink-0 border-t border-[var(--admin-border)]">
           <button
             onClick={onClose}
-            className="px-5 py-2 rounded-xl fs9 font-semibold cursor-pointer border border-(--admin-border) bg-transparent text-(--admin-subtext) hover:bg-(--admin-hover) transition-colors"
+            className="px-5 py-2 rounded-xl fs9 font-semibold cursor-pointer border border-[var(--admin-border)] bg-transparent text-[var(--admin-subtext)] hover:bg-[var(--admin-hover)] transition-colors"
           >
             Cancel
           </button>
           <button
             onClick={handleSave}
-            className="px-6 py-2 rounded-xl fs9 font-bold text-white border-0 cursor-pointer hover:opacity-90 transition-opacity"
-            style={{ background: "var(--admin-accent-grad)", boxShadow: "0 4px 14px var(--admin-accent-soft)" }}
+            className="px-6 py-2 rounded-xl fs9 font-bold text-white border-0 cursor-pointer hover:opacity-90 transition-opacity bg-[var(--admin-accent)] [background:var(--admin-accent-grad)] shadow-[0_4px_14px_var(--admin-accent-soft)]"
           >
             {mode === "add" ? "Add Plan" : "Save Changes"}
           </button>
@@ -295,30 +279,32 @@ function PlanModal({ mode, data, onClose, onSave }) {
 function DeleteConfirm({ name, onClose, onConfirm }) {
   return (
     <div
-      className="fixed inset-0 z-9999 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+      className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
       onClick={(e) => e.target === e.currentTarget && onClose()}
     >
-      <div className="w-full max-w-sm rounded-2xl p-8 text-center shadow-2xl bg-(--admin-surface) border border-(--admin-border)">
-        <div className="w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-4 bg-(--admin-danger-soft)">
+      <div className="w-full max-w-sm rounded-2xl p-8 text-center shadow-2xl bg-[var(--admin-surface)] border border-[var(--admin-border)]">
+        <div className="w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-4 bg-[var(--admin-danger-soft)]">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
             <path d="M3 6h18M8 6V4h8v2M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"
-              stroke="var(--admin-danger)" strokeWidth="2" strokeLinecap="round"/>
+              stroke="currentColor" strokeWidth="2" strokeLinecap="round"
+              className="text-[var(--admin-danger)]"
+            />
           </svg>
         </div>
-        <p className="fs7 font-bold m-0 mb-2 text-(--admin-text)">Delete Plan?</p>
-        <p className="fs9 m-0 mb-6 text-(--admin-muted)">
-          "<strong className="text-(--admin-subtext)">{name}</strong>" permanently delete ho jayega.
+        <p className="fs7 font-bold m-0 mb-2 text-[var(--admin-text)]">Delete Plan?</p>
+        <p className="fs9 m-0 mb-6 text-[var(--admin-muted)]">
+          "<strong className="text-[var(--admin-subtext)]">{name}</strong>" permanently delete ho jayega.
         </p>
         <div className="flex items-center justify-center gap-3">
           <button
             onClick={onClose}
-            className="px-6 py-2 rounded-xl fs9 font-semibold cursor-pointer border border-(--admin-border) bg-transparent text-(--admin-subtext) hover:bg-(--admin-hover) transition-colors"
+            className="px-6 py-2 rounded-xl fs9 font-semibold cursor-pointer border border-[var(--admin-border)] bg-transparent text-[var(--admin-subtext)] hover:bg-[var(--admin-hover)] transition-colors"
           >
             Cancel
           </button>
           <button
             onClick={onConfirm}
-            className="px-6 py-2 rounded-xl fs9 font-bold text-white border-0 cursor-pointer bg-(--admin-danger) hover:opacity-85 transition-opacity"
+            className="px-6 py-2 rounded-xl fs9 font-bold text-white border-0 cursor-pointer bg-[var(--admin-danger)] hover:opacity-85 transition-opacity"
           >
             Delete
           </button>
@@ -338,67 +324,49 @@ function PricingPreviewCard({ plan, billing, onEdit, onDelete }) {
     <div className="relative flex flex-col">
 
       {plan.highlight && (
-        <div className="flex justify-center" style={{ marginBottom: "-1px", position: "relative", zIndex: 2 }}>
-          <span
-            className="px-5 py-1.5 rounded-full fs10 font-bold tracking-widest text-white"
-            style={{ background: "var(--admin-accent-grad)" }}
-          >
+        <div className="flex justify-center -mb-px relative z-[2]">
+          <span className="px-5 py-1.5 rounded-full fs10 font-bold tracking-widest text-white [background:var(--admin-accent-grad)]">
             {plan.highlightLabel}
           </span>
         </div>
       )}
 
-      <div
-        className="flex flex-col flex-1 rounded-2xl p-6 transition-all duration-200"
-        style={{
-          background: "rgba(255,255,255,0.04)",
-          border: plan.highlight ? "1px solid var(--admin-accent)" : "1px solid var(--admin-border)",
-          boxShadow: plan.highlight ? "0 0 40px var(--admin-accent-soft)" : "none",
-          marginTop: plan.highlight ? "0" : "24px",
-        }}
-      >
+      <div className={`flex flex-col flex-1 rounded-2xl p-6 transition-all duration-200 bg-white/[0.04] ${
+        plan.highlight
+          ? "border border-[var(--admin-accent)] shadow-[0_0_40px_var(--admin-accent-soft)] mt-0"
+          : "border border-[var(--admin-border)] shadow-none mt-6"
+      }`}>
+
         {/* Badge */}
-        <span
-          className="self-start px-3 py-1 rounded-full fs10 font-bold tracking-widest mb-4"
-          style={{ border: "1px solid var(--admin-border)", color: "var(--admin-text)" }}
-        >
+        <span className="self-start px-3 py-1 rounded-full fs10 font-bold tracking-widest mb-4 border border-[var(--admin-border)] text-[var(--admin-text)]">
           {plan.badge}
         </span>
 
         {/* Name + Subtitle */}
-        <p className="fs6 font-bold m-0 mb-1" style={{ color: "var(--admin-text)" }}>{plan.name}</p>
-        <p className="fs10 m-0 mb-4" style={{ color: "var(--admin-muted)" }}>{plan.subtitle}</p>
+        <p className="fs6 font-bold m-0 mb-1 text-[var(--admin-text)]">{plan.name}</p>
+        <p className="fs10 m-0 mb-4 text-[var(--admin-muted)]">{plan.subtitle}</p>
 
         {/* Price */}
         <div className="flex items-baseline gap-1 mb-4">
-          <span className="fs10" style={{ color: "var(--admin-muted)" }}>Rs.</span>
-          <span className="font-bold" style={{ fontSize: "2rem", color: "var(--admin-text)", lineHeight: 1 }}>{price}</span>
-          <span className="fs10" style={{ color: "var(--admin-muted)" }}>{plan.period}</span>
+          <span className="fs10 text-[var(--admin-muted)]">Rs.</span>
+          <span className="font-bold text-4xl leading-none text-[var(--admin-text)]">{price}</span>
+          <span className="fs10 text-[var(--admin-muted)]">{plan.period}</span>
         </div>
 
         {/* Divider */}
-        <div className="mb-4" style={{ borderTop: "1px dashed rgba(255,255,255,0.1)" }} />
+        <div className="mb-4 border-t border-dashed border-white/10" />
 
         {/* Features */}
         <div className="flex flex-col gap-2 flex-1 mb-5">
           {plan.features.map((f, i) => (
             <div key={i} className="flex items-center gap-2.5">
-              <span
-                className="w-5 h-5 rounded-full flex-shrink-0 flex items-center justify-center"
-                style={{ background: "var(--admin-accent)" }}
-              >
+              <span className="w-5 h-5 rounded-full flex-shrink-0 flex items-center justify-center bg-[var(--admin-accent)]">
                 {f.included
                   ? <svg width="10" height="10" viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="var(--admin-surface)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
                   : <svg width="8" height="8" viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18M6 6l12 12" stroke="var(--admin-muted)" strokeWidth="2.5" strokeLinecap="round"/></svg>
                 }
               </span>
-              <span
-                className="fs10"
-                style={{
-                  color: f.included ? "var(--admin-text)" : "var(--admin-muted)",
-                  textDecoration: f.included ? "none" : "line-through",
-                }}
-              >
+              <span className={`fs10 ${f.included ? "text-[var(--admin-text)]" : "text-[var(--admin-muted)] line-through"}`}>
                 {f.text}
               </span>
             </div>
@@ -406,10 +374,7 @@ function PricingPreviewCard({ plan, billing, onEdit, onDelete }) {
         </div>
 
         {/* CTA preview */}
-        <div
-          className="w-full flex items-center justify-between px-4 py-3 rounded-xl fs10 font-semibold mb-3"
-          style={{ background: "var(--admin-surface)", color: "var(--admin-text)" }}
-        >
+        <div className="w-full flex items-center justify-between px-4 py-3 rounded-xl fs10 font-semibold mb-3 bg-[var(--admin-surface)] text-[var(--admin-text)]">
           <span>{plan.cta}</span>
           <IconArrow />
         </div>
@@ -418,13 +383,13 @@ function PricingPreviewCard({ plan, billing, onEdit, onDelete }) {
         <div className="flex gap-2">
           <button
             onClick={() => onEdit(plan)}
-            className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl fs10 font-semibold cursor-pointer border-0 transition-all duration-200 bg-(--admin-accent-soft) text-(--admin-accent) hover:opacity-80"
+            className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl fs10 font-semibold cursor-pointer border-0 transition-all duration-200 bg-[var(--admin-accent-soft)] text-[var(--admin-accent)] hover:opacity-80"
           >
             <IconEdit /> Edit
           </button>
           <button
             onClick={() => onDelete(plan)}
-            className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl fs10 font-semibold cursor-pointer border-0 transition-all duration-200 bg-(--admin-danger-soft) text-(--admin-danger) hover:opacity-80"
+            className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl fs10 font-semibold cursor-pointer border-0 transition-all duration-200 bg-[var(--admin-danger-soft)] text-[var(--admin-danger)] hover:opacity-80"
           >
             <IconDelete /> Delete
           </button>
@@ -439,9 +404,9 @@ function PricingPreviewCard({ plan, billing, onEdit, onDelete }) {
    MAIN PAGE
 ════════════════════════════════════════════ */
 export default function ManagePricing() {
-  const [plans, setPlans]               = useState(initialPlans);
-  const [billing, setBilling]           = useState("monthly");
-  const [modal, setModal]               = useState(null);
+  const [plans, setPlans] = useState(initialPlans);
+  const [billing, setBilling] = useState("monthly");
+  const [modal, setModal] = useState(null);
   const [deleteTarget, setDeleteTarget] = useState(null);
 
   const handleSave = (form) => {
@@ -459,63 +424,52 @@ export default function ManagePricing() {
   };
 
   return (
-    <div className="p-7">
+    <div className="p-4 sm:p-7">
 
-      {/* ── Page Header ── */}
+      {/* Page Header */}
       <div className="flex items-center justify-between flex-wrap gap-3 mb-8">
         <div>
-          <h1 className="fs6 font-bold m-0 text-(--admin-text)">Manage Pricing</h1>
-          <p className="fs10 mt-1 m-0 text-(--admin-muted)">{plans.length} plans · Live preview below</p>
+          <h1 className="fs6 font-bold m-0 text-[var(--admin-text)]">Manage Pricing</h1>
+          <p className="fs10 mt-1 m-0 text-[var(--admin-muted)]">{plans.length} plans · Live preview below</p>
         </div>
         <button
           onClick={() => setModal({ mode: "add", data: { ...emptyPlan, features: [{ text: "", included: true }] } })}
-          className="flex items-center gap-2 px-5 py-2.5 rounded-xl fs9 font-bold text-white border-0 cursor-pointer hover:opacity-90 transition-opacity"
-          style={{ background: "var(--admin-accent-grad)", boxShadow: "0 4px 14px rgba(99,102,241,0.3)" }}
+          className="flex items-center gap-2 px-5 py-2.5 rounded-xl fs9 font-bold text-white border-0 cursor-pointer hover:opacity-90 transition-opacity [background:var(--admin-accent-grad)] shadow-[0_4px_14px_rgba(99,102,241,0.3)]"
         >
           <IconPlus /> Add Plan
         </button>
       </div>
 
-      {/* ── Live Preview Panel ── */}
-      <div
-        className="rounded-2xl overflow-hidden border border-(--admin-border)"
-        style={{ background: "var(--admin-surface)" }}
-      >
+      {/* Live Preview Panel */}
+      <div className="rounded-2xl overflow-hidden border border-[var(--admin-border)] bg-[var(--admin-surface)]">
+
         {/* Panel bar */}
-        <div
-          className="flex items-center justify-between px-6 py-3"
-          style={{ borderBottom: "1px solid var(--admin-border)" }}
-        >
-          <div className="flex items-center gap-2" style={{ color: "var(--admin-muted)" }}>
+        <div className="flex items-center justify-between px-4 sm:px-6 py-3 border-b border-[var(--admin-border)]">
+          <div className="flex items-center gap-2 text-[var(--admin-muted)]">
             <IconStar />
             <span className="fs10 font-bold tracking-widest uppercase">Live Preview</span>
           </div>
 
           {/* Monthly / Yearly toggle */}
-          <div
-            className="flex items-center p-1 rounded-full"
-            style={{ background: "var(--admin-surface-soft)", border: "1px solid var(--admin-border)" }}
-          >
+          <div className="flex items-center p-1 rounded-full border border-[var(--admin-border)] bg-[var(--admin-bg)]">
             {["monthly", "yearly"].map((b) => (
               <button
                 key={b}
                 onClick={() => setBilling(b)}
-                className="flex items-center gap-2 px-4 py-1.5 rounded-full fs10 font-semibold cursor-pointer border-0 transition-all duration-200 capitalize"
-                style={{
-                  background: billing === b ? "var(--admin-accent)" : "transparent",
-                  color: billing === b ? "#0f172a" : "var(--admin-text)",
-                }}
+                className={`flex items-center gap-2 px-3 sm:px-4 py-1.5 rounded-full fs10 font-semibold cursor-pointer border-0 transition-all duration-200 capitalize ${
+                  billing === b
+                    ? "bg-[var(--admin-accent)] text-[#0f172a]"
+                    : "bg-transparent text-[var(--admin-text)]"
+                }`}
               >
                 {b === "yearly" ? (
                   <>
                     Yearly
-                    <span
-                      className="px-1.5 py-0.5 rounded-full fs10 font-bold"
-                      style={{
-                        background: billing === "yearly" ? "var(--admin-accent-grad)" : "var(--admin-surface-soft)",
-                        color: billing === "yearly" ? "#fff" : "var(--admin-text)",
-                      }}
-                    >
+                    <span className={`px-1.5 py-0.5 rounded-full fs10 font-bold ${
+                      billing === "yearly"
+                        ? "[background:var(--admin-accent-grad)] text-white"
+                        : "bg-[var(--admin-hover)] text-[var(--admin-text)]"
+                    }`}>
                       -17%
                     </span>
                   </>
@@ -525,17 +479,14 @@ export default function ManagePricing() {
           </div>
         </div>
 
-        {/* Cards */}
-        <div className="p-8">
+        {/* Cards grid */}
+        <div className="p-4 sm:p-8">
           {plans.length === 0 ? (
-            <p className="text-center py-16 fs9" style={{ color: "var(--admin-muted)" }}>
+            <p className="text-center py-16 fs9 text-[var(--admin-muted)]">
               No plans yet. Click "Add Plan" to create one.
             </p>
           ) : (
-            <div
-              className="grid gap-5"
-              style={{ gridTemplateColumns: `repeat(${Math.min(plans.length, 3)}, 1fr)` }}
-            >
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
               {plans.map((plan) => (
                 <PricingPreviewCard
                   key={plan.id}
@@ -550,7 +501,7 @@ export default function ManagePricing() {
         </div>
       </div>
 
-      {/* ── Modals ── */}
+      {/* Modals */}
       {modal && (
         <PlanModal
           mode={modal.mode}

@@ -3,15 +3,23 @@
 
 /* ---======== commens style ========------- */
 /* ---=================================----- */
-body{ display:block; background: var(--color5); transition: background 0.4s ease, color 0.4s ease;}
+html,body{ display:block; background: var(--color5); overflow-x: hidden; transition: background 0.4s ease, color 0.4s ease;}
 a{text-decoration:none !important; }
+
+/* ---======== scroll styles ==========------- */
+/* ---=================================----- */
+* {scrollbar-width: thin; scrollbar-color: var(--color2) transparent;}
+*::-webkit-scrollbar {width: 8px; height: 8px;}
+*::-webkit-scrollbar-track {background: transparent;}
+*::-webkit-scrollbar-thumb {background: var(--color2);border-radius: 999px; border: 2px solid transparent; background-clip: content-box;}
+*::-webkit-scrollbar-thumb:hover {background: var(--color2);background-clip: content-box;}
 
 :root {
     /* ---======= web-color =======---- */
     /* ---========================----- */
     --color1:#d2e6f9;
-    --color2:linear-gradient(to right, #434343 0%, black 100%);
-    --color3:linear-gradient(90deg,#fdc830,#f37335);
+    --color2: linear-gradient(135deg, #1f2937, #111827);
+    --color3: linear-gradient(135deg, #2563eb, #1d4ed8);
     --color4:#818181; 
     --color5:#fff;
     --color6:#000;  
@@ -67,8 +75,8 @@ a{text-decoration:none !important; }
     --color2:linear-gradient(to right, #0f172a 0%, #020617 100%);
     --color3:linear-gradient(90deg,#6366f1,#0ea5e9);
     --color4:#cbd5e1;
-    --color5:#0f172a;   /* main background */
-    --color6:#ffffff;   /* main text */
+    --color5:#0f172a;   
+    --color6:#ffffff;   
     --color7:#e2e8f0;
     --color8:#94a3b8;
     --color9:#f1f5f9;
@@ -93,14 +101,32 @@ a{text-decoration:none !important; }
 .fontStyle9 {font: var(--fontStyle9);}
 .fontStyle10 {font: var(--fontStyle10);}
 
+@media (max-width:1200px) {
+.fontStyle3 {font: var(--fontStyle4);}
+.fontStyle4 {font-size: 1.9rem;}
+.fontStyle2{font: var(--fontStyle4);}
+}
+
+@media (max-width:600px) {
+.fontStyle3 {font: var(--fontStyle5);}
+.fontStyle4{font: var(--fontStyle5);}
+}
+
+
 /* ---======== commen class ========----- */
 /* ---==============================----- */
 .w-width{width:90%; margin: 0 auto;}
 .bg-blur{backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);}
 
-/* ---======== Hero section style ========----- */
-/* ---======================================----- */
+.glow-gold{background:radial-gradient(circle,#fdc830,transparent 70%);}
+.glow-orange{background:radial-gradient(circle,#f37335,transparent 70%);}
 
+.bg-color2{background: var(--color2);}
+.bg-color3{background: var(--color3);}
+
+/* ---======== Hero section style ========----- */
+/* ---====================================----- */
+ 
 @keyframes gridFloat {
     0% {transform: rotateX(55deg) rotateZ(-45deg) translateY(0px);}
     50% {transform: rotateX(55deg) rotateZ(-45deg) translateY(-120px);}
@@ -135,8 +161,15 @@ a{text-decoration:none !important; }
 
 /* ---======== header section style ========----- */
 /* ---======================================----- */
+
 .header{z-index: 9999;}
-.header nav ul li a{padding:1.8rem 0; cursor: pointer;display:inline-block;}
+.header nav ul li a{padding:1.8rem 0; cursor: pointer; }
+.header nav ul li ul li a{padding:1rem !important;}
+
+@media (max-width:1200px) {
+   .header{padding:1rem 0;} 
+}
+
 
 /* ---======== scroll-icon section section style ========----- */
 /* ---===================================================----- */

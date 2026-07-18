@@ -397,7 +397,7 @@ export default function BlogDetail() {
       <div className="bg-[var(--color5)]">
 
         {/* ─── HERO ─── */}
-        <section className="pt-16 pb-0 overflow-hidden">
+        <section className="py-10 sm:py-12 md:py-20  overflow-hidden">
           <div className="w-width">
 
             {/* Breadcrumb */}

@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 export default function BreadCrumbNav({ items = [] }) {
   return (
     <nav
-      className="mb-8"
+      className="mb-10"
       aria-label="Breadcrumb"
     >
       <ol className="flex items-center flex-wrap gap-2 text-sm font-medium text-gray-500">
