@@ -1,12 +1,19 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import SEOHead from "../components/SEOHead";
+import { useSelector, useDispatch } from "react-redux";
+import { clearCart, setDbCart, selectCartItems } from "../store/slices/cartSlice";
+import { useClearCartApiMutation } from "../store/apiSlice";
+import { API_BASE } from "../services/api";
 
-/* ── Mock Order ── */
-const orderItems = [
-  { id: 1, name: "Agency Pro",   price: 29, image: "https://placehold.co/400x260/6366f1/ffffff?text=Agency+Pro"  },
-  { id: 2, name: "SaaS Landing", price: 49, image: "https://placehold.co/400x260/34d399/ffffff?text=SaaS+Landing" },
-];
+/* ── image URL helper ── */
+const imgUrl = (path) => {
+  if (!path) return null;
+  if (path.startsWith("http") || path.startsWith("blob:")) return path;
+
+  const origin = API_BASE.replace(/\/api\/?$/, "");
+  return `${origin}${path}`;
+};
 
 /* ── Shared Classes ── */
 const labelCls = "block fontStyle10 font-semibold uppercase tracking-wider text-[var(--color4)] mb-1.5";
@@ -92,6 +99,10 @@ const validate = {
 };
 
 export default function Checkout() {
+  const dispatch = useDispatch();
+  const orderItems = useSelector(selectCartItems);
+  const isAuth = useSelector((state) => state.cart.isAuth);
+  const [clearCartApi] = useClearCartApiMutation();
   const [step,      setStep]      = useState(1);
   const [loading,   setLoading]   = useState(false);
   const [payMethod, setPayMethod] = useState("card");
@@ -106,7 +117,34 @@ export default function Checkout() {
   const [cardErr, setCardErr] = useState({});
   const [upiErr,  setUpiErr]  = useState({});
 
-  const subtotal = orderItems.reduce((s, i) => s + i.price, 0);
+  /* ── Normalize item structure — DB items have templateId nested, guest items are flat ── */
+  const norm = (item) => {
+    const t = item.templateId || item;
+    return {
+      id: t._id || item._id,
+      name: t.name || item.name || "Untitled",
+      price: t.price || item.price || 0,
+      image: Array.isArray(t.images) && t.images.length ? t.images[0] : (t.image || item.image || ""),
+    };
+  };
+
+  const subtotal = orderItems.reduce((s, i) => s + Number(norm(i).price || 0), 0);
+
+  /* ── Empty cart guard ── */
+  if (orderItems.length === 0 && step !== 3) return (
+    <section className="min-h-screen bg-[var(--color5)] flex items-center justify-center px-4">
+      <div className="text-center">
+        <div className="w-20 h-20 rounded-2xl bg-[var(--color11)] border border-[var(--color6)]/10 flex items-center justify-center mx-auto mb-5">
+          <i className="bx bx-cart text-4xl text-[var(--color4)]"></i>
+        </div>
+        <h2 className="fontStyle5 font-bold text-[var(--color6)] mb-2">Your cart is empty</h2>
+        <p className="fontStyle9 text-[var(--color4)] mb-6">Add some templates before checking out.</p>
+        <Link to="/templates" className="inline-flex items-center gap-2 px-6 py-3 rounded-xl fontStyle9 font-bold text-white hover:opacity-90 transition-opacity duration-200" style={{ background: "var(--color3)" }}>
+          Browse Templates <i className="bx bx-chevron-right text-base"></i>
+        </Link>
+      </div>
+    </section>
+  );
 
   /* ── Formatters ── */
   const fmtCard   = (v) => v.replace(/\D/g, "").slice(0, 16).replace(/(.{4})/g, "$1 ").trim();
@@ -132,6 +170,11 @@ export default function Checkout() {
     setLoading(true);
     await new Promise(r => setTimeout(r, 1500));
     setLoading(false);
+    if (isAuth) {
+      clearCartApi().unwrap().then(() => dispatch(setDbCart([]))).catch(() => {});
+    } else {
+      dispatch(clearCart());
+    }
     setStep(3);
   };
 
@@ -154,12 +197,22 @@ export default function Checkout() {
         <div className="rounded-2xl border border-[var(--color6)]/10 bg-[var(--color11)] p-5 mb-6 text-left">
           <p className="fontStyle10 font-bold uppercase tracking-wider text-[var(--color4)] mb-3">Order Details</p>
           <div className="space-y-2">
-            {orderItems.map(item => (
-              <div key={item.id} className="flex items-center justify-between">
-                <span className="fontStyle9 text-[var(--color6)]">{item.name}</span>
-                <span className="fontStyle9 font-bold text-[var(--color6)]">${item.price}</span>
-              </div>
-            ))}
+          {orderItems.map((item, index) => {
+          const n = norm(item);
+          return (
+          <div
+          key={n.id || `order-item-${index}`}
+          className="flex items-center justify-between"
+          >
+          <span className="fontStyle9 text-[var(--color6)]">
+          {n.name}
+          </span>
+          <span className="fontStyle9 font-bold text-[var(--color6)]">
+          ${n.price}
+          </span>
+          </div>
+          );
+          })}
           </div>
           <div className="pt-3 mt-3 border-t border-[var(--color6)]/10 flex items-center justify-between">
             <span className="fontStyle8 font-bold text-[var(--color6)]">Total Paid</span>
@@ -425,15 +478,37 @@ export default function Checkout() {
             <div className="rounded-2xl border border-[var(--color6)]/10 bg-[var(--color11)] p-4 sm:p-5">
               <p className="fontStyle8 font-bold text-[var(--color6)] mb-4">Order Summary</p>
               <div className="space-y-3 pb-4 border-b border-[var(--color6)]/10">
-                {orderItems.map((item) => (
-                  <div key={item.id} className="flex items-center gap-3">
-                    <div className="w-12 h-8 rounded-lg overflow-hidden flex-shrink-0">
-                      <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
-                    </div>
-                    <span className="flex-1 fontStyle10 text-[var(--color6)] truncate">{item.name}</span>
-                    <span className="fontStyle10 font-bold text-[var(--color6)] shrink-0">${item.price}</span>
-                  </div>
-                ))}
+              {orderItems.map((item, index) => {
+              const n = norm(item);
+              return (
+              <div
+              key={n.id || `cart-item-${index}`}
+              className="flex items-center gap-3"
+              >
+              <div className="w-12 h-8 rounded-lg overflow-hidden flex-shrink-0">
+              {n.image ? (
+              <img
+              src={imgUrl(n.image)}
+              alt={n.name}
+              className="w-full h-full object-cover"
+              />
+              ) : (
+              <div className="w-full h-full flex items-center justify-center bg-[var(--color5)]">
+              <i className="bx bx-image text-[var(--color4)]"></i>
+              </div>
+              )}
+              </div>
+
+              <span className="flex-1 fontStyle10 text-[var(--color6)] truncate">
+              {n.name}
+              </span>
+
+              <span className="fontStyle10 font-bold text-[var(--color6)] shrink-0">
+              ${n.price}
+              </span>
+              </div>
+              );
+              })}
               </div>
               <div className="pt-4 space-y-2">
                 <div className="flex items-center justify-between">
@@ -454,7 +529,6 @@ export default function Checkout() {
             <div className="rounded-2xl border border-[var(--color6)]/10 bg-[var(--color11)] p-4">
               {[
                 { icon: "bx-shield-check", label: "Secure Checkout",  desc: "256-bit SSL encryption"    },
-                { icon: "bx-refresh",      label: "30-Day Refund",    desc: "No questions asked"         },
                 { icon: "bx-download",     label: "Instant Download", desc: "Access immediately"         },
               ].map((b, i) => (
                 <div key={i} className={`flex items-center gap-3 py-2.5 ${i < 2 ? "border-b border-[var(--color6)]/10" : ""}`}>

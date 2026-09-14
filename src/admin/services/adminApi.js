@@ -23,11 +23,25 @@ const request = async (endpoint, options = {}) => {
 
 // ─── Admin Auth APIs ──────────────────────────────────────────
 
-// Admin Login
+// Admin Login (step 1: email + password)
 export const adminLoginAPI = (email, password) =>
   request("/admin/login", {
     method: "POST",
     body: JSON.stringify({ email, password }),
+  });
+
+// Admin Verify OTP (step 2)
+export const adminVerifyOTPAPI = (email, otp) =>
+  request("/admin/verify-otp", {
+    method: "POST",
+    body: JSON.stringify({ email, otp }),
+  });
+
+// Admin Resend OTP
+export const adminResendOTPAPI = (email) =>
+  request("/admin/resend-otp", {
+    method: "POST",
+    body: JSON.stringify({ email }),
   });
 
 // Get admin profile (protected)
@@ -90,6 +104,12 @@ export const adminDeleteChatAPI = (id) =>
 export const adminDeleteTemplateChatAPI = (templateId) =>
   request(`/admin/chats/template/${templateId}`, { method: "DELETE" });
 
+export const adminReplyChatAPI = (id, message) =>
+  request(`/admin/chats/${id}/reply`, {
+    method: "POST",
+    body: JSON.stringify({ message }),
+  });
+
 // ─── Review APIs (Admin) ──────────────────────────────────────
 export const adminGetReviewsAPI = () =>
   request("/admin/reviews", { method: "GET" });
@@ -112,3 +132,35 @@ export const adminUpdateContactStatusAPI = (id, status) =>
  
 export const adminDeleteContactAPI = (id) =>
   request(`/admin/contacts/${id}`, { method: "DELETE" });
+
+export const adminReplyContactAPI = (id, reply) =>
+  request(`/admin/contacts/${id}/reply`, {
+    method: "POST",
+    body: JSON.stringify({ reply }),
+  });
+
+// ─── Blog APIs (Admin) ────────────────────────────────────────
+export const adminGetBlogsAPI = () =>
+  request("/admin/blogs", { method: "GET" });
+
+export const adminCreateBlogAPI = (formData) =>
+  request("/admin/blogs", { method: "POST", body: formData });
+
+export const adminUpdateBlogAPI = (id, formData) =>
+  request(`/admin/blogs/${id}`, { method: "PUT", body: formData });
+
+export const adminDeleteBlogAPI = (id) =>
+  request(`/admin/blogs/${id}`, { method: "DELETE" });
+
+// ─── Newsletter APIs (Admin) ──────────────────────────────────
+export const adminGetNewsletterAPI = () =>
+  request("/admin/newsletter", { method: "GET" });
+
+export const adminDeleteNewsletterAPI = (id) =>
+  request(`/admin/newsletter/${id}`, { method: "DELETE" });
+
+export const adminSendNewsletterAPI = (subject, message) =>
+  request("/admin/newsletter/send", {
+    method: "POST",
+    body: JSON.stringify({ subject, message }),
+  });

@@ -5,39 +5,6 @@ import SEOHead from "../components/SEOHead";
 import { registerAPI, verifyOTPAPI, resendOTPAPI } from "../services/api";
 import { useAuth } from "../context/AuthContext";
 
-// ── Floating bg shapes ──────────────────────────────────────
-function AuthDots() {
-  return (
-    <>
-      {Array.from({ length: 40 }).map((_, i) => (
-        <div
-          key={i}
-          className="w-[3px] h-[3px] rounded-full bg-white/15 absolute animate-pulse"
-          style={{
-            left: `${(i % 7) * 14 + 2}%`,
-            top: `${Math.floor(i / 7) * 16 + 4}%`,
-            animationDelay: `${(i * 0.12) % 1.5}s`,
-            animationDuration: `${2 + (i % 3)}s`,
-          }}
-        />
-      ))}
-    </>
-  );
-}
-
-function FloatingShapes() {
-  return (
-    <div className="absolute inset-0 overflow-hidden pointer-events-none">
-      <div className="w-[380px] h-[380px] border-2 border-white/10 rounded-full absolute -top-16 -left-24 animate-spin" style={{ animationDuration: "32s" }} />
-      <div className="w-[180px] h-[180px] border border-white/8 rounded-full absolute -bottom-5 -right-12 animate-spin" style={{ animationDuration: "22s", animationDirection: "reverse" }} />
-      <AuthDots />
-      <div className="w-16 h-16 border-2 border-white/20 rounded-2xl absolute top-[38%] right-9 animate-bounce" style={{ animationDuration: "5s", transform: "rotate(-15deg)" }} />
-      <div className="w-5 h-5 bg-white/15 rounded-md absolute bottom-40 left-[15%] animate-bounce" style={{ animationDuration: "4.5s", animationDelay: "0.8s", transform: "rotate(25deg)" }} />
-    </div>
-  );
-}
-
-// ── Password strength bar ────────────────────────────────────
 function StrengthBar({ password }) {
   if (!password) return null;
   const checks = [
@@ -58,11 +25,11 @@ function StrengthBar({ password }) {
     <div className="mt-2">
       <div className="flex gap-1 mb-1">
         {[0, 1, 2, 3].map((i) => (
-          <div key={i} className="flex-1 h-[3px] rounded-full transition-all duration-300"
-            style={{ background: i < score ? lvl.color : "rgba(0,0,0,0.08)" }} />
+          <div key={i} className={`flex-1 h-[3px] rounded-full transition-all duration-300 ${i < score ? "" : "bg-[var(--color6)]/10"}`}
+            style={i < score ? { background: lvl.color } : undefined} />
         ))}
       </div>
-      <span className="fontStyle10 font-semibold" style={{ color: lvl.color }}>{lvl.label} password</span>
+      <span className="fontStyle10 font-semibold" style={{ color: lvl.color }}>{lvl.label}</span>
     </div>
   );
 }
@@ -73,7 +40,6 @@ export default function Signup() {
   const navigate    = useNavigate();
   const { login }   = useAuth();
 
-  // ── Step: "form" | "otp" ──
   const [step, setStep] = useState("form");
 
   const [mounted, setMounted]         = useState(false);
@@ -81,12 +47,10 @@ export default function Signup() {
   const [showPass, setShowPass]       = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [agreed, setAgreed]           = useState(false);
-  const [focused, setFocused]         = useState("");
   const [loading, setLoading]         = useState(false);
   const [error, setError]             = useState("");
   const [success, setSuccess]         = useState("");
 
-  // OTP state
   const [digits, setDigits]       = useState(Array(OTP_LENGTH).fill(""));
   const [countdown, setCountdown] = useState(60);
   const [resending, setResending] = useState(false);
@@ -99,14 +63,12 @@ export default function Signup() {
     return () => clearTimeout(t);
   }, []);
 
-  // Step change hone pe mounted re-trigger karo (smooth transition)
   useEffect(() => {
     setMounted(false);
     const t = setTimeout(() => setMounted(true), 60);
     return () => clearTimeout(t);
   }, [step]);
 
-  // Countdown for resend
   useEffect(() => {
     if (step !== "otp" || countdown <= 0) return;
     const timer = setInterval(() => setCountdown((c) => c - 1), 1000);
@@ -121,13 +83,6 @@ export default function Signup() {
 
   const mismatch = form.confirm && form.confirm !== form.password;
 
-  const inputCls = `w-full pl-11 pr-4 py-[14px] rounded-[14px]
-    border-[1.5px] border-[var(--color6)]/10 bg-[var(--color5)]
-    fontStyle9 text-[var(--color6)] outline-none placeholder:text-[var(--color4)]
-    focus:border-[var(--color6)] focus:shadow-[4px_4px_0_var(--color6)]
-    transition-all duration-200`;
-
-  // ── STEP 1: Register ─────────────────────────────────────
   const handleRegister = async (e) => {
     e.preventDefault();
     if (!agreed || mismatch) return;
@@ -148,7 +103,6 @@ export default function Signup() {
     }
   };
 
-  // ── OTP input handlers ───────────────────────────────────
   const handleDigitChange = (value, index) => {
     if (!/^\d*$/.test(value)) return;
     const newDigits = [...digits];
@@ -160,8 +114,8 @@ export default function Signup() {
 
   const handleKeyDown = (e, index) => {
     if (e.key === "Backspace" && !digits[index] && index > 0) refs.current[index - 1]?.focus();
-    if (e.key === "ArrowLeft"  && index > 0)            refs.current[index - 1]?.focus();
-    if (e.key === "ArrowRight" && index < OTP_LENGTH - 1) refs.current[index + 1]?.focus();
+    if (e.key === "ArrowLeft"  && index > 0)                  refs.current[index - 1]?.focus();
+    if (e.key === "ArrowRight" && index < OTP_LENGTH - 1)     refs.current[index + 1]?.focus();
   };
 
   const handlePaste = (e) => {
@@ -174,7 +128,6 @@ export default function Signup() {
     refs.current[Math.min(pasted.length, OTP_LENGTH - 1)]?.focus();
   };
 
-  // ── STEP 2: Verify OTP ───────────────────────────────────
   const handleVerify = async () => {
     const otp = digits.join("");
     if (otp.length < OTP_LENGTH) { setError("Please enter the complete 6-digit OTP."); return; }
@@ -197,7 +150,6 @@ export default function Signup() {
     }
   };
 
-  // ── Resend OTP ───────────────────────────────────────────
   const handleResend = async () => {
     if (countdown > 0 || resending) return;
     setResending(true);
@@ -224,7 +176,7 @@ export default function Signup() {
 
   return (
     <div className="w-width py-12 sm:py-12 md:py-20">
-      <SEOHead title="Sign Up" description="Create a free TemplateWorld account to download templates and access exclusive features." />
+      <SEOHead title="Sign Up" description="Create a free {site} account to download templates and access exclusive features." />
 
       <BreadCrumb_Nav
         items={[
@@ -236,110 +188,129 @@ export default function Signup() {
 
       <div className="min-h-screen bg-[var(--color5)] flex items-center justify-center md:p-10">
         <div className={`w-full max-w-[920px] grid grid-cols-1 md:grid-cols-2 rounded-[20px] sm:rounded-[28px] overflow-hidden
-          border-2 border-[var(--color6)] shadow-[8px_8px_0_var(--color6)] sm:shadow-[14px_14px_0_var(--color6)]
+          border border-[var(--color6)]/10
           transition-all duration-500 ease-out
-          ${mounted ? "opacity-100 scale-100" : "opacity-0 scale-95"}`}>
+          ${mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}
+          style={{ boxShadow: "0 20px 60px -15px rgba(0,0,0,0.08), 0 0 0 1px rgba(0,0,0,0.02)" }}>
 
           {/* ── LEFT: Form / OTP panel ── */}
-          <div className="bg-[var(--color5)] p-8 sm:p-10 md:p-[52px_48px] flex flex-col justify-center overflow-y-auto">
+          <div className="bg-[var(--color5)] p-8 sm:p-10 md:p-[52px_48px] flex flex-col justify-center">
 
             {/* ════════ STEP 1: Register Form ════════ */}
             {step === "form" && (
               <>
                 <div className={fadeUp("delay-100")}>
-                  <Link to="/" className="inline-block mb-5 md:mb-7">
-                    <svg width="34" height="28" viewBox="0 0 36 30" fill="none">
-                      <path d="M0 0L9 15L0 30H8L18 15L8 0H0Z" fill="var(--color6)" />
-                      <path d="M14 0L23 15L14 30H22L32 15L22 0H14Z" fill="var(--color6)" opacity="0.4" />
-                    </svg>
-                  </Link>
+                  <div className="flex items-center justify-between mb-6 md:mb-8">
+                    <Link to="/" className="inline-block">
+                      <svg width="34" height="28" viewBox="0 0 36 30" fill="none">
+                        <path d="M0 0L9 15L0 30H8L18 15L8 0H0Z" fill="var(--color6)" />
+                        <path d="M14 0L23 15L14 30H22L32 15L22 0H14Z" fill="var(--color6)" opacity="0.4" />
+                      </svg>
+                    </Link>
+                  </div>
                   <p className="fontStyle10 font-bold tracking-[0.12em] uppercase text-[var(--color4)] mb-1">Get started</p>
-                  <h1 className="fontStyle4 font-black text-[var(--color6)] leading-[1.1] mb-1">Create account</h1>
-                  <p className="fontStyle9 text-[var(--color4)] mb-6 md:mb-7">
-                    Already have an account?{" "}
-                    <Link to="/login" className="text-[var(--color6)] font-bold underline underline-offset-4">Log in →</Link>
+                  <h1 className="fontStyle2 font-black text-[var(--color6)] leading-[1.15] mb-1.5">Create your account</h1>
+                  <p className="fontStyle9 text-[var(--color4)] mb-7 md:mb-8">
+                    Already registered?{" "}
+                    <Link to="/login" className="text-[var(--color6)] font-bold underline underline-offset-4 hover:opacity-70 transition-opacity">Log in</Link>
                   </p>
                 </div>
 
                 <form className="flex flex-col gap-4 sm:gap-[18px]" onSubmit={handleRegister}>
 
                   {error && (
-                    <div className="flex items-center gap-2 p-3 rounded-xl bg-red-50 border border-red-200">
-                      <i className="bx bx-error-circle text-red-400 text-base flex-shrink-0" />
-                      <p className="fontStyle10 text-red-500 font-semibold">{error}</p>
+                    <div className={`flex items-center gap-2.5 p-3.5 rounded-xl bg-red-50 border border-red-200 ${fadeUp()}`}>
+                      <div className="w-7 h-7 rounded-lg bg-red-100 flex items-center justify-center shrink-0">
+                        <svg className="w-3.5 h-3.5 text-red-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/>
+                        </svg>
+                      </div>
+                      <p className="fontStyle10 text-red-500 font-semibold m-0">{error}</p>
                     </div>
                   )}
 
-                  {/* Name */}
                   <div className={fadeUp("delay-150")}>
-                    <label className="fontStyle10 font-bold tracking-[0.1em] uppercase text-[var(--color4)] block mb-2">Full Name</label>
+                    <label className="fontStyle10 font-bold tracking-[0.1em] uppercase text-[var(--color4)] block mb-2">Full name</label>
                     <div className="relative">
-                      <i className={`bx bx-user absolute left-4 top-1/2 -translate-y-1/2 text-base transition-colors duration-200 ${focused === "name" ? "text-[var(--color6)]" : "text-[var(--color4)]"}`} />
+                      <svg className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--color4)] pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+                      </svg>
                       <input type="text" name="name" autoComplete="name" required placeholder="Aryan Mehta"
                         value={form.name}
-                        onFocus={() => setFocused("name")} onBlur={() => setFocused("")}
                         onChange={(e) => { setForm({ ...form, name: e.target.value }); setError(""); }}
-                        className={inputCls} />
+                        className="w-full min-h-[48px] bg-[var(--color5)] border border-[var(--color6)]/10 rounded-xl pl-10 pr-4 py-3 fontStyle9 text-[var(--color6)] outline-none placeholder:text-[var(--color4)] focus:border-[var(--color6)] focus:ring-2 focus:ring-[var(--color6)]/10 transition-all duration-200" />
                     </div>
                   </div>
 
-                  {/* Email */}
                   <div className={fadeUp("delay-200")}>
                     <label className="fontStyle10 font-bold tracking-[0.1em] uppercase text-[var(--color4)] block mb-2">Email</label>
                     <div className="relative">
-                      <i className={`bx bx-envelope absolute left-4 top-1/2 -translate-y-1/2 text-base transition-colors duration-200 ${focused === "email" ? "text-[var(--color6)]" : "text-[var(--color4)]"}`} />
+                      <svg className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--color4)] pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/>
+                      </svg>
                       <input type="email" name="email" autoComplete="email" required placeholder="you@example.com"
                         value={form.email}
-                        onFocus={() => setFocused("email")} onBlur={() => setFocused("")}
                         onChange={(e) => { setForm({ ...form, email: e.target.value }); setError(""); }}
-                        className={inputCls} />
+                        className="w-full min-h-[48px] bg-[var(--color5)] border border-[var(--color6)]/10 rounded-xl pl-10 pr-4 py-3 fontStyle9 text-[var(--color6)] outline-none placeholder:text-[var(--color4)] focus:border-[var(--color6)] focus:ring-2 focus:ring-[var(--color6)]/10 transition-all duration-200" />
                     </div>
                   </div>
 
-                  {/* Password */}
                   <div className={fadeUp("delay-[250ms]")}>
                     <label className="fontStyle10 font-bold tracking-[0.1em] uppercase text-[var(--color4)] block mb-2">Password</label>
                     <div className="relative">
-                      <i className={`bx bx-lock-alt absolute left-4 top-1/2 -translate-y-1/2 text-base transition-colors duration-200 ${focused === "pass" ? "text-[var(--color6)]" : "text-[var(--color4)]"}`} />
+                      <svg className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--color4)] pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                      </svg>
                       <input type={showPass ? "text" : "password"} name="password" autoComplete="new-password" required placeholder="Min. 8 characters"
-                        value={form.password} 
-                        onFocus={() => setFocused("pass")} onBlur={() => setFocused("")}
+                        value={form.password}
                         onChange={(e) => { setForm({ ...form, password: e.target.value }); setError(""); }}
-                        className={`${inputCls} pr-12`} />
+                        className="w-full min-h-[48px] bg-[var(--color5)] border border-[var(--color6)]/10 rounded-xl pl-10 pr-12 py-3 fontStyle9 text-[var(--color6)] outline-none placeholder:text-[var(--color4)] focus:border-[var(--color6)] focus:ring-2 focus:ring-[var(--color6)]/10 transition-all duration-200" />
                       <button type="button" onClick={() => setShowPass(!showPass)}
-                        className="absolute right-4 top-1/2 -translate-y-1/2 text-[var(--color4)] hover:text-[var(--color6)] transition-colors flex">
-                        <i className={`bx ${showPass ? "bx-hide" : "bx-show"} text-[17px]`} />
+                        className="absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 flex items-center justify-center text-[var(--color4)] hover:text-[var(--color6)] transition-colors bg-transparent border-none cursor-pointer rounded-lg">
+                        <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          {showPass
+                            ? <><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><path d="M1 1l22 22"/></>
+                            : <><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></>
+                          }
+                        </svg>
                       </button>
                     </div>
                     <StrengthBar password={form.password} />
                   </div>
 
-                  {/* Confirm */}
                   <div className={fadeUp("delay-300")}>
-                    <label className="fontStyle10 font-bold tracking-[0.1em] uppercase text-[var(--color4)] block mb-2">Confirm Password</label>
+                    <label className="fontStyle10 font-bold tracking-[0.1em] uppercase text-[var(--color4)] block mb-2">Confirm password</label>
                     <div className="relative">
-                      <i className={`bx bx-lock-alt absolute left-4 top-1/2 -translate-y-1/2 text-base transition-colors duration-200 ${focused === "confirm" ? "text-[var(--color6)]" : "text-[var(--color4)]"}`} />
+                      <svg className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--color4)] pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                      </svg>
                       <input type={showConfirm ? "text" : "password"} name="confirm" autoComplete="new-password" required placeholder="Repeat password"
                         value={form.confirm}
-                        onFocus={() => setFocused("confirm")} onBlur={() => setFocused("")}
                         onChange={(e) => setForm({ ...form, confirm: e.target.value })}
-                        className={`${inputCls} pr-12 ${mismatch ? "!border-red-400 !shadow-[3px_3px_0_#ef4444]" : ""}`} />
+                        className={`w-full min-h-[48px] bg-[var(--color5)] border rounded-xl pl-10 pr-12 py-3 fontStyle9 text-[var(--color6)] outline-none placeholder:text-[var(--color4)] focus:ring-2 transition-all duration-200 ${mismatch ? "border-red-400 focus:ring-red-200" : "border-[var(--color6)]/10 focus:border-[var(--color6)] focus:ring-[var(--color6)]/10"}`} />
                       <button type="button" onClick={() => setShowConfirm(!showConfirm)}
-                        className="absolute right-4 top-1/2 -translate-y-1/2 text-[var(--color4)] hover:text-[var(--color6)] transition-colors flex">
-                        <i className={`bx ${showConfirm ? "bx-hide" : "bx-show"} text-[17px]`} />
+                        className="absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 flex items-center justify-center text-[var(--color4)] hover:text-[var(--color6)] transition-colors bg-transparent border-none cursor-pointer rounded-lg">
+                        <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          {showConfirm
+                            ? <><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><path d="M1 1l22 22"/></>
+                            : <><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></>
+                          }
+                        </svg>
                       </button>
                     </div>
-                    {mismatch && <p className="fontStyle10 text-red-400 font-semibold mt-1">Passwords do not match</p>}
+                    {mismatch && <p className="fontStyle10 text-red-500 font-semibold mt-1.5">Passwords do not match</p>}
                   </div>
 
-                  {/* Terms */}
-                  <div className={`!flex !items-center gap-3 ${fadeUp("delay-[330ms]")}`}>
+                  <div className={`flex items-center gap-3 ${fadeUp("delay-[330ms]")}`}>
                     <button type="button" onClick={() => setAgreed(!agreed)}
-                      className={`w-5 h-5 rounded-md border-2 flex items-center justify-center flex-shrink-0 mt-0.5 transition-all duration-200
-                        ${agreed ? "bg-[var(--color6)] border-[var(--color6)] shadow-[2px_2px_0_var(--color4)]" : "border-[var(--color6)]/20 bg-[var(--color5)] hover:border-[var(--color6)]"}`}>
-                      {agreed && <i className="bx bx-check text-[var(--color5)] text-lg" />}
+                      className={`w-5 h-5 rounded-md border-2 flex items-center justify-center shrink-0 mt-0.5 transition-all duration-200 ${agreed ? "bg-[var(--color6)] border-[var(--color6)]" : "border-[var(--color6)]/20 hover:border-[var(--color6)]"}`}>
+                      {agreed && (
+                        <svg className="w-3 h-3 text-[var(--color5)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                          <polyline points="20 6 9 17 4 12"/>
+                        </svg>
+                      )}
                     </button>
-                    <p className="fontStyle10 text-[var(--color4)] leading-relaxed">
+                    <p className="fontStyle10 text-[var(--color4)] leading-relaxed m-0">
                       I agree to the{" "}
                       <Link to="/terms" className="text-[var(--color6)] font-bold underline underline-offset-4">Terms</Link>
                       {" "}and{" "}
@@ -347,42 +318,32 @@ export default function Signup() {
                     </p>
                   </div>
 
-                  {/* Submit */}
                   <div className={fadeUp("delay-[360ms]")}>
                     <button type="submit"
                       disabled={loading || !agreed || !!mismatch || !form.password || !form.name || !form.email}
-                      className="w-full py-[13px] sm:py-[15px] rounded-[14px] bg-[var(--color6)] text-[var(--color5)]
-                        fontStyle9 font-bold tracking-[0.04em] border-2 border-[var(--color6)]
-                        !flex !items-center justify-center gap-2
-                        hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[6px_6px_0_var(--color4)]
-                        active:translate-x-px active:translate-y-px active:shadow-[2px_2px_0_var(--color4)]
-                        disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200">
+                      className="w-full min-h-[48px] text-[var(--color5)] fontStyle9 font-semibold py-3 rounded-xl mt-1 flex items-center justify-center gap-2 border-none cursor-pointer transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                      style={{ background: "var(--color6)", boxShadow: "0 4px 14px rgba(0,0,0,0.1)" }}>
                       {loading
-                        ? <><i className="bx bx-loader-alt animate-spin text-base" /> Sending OTP…</>
-                        : <>Continue <i className="bx bx-right-arrow-alt text-lg" /></>
+                        ? <><svg className="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> Sending OTP…</>
+                        : <><span>Create account</span><svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg></>
                       }
                     </button>
                   </div>
 
-                  {/* Divider + OAuth */}
                   <div className={`flex items-center gap-3 ${fadeUp("delay-[380ms]")}`}>
-                    <div className="flex-1 h-px bg-[var(--color6)]/8" />
+                    <div className="flex-1 h-px bg-[var(--color6)]/10" />
                     <span className="fontStyle10 text-[var(--color4)]">or sign up with</span>
-                    <div className="flex-1 h-px bg-[var(--color6)]/8" />
+                    <div className="flex-1 h-px bg-[var(--color6)]/10" />
                   </div>
+
                   <div className={`flex gap-3 ${fadeUp("delay-[400ms]")}`}>
                     {[{ icon: "bxl-google", label: "Google" }, { icon: "bxl-github", label: "GitHub" }].map(({ icon, label }) => (
                       <button key={label} type="button"
-                        className="flex-1 py-2.5 sm:py-3 rounded-xl border-[1.5px] border-[var(--color6)]/12 bg-[var(--color5)]
-                          fontStyle9 font-semibold text-[var(--color6)]
-                          !flex !items-center justify-center gap-2
-                          hover:border-[var(--color6)] hover:shadow-[3px_3px_0_var(--color6)]
-                          hover:-translate-x-px hover:-translate-y-px transition-all duration-200">
+                        className="flex-1 py-2.5 sm:py-3 rounded-xl border border-[var(--color6)]/10 bg-transparent fontStyle9 font-semibold text-[var(--color6)] flex items-center justify-center gap-2 cursor-pointer hover:bg-[var(--color6)]/5 transition-all duration-200">
                         <i className={`bx ${icon} text-base`} /> {label}
                       </button>
                     ))}
                   </div>
-
                 </form>
               </>
             )}
@@ -391,19 +352,21 @@ export default function Signup() {
             {step === "otp" && (
               <>
                 <div className={fadeUp("delay-100")}>
-                  <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-[var(--color6)] flex items-center justify-center mb-5 md:mb-7">
-                    <i className="bx bx-envelope-open text-[var(--color5)] text-xl sm:text-2xl" />
+                  <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl flex items-center justify-center mb-5 md:mb-6"
+                    style={{ background: "var(--color6)" }}>
+                    <svg className="w-6 h-6 text-[var(--color5)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/>
+                    </svg>
                   </div>
                   <p className="fontStyle10 font-bold tracking-[0.12em] uppercase text-[var(--color4)] mb-1">Verify email</p>
-                  <h1 className="fontStyle4 font-black text-[var(--color6)] leading-[1.1] mb-1">Enter OTP</h1>
+                  <h1 className="fontStyle2 font-black text-[var(--color6)] leading-[1.15] mb-1.5">Enter OTP</h1>
                   <p className="fontStyle9 text-[var(--color4)] mb-7">
                     Code sent to{" "}
                     <span className="font-bold text-[var(--color6)]">{form.email}</span>
                   </p>
                 </div>
 
-                {/* OTP boxes */}
-                <div className={`flex gap-2 sm:gap-3 mb-5 ${fadeUp("delay-150")}`} onPaste={handlePaste}>
+                <div className={`flex gap-2 sm:gap-3 mb-6 ${fadeUp("delay-150")}`} onPaste={handlePaste}>
                   {digits.map((digit, i) => (
                     <input
                       key={i}
@@ -414,99 +377,85 @@ export default function Signup() {
                       value={digit}
                       onChange={(e) => handleDigitChange(e.target.value, i)}
                       onKeyDown={(e) => handleKeyDown(e, i)}
-                      className={`w-11 h-14 sm:w-12 sm:h-16 text-center rounded-[14px]
-                        border-[1.5px] bg-[var(--color5)] outline-none
-                        fontStyle4 font-black text-[var(--color6)] text-xl
-                        caret-transparent transition-all duration-200
-                        ${digit
-                          ? "border-[var(--color6)] shadow-[3px_3px_0_var(--color6)]"
-                          : "border-[var(--color6)]/15 focus:border-[var(--color6)] focus:shadow-[3px_3px_0_var(--color6)]"
-                        }
-                        ${error ? "!border-red-400" : ""}`}
-                    />
+                      className={`w-11 h-14 sm:w-12 sm:h-16 text-center rounded-xl border-2 bg-[var(--color5)] outline-none fontStyle2 font-bold text-[var(--color6)] caret-transparent transition-all duration-200 ${digit ? "border-[var(--color6)]" : "border-[var(--color6)]/10 focus:border-[var(--color6)]"} ${error ? "!border-red-400" : ""}`} />
                   ))}
                 </div>
 
-                {/* Error / Success */}
                 {error && (
-                  <div className={`flex items-center gap-2 mb-4 p-3 rounded-xl bg-red-50 border border-red-200 ${fadeUp()}`}>
-                    <i className="bx bx-error-circle text-red-400 text-base flex-shrink-0" />
-                    <p className="fontStyle10 text-red-500 font-semibold">{error}</p>
+                  <div className={`flex items-center gap-2.5 p-3.5 rounded-xl bg-red-50 border border-red-200 mb-5 ${fadeUp()}`}>
+                    <div className="w-7 h-7 rounded-lg bg-red-100 flex items-center justify-center shrink-0">
+                      <svg className="w-3.5 h-3.5 text-red-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/>
+                      </svg>
+                    </div>
+                    <p className="fontStyle10 text-red-500 font-semibold m-0">{error}</p>
                   </div>
                 )}
                 {success && (
-                  <div className={`flex items-center gap-2 mb-4 p-3 rounded-xl bg-green-50 border border-green-200 ${fadeUp()}`}>
-                    <i className="bx bx-check-circle text-green-500 text-base flex-shrink-0" />
-                    <p className="fontStyle10 text-green-600 font-semibold">{success}</p>
+                  <div className={`flex items-center gap-2.5 p-3.5 rounded-xl bg-green-50 border border-green-200 mb-5 ${fadeUp()}`}>
+                    <div className="w-7 h-7 rounded-lg bg-green-100 flex items-center justify-center shrink-0">
+                      <svg className="w-3.5 h-3.5 text-green-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <polyline points="20 6 9 17 4 12"/>
+                      </svg>
+                    </div>
+                    <p className="fontStyle10 text-green-600 font-semibold m-0">{success}</p>
                   </div>
                 )}
 
-                {/* Verify button */}
                 <div className={fadeUp("delay-200")}>
                   <button type="button" onClick={handleVerify}
                     disabled={loading || otp.length < OTP_LENGTH}
-                    className="w-full py-[13px] sm:py-[15px] rounded-[14px] bg-[var(--color6)] text-[var(--color5)]
-                      fontStyle9 font-bold tracking-[0.04em] border-2 border-[var(--color6)]
-                      !flex !items-center justify-center gap-2
-                      hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[6px_6px_0_var(--color4)]
-                      active:translate-x-px active:translate-y-px
-                      disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200">
+                    className="w-full min-h-[48px] text-[var(--color5)] fontStyle9 font-semibold py-3 rounded-xl flex items-center justify-center gap-2 border-none cursor-pointer transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                    style={{ background: "var(--color6)", boxShadow: "0 4px 14px rgba(0,0,0,0.1)" }}>
                     {loading
-                      ? <><i className="bx bx-loader-alt animate-spin text-base" /> Verifying…</>
-                      : <>Verify & Create Account <i className="bx bx-right-arrow-alt text-lg" /></>
+                      ? <><svg className="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> Verifying…</>
+                      : <><span>Verify & create account</span><svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg></>
                     }
                   </button>
                 </div>
 
-                {/* Resend */}
                 <div className={`flex items-center gap-3 mt-4 ${fadeUp("delay-[250ms]")}`}>
-                  <div className="flex-1 h-px bg-[var(--color6)]/8" />
+                  <div className="flex-1 h-px bg-[var(--color6)]/10" />
                   <span className="fontStyle10 text-[var(--color4)]">or</span>
-                  <div className="flex-1 h-px bg-[var(--color6)]/8" />
+                  <div className="flex-1 h-px bg-[var(--color6)]/10" />
                 </div>
 
                 <div className={fadeUp("delay-300")}>
                   <button type="button" onClick={handleResend}
                     disabled={countdown > 0 || resending}
-                    className="w-full mt-3 py-[11px] rounded-[14px] border-[1.5px] border-[var(--color6)]/15
-                      text-[var(--color4)] fontStyle9 font-semibold
-                      !flex !items-center justify-center gap-2
-                      hover:border-[var(--color6)] hover:text-[var(--color6)]
-                      hover:shadow-[3px_3px_0_var(--color6)] hover:-translate-x-px hover:-translate-y-px
-                      disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-200">
+                    className="w-full mt-3 py-[11px] rounded-xl border border-[var(--color6)]/10 text-[var(--color4)] fontStyle9 font-semibold flex items-center justify-center gap-2 bg-transparent cursor-pointer hover:border-[var(--color6)] hover:text-[var(--color6)] transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed">
                     {resending
-                      ? <><i className="bx bx-loader-alt animate-spin text-base" /> Resending…</>
+                      ? <><svg className="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> Resending…</>
                       : countdown > 0
-                        ? <><i className="bx bx-time-five text-base" /> Resend in {countdown}s</>
-                        : <><i className="bx bx-refresh text-base" /> Resend OTP</>
+                        ? <><svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Resend in {countdown}s</>
+                        : <><svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg> Resend OTP</>
                     }
                   </button>
                 </div>
 
-                {/* Back to form */}
                 <div className={`mt-5 ${fadeUp("delay-[330ms]")}`}>
                   <button type="button" onClick={() => { setStep("form"); setError(""); setDigits(Array(OTP_LENGTH).fill("")); }}
-                    className="flex items-center justify-center gap-2 w-full fontStyle9 font-semibold text-[var(--color4)]
-                      hover:text-[var(--color6)] transition-colors duration-200 group">
-                    <i className="bx bx-arrow-back text-base transition-transform duration-300 group-hover:-translate-x-1" />
-                    Back to Signup
+                    className="flex items-center justify-center gap-2 w-full fontStyle9 font-semibold text-[var(--color4)] hover:text-[var(--color6)] transition-colors duration-200 bg-transparent border-none cursor-pointer py-2">
+                    <svg className="w-4 h-4 transition-transform duration-300 group-hover:-translate-x-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                    Back to signup
                   </button>
                 </div>
               </>
             )}
-
           </div>
 
-          {/* ── RIGHT: Black decorative panel ── */}
-          <div className="bg-[var(--color6)] p-8 sm:p-10 md:p-[60px_48px] flex flex-col justify-center relative min-h-[260px] md:min-h-[620px]">
-            <FloatingShapes />
+          {/* ── RIGHT: Dark decorative panel ── */}
+          <div className="bg-[var(--color6)] p-8 sm:p-10 md:p-[60px_48px] flex flex-col justify-center relative min-h-[260px] md:min-h-[620px] overflow-hidden">
+            <div className="absolute inset-0 opacity-[0.03] pointer-events-none"
+              style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")` }} />
+
+            <div className="absolute top-1/3 -right-20 w-[300px] h-[300px] rounded-full opacity-[0.06] pointer-events-none"
+              style={{ background: "radial-gradient(circle, #fff 0%, transparent 70%)" }} />
+            <div className="absolute -bottom-20 -left-20 w-[250px] h-[250px] rounded-full opacity-[0.04] pointer-events-none"
+              style={{ background: "radial-gradient(circle, #fff 0%, transparent 70%)" }} />
 
             <div className={`relative z-10 ${slideIn("delay-100")}`}>
-              {/* <span className="inline-block px-4 py-1.5 rounded-full border border-white/20
-                fontStyle10 font-bold tracking-[0.1em] uppercase text-[var(--color10)] mb-5 md:mb-7">
-                Join 50,000+ brands
-              </span> */}
-              <h2 className="fontStyle3 font-black text-[var(--color5)] leading-[1.1] mb-4 md:mb-5">
+              <h2 className="fontStyle3 font-black text-[var(--color5)] leading-[1.15] mb-4 md:mb-5">
                 Your brand deserves better.
               </h2>
               <p className="fontStyle9 text-[var(--color10)] leading-[1.75] max-w-[270px]">
@@ -514,21 +463,17 @@ export default function Signup() {
               </p>
             </div>
 
-            {/* Step indicator — right panel me */}
             <div className={`hidden sm:flex flex-col gap-4 relative z-10 mt-8 md:mt-10 ${slideIn("delay-200")}`}>
               {[
-                { label: "Fill your details", icon: "bx-user-plus",    done: step === "otp", active: step === "form" },
-                { label: "Verify your email", icon: "bx-check-circle", done: false,          active: step === "otp"  },
-                { label: "Start exploring",   icon: "bx-rocket",       done: false,          active: false           },
+                { label: "Fill your details",   icon: "bx-user-plus",    done: step === "otp", active: step === "form" },
+                { label: "Verify your email",   icon: "bx-check-circle", done: false,          active: step === "otp"  },
+                { label: "Start exploring",     icon: "bx-rocket",       done: false,          active: false           },
               ].map(({ label, icon, done, active }) => (
                 <div key={label} className="flex items-center gap-3">
-                  <div className={`w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 transition-all duration-300
-                    ${active ? "bg-[var(--color5)]" : done ? "bg-white/30" : "bg-white/10"}`}>
-                    <i className={`bx ${done ? "bx-check" : icon} text-sm
-                      ${active ? "text-[var(--color6)]" : "text-[var(--color5)]"}`} />
+                  <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 transition-all duration-300 ${active ? "bg-[var(--color5)]" : done ? "bg-[var(--color5)]/40" : "bg-[var(--color5)]/15"}`}>
+                    <i className={`bx ${done ? "bx-check" : icon} text-sm ${active ? "text-[var(--color6)]" : "text-[var(--color5)]"}`} />
                   </div>
-                  <span className={`fontStyle9 font-medium transition-all duration-300
-                    ${active ? "text-[var(--color5)]" : "text-[var(--color10)]"}`}>
+                  <span className={`fontStyle9 font-medium transition-all duration-300 ${active ? "text-[var(--color5)] font-bold" : "text-[var(--color5)]/60"}`}>
                     {label}
                   </span>
                 </div>
@@ -539,7 +484,7 @@ export default function Signup() {
               <p className="fontStyle10 text-[var(--color10)] leading-relaxed">
                 "The best investment we made for our brand."
               </p>
-              <span className="fontStyle10 text-white/30 mt-1 block">— Rajeev Sharma, Founder</span>
+              {/* <span className="fontStyle10 text-[var(--color10)] opacity-60 mt-1 block">— Rajeev Sharma, Founder</span> */}
             </div>
           </div>
 

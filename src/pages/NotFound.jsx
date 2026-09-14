@@ -1,5 +1,6 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
+import SEOHead from "../components/SEOHead";
 
 // ─────────────────────────────────────────────
 // DATA
@@ -72,61 +73,10 @@ function GlitchText({ text }) {
 }
 
 // ─────────────────────────────────────────────
-// CIRCULAR COUNTDOWN TIMER
-// ─────────────────────────────────────────────
-
-function Countdown({ seconds, onComplete }) {
-  const [left, setLeft] = useState(seconds);
-  const circumference = 2 * Math.PI * 15;
-
-  useEffect(() => {
-    if (left <= 0) { onComplete?.(); return; }
-    const t = setTimeout(() => setLeft((l) => l - 1), 1000);
-    return () => clearTimeout(t);
-  }, [left, onComplete]);
-
-  const progress = (seconds - left) / seconds;
-
-  return (
-    <div className="inline-flex items-center gap-3">
-      <div className="relative w-10 h-10 flex-shrink-0">
-        <svg className="w-full h-full -rotate-90" viewBox="0 0 36 36">
-          <circle
-            cx="18" cy="18" r="15"
-            fill="none"
-            stroke="var(--color6)"
-            strokeOpacity=".08"
-            strokeWidth="2.5"
-          />
-          <circle
-            cx="18" cy="18" r="15"
-            fill="none"
-            stroke="var(--color6)"
-            strokeWidth="2.5"
-            strokeLinecap="round"
-            strokeDasharray={circumference}
-            strokeDashoffset={circumference * (1 - progress)}
-            style={{ transition: "stroke-dashoffset 1s linear" }}
-          />
-        </svg>
-        <span className="absolute inset-0 flex items-center justify-center fontStyle10 font-bold text-[var(--color6)]">
-          {left}
-        </span>
-      </div>
-      <span className="fontStyle9 text-[var(--color4)]">
-        Auto-redirecting to home in{" "}
-        <span className="font-semibold text-[var(--color6)]">{left}s</span>
-      </span>
-    </div>
-  );
-}
-
-// ─────────────────────────────────────────────
 // MAIN 404 PAGE
 // ─────────────────────────────────────────────
 
 export default function NotFound() {
-  const navigate         = useNavigate();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -145,6 +95,11 @@ export default function NotFound() {
       className="relative min-h-screen flex items-center justify-center py-24 overflow-hidden bg-[var(--color5)]"
       aria-labelledby="nf-heading"
     >
+      <SEOHead
+        title="Page Not Found"
+        description="The page you're looking for may have been moved, renamed, or removed."
+        noindex={true}
+      />
 
       {/* ── Dot grid background ── */}
       <div
@@ -251,11 +206,6 @@ export default function NotFound() {
                 <i className="bx bx-home-alt-2 text-lg text-[var(--color6)]"></i>
               </span>
             </Link>
-          </div>
-
-          {/* Countdown */}
-          <div style={fadeUp(0.33)}>
-            <Countdown seconds={15} onComplete={() => navigate("/")} />
           </div>
 
           {/* Divider */}

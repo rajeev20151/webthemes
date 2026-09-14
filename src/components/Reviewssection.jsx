@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { getTemplateReviewsAPI, createTemplateReviewAPI, deleteTemplateReviewAPI } from "../services/api";
-import { useAuth } from "../context/AuthContext";
+import { useGetTemplateReviewsQuery, useCreateReviewMutation, useDeleteReviewMutation } from "../store/apiSlice";
+import { useSelector } from "react-redux";
 
 /* ── Star Rating (keep your existing one or use this) ── */
 function StarRating({ rating, size = "text-sm" }) {
@@ -44,42 +44,33 @@ function timeAgo(date) {
    Props: templateId (from useParams)
 ════════════════════════════════════════════ */
 export default function ReviewsSection({ templateId,onCountChange }) {
-  const { token: contextToken, user } = useAuth();
-  const token = contextToken || localStorage.getItem("token");
+  const { user } = useSelector((state) => state.auth);
+  const token = localStorage.getItem("token");
   const userName = user?.name || JSON.parse(localStorage.getItem("user") || "{}").name || "You";
+
+  const { data: reviewsData, isLoading: loading } = useGetTemplateReviewsQuery(templateId, { skip: !templateId });
+  const [createReview, { isLoading: sending }] = useCreateReviewMutation();
+  const [deleteReview] = useDeleteReviewMutation();
 
   const [reviews, setReviews]   = useState([]);
   const [stats, setStats]       = useState({ total: 0, avgRating: 0 });
-  const [loading, setLoading]   = useState(true);
   const [rating, setRating]     = useState(0);
   const [title, setTitle]       = useState("");
   const [comment, setComment]   = useState("");
   const [error, setError]       = useState("");
-  const [sending, setSending]   = useState(false);
   const [showForm, setShowForm] = useState(false);
 
-  /* ── Fetch reviews ── */
-  const fetchReviews = async () => {
-    try {
-      const res = await getTemplateReviewsAPI(templateId);
-      if (res.success) {
-        setReviews(res.reviews);
-        setStats(res.stats);
-        
-        if (onCountChange) {
-        onCountChange(res.stats.total);
-        }
-      }
-    } catch (err) {
-      console.error("Failed to fetch reviews", err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
+  /* ── Sync reviews from RTK Query data ── */
   useEffect(() => {
-    if (templateId) fetchReviews();
-  }, [templateId]);
+    if (reviewsData?.success) {
+      setReviews(reviewsData.reviews);
+      setStats(reviewsData.stats);
+      
+      if (onCountChange) {
+        onCountChange(reviewsData.stats.total);
+      }
+    }
+  }, [reviewsData, onCountChange]);
 
   /* ── Submit review ── */
   const submitReview = async () => {
@@ -87,14 +78,14 @@ export default function ReviewsSection({ templateId,onCountChange }) {
     if (!title.trim())   return setError("Please add a review title.");
     if (!comment.trim()) return setError("Please write a comment.");
 
-    setSending(true);
     setError("");
     try {
-      const res = await createTemplateReviewAPI(templateId, {
+      const res = await createReview({
+        templateId,
         rating,
         title: title.trim(),
         comment: comment.trim(),
-      });
+      }).unwrap();
       if (res.success) {
         setReviews((prev) => [res.review, ...prev]);
         setStats((prev) => ({
@@ -112,15 +103,13 @@ export default function ReviewsSection({ templateId,onCountChange }) {
       }
     } catch (err) {
       setError("Network error — please try again");
-    } finally {
-      setSending(false);
     }
   };
 
   /* ── Delete review ── */
   const handleDelete = async (reviewId) => {
     try {
-      const res = await deleteTemplateReviewAPI(reviewId);
+      const res = await deleteReview(reviewId).unwrap();
       if (res.success) {
         setReviews((prev) => prev.filter((r) => r._id !== reviewId));
         // Recalc stats
@@ -271,8 +260,8 @@ export default function ReviewsSection({ templateId,onCountChange }) {
                   <p className="fontStyle9 text-[var(--color8)] leading-relaxed whitespace-pre-line">{r.comment}</p>
                 </div>
 
-                {/* Delete button — own review or admin */}
-                {token && (r.userName === userName || user?.role === "admin") && (
+                {/* Delete button — admin only */}
+                {token && user?.role === "admin" && (
                   <button
                     onClick={() => handleDelete(r._id)}
                     className="fontStyle10 text-[var(--color4)] hover:text-red-400 transition-colors duration-200 cursor-pointer bg-transparent border-none p-0 flex items-center gap-1 shrink-0"

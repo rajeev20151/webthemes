@@ -40,7 +40,7 @@ useEffect(() => {
           sessionStorage.removeItem("admin");
           setAdmin(null);
           setToken(null);
-          window.location.href = "/admin/login";
+          window.location.href = "/batman/login";
         }, remainingTime);
       }
     } catch {

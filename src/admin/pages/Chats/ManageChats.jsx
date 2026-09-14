@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { adminGetChatsAPI, adminDeleteChatAPI, adminDeleteTemplateChatAPI } from "../../services/adminApi";
+﻿import { useState, useEffect } from "react";
+import { adminGetChatsAPI, adminDeleteChatAPI, adminDeleteTemplateChatAPI, adminReplyChatAPI } from "../../services/adminApi";
 
 /* ── Time Ago Helper ── */
 function timeAgo(date) {
@@ -29,6 +29,9 @@ export default function ManageChats() {
   const [search, setSearch]     = useState("");
   const [filter, setFilter]     = useState("all"); // all | top-level | replies
   const [deleteId, setDeleteId] = useState(null);   // confirm delete modal
+  const [replyTo, setReplyTo]   = useState(null);   // chat being replied to
+  const [replyMsg, setReplyMsg] = useState("");
+  const [replySending, setReplySending] = useState(false);
 
   /* ── Fetch ── */
   const fetchChats = async () => {
@@ -60,6 +63,25 @@ export default function ManageChats() {
       }
     } catch (err) {
       console.error(err);
+    }
+  };
+
+  /* ── Reply to a chat message ── */
+  const handleReply = async () => {
+    if (!replyMsg.trim() || !replyTo) return;
+    setReplySending(true);
+    try {
+      const res = await adminReplyChatAPI(replyTo._id, replyMsg);
+      if (res.success) {
+        setChats((prev) => [res.chat, ...prev]);
+        setReplyTo(null);
+        setReplyMsg("");
+        fetchChats();
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setReplySending(false);
     }
   };
 
@@ -98,7 +120,7 @@ export default function ManageChats() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <p className="fs8 admin-muted">Loading chats...</p>
+        <p className="fontStyle9 admin-muted">Loading chats...</p>
       </div>
     );
   }
@@ -109,13 +131,13 @@ export default function ManageChats() {
       {/* ── Header ── */}
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div>
-          <h1 className="fs5 font-bold admin-text">Manage Chats</h1>
-          <p className="fs9 admin-muted mt-1">{stats.total} messages across {stats.templatesWithChats} templates</p>
+          <h1 className="fontStyle7 font-bold admin-text">Manage Chats</h1>
+          <p className="fontStyle9 admin-muted mt-1">{stats.total} messages across {stats.templatesWithChats} templates</p>
         </div>
       </div>
 
       {/* ── Stats Cards ── */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {statCards.map((card, i) => (
           <div
             key={i}
@@ -123,11 +145,14 @@ export default function ManageChats() {
           >
             <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${card.color} bg-current/10`}
                  style={{ background: "var(--admin-hover)" }}>
-              <i className={`bx ${card.icon} text-xl ${card.color}`}></i>
+              {card.icon === "bx-chat" && <svg className={`w-5 h-5 ${card.color}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>}
+              {card.icon === "bx-message-dots" && <svg className={`w-5 h-5 ${card.color}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"/></svg>}
+              {card.icon === "bx-reply" && <svg className={`w-5 h-5 ${card.color}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/></svg>}
+              {card.icon === "bx-layout" && <svg className={`w-5 h-5 ${card.color}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"/></svg>}
             </div>
             <div>
-              <p className={`fs5 font-bold ${card.color}`}>{card.value}</p>
-              <p className="fs10 admin-muted">{card.label}</p>
+              <p className={`fontStyle7 font-bold ${card.color}`}>{card.value}</p>
+              <p className="fontStyle9 admin-muted">{card.label}</p>
             </div>
           </div>
         ))}
@@ -138,13 +163,13 @@ export default function ManageChats() {
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           {/* Search */}
           <div className="relative w-full sm:w-80">
-            <i className="bx bx-search absolute left-3 top-1/2 -translate-y-1/2 text-lg admin-muted"></i>
+            <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-[var(--admin-muted)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
             <input
               type="text"
               placeholder="Search name, message, or template..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 rounded-xl fs9 outline-none transition-colors duration-200"
+              className="w-full pl-10 pr-4 py-2.5 rounded-xl fontStyle9 outline-none transition-colors duration-200"
               style={{
                 background: "var(--admin-bg)",
                 color: "var(--admin-text)",
@@ -159,7 +184,7 @@ export default function ManageChats() {
               <button
                 key={tab.key}
                 onClick={() => setFilter(tab.key)}
-                className={`px-4 py-1.5 rounded-full fs9 font-medium transition-all duration-200 cursor-pointer border ${
+                className={`px-4 py-1.5 rounded-full fontStyle9 font-medium transition-all duration-200 cursor-pointer border ${
                   filter === tab.key
                     ? "text-white border-transparent"
                     : "admin-text border-[var(--admin-border)] hover:border-[var(--admin-accent)]"
@@ -180,7 +205,7 @@ export default function ManageChats() {
             <thead>
               <tr style={{ borderBottom: "1px solid var(--admin-border)" }}>
                 {["USER", "MESSAGE", "TEMPLATE", "TYPE", "DATE", "ACTIONS"].map((h) => (
-                  <th key={h} className="px-5 py-3.5 text-left fs10 font-semibold admin-muted uppercase tracking-wider">
+                  <th key={h} className="px-5 py-3.5 text-left fontStyle9 font-semibold admin-muted uppercase tracking-wider">
                     {h}
                   </th>
                 ))}
@@ -190,9 +215,9 @@ export default function ManageChats() {
               {filtered.length === 0 ? (
                 <tr>
                   <td colSpan={6} className="px-5 py-12 text-center">
-                    <i className="bx bx-chat text-4xl admin-muted block mb-2"></i>
-                    <p className="fs8 font-semibold admin-text">No messages found</p>
-                    <p className="fs9 admin-muted">
+                    <svg className="w-10 h-10 text-[var(--admin-muted)] block mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+                    <p className="fontStyle9 font-semibold admin-text">No messages found</p>
+                    <p className="fontStyle9 admin-muted">
                       {search ? "Try a different search term." : "No discussion messages yet."}
                     </p>
                   </td>
@@ -214,9 +239,9 @@ export default function ManageChats() {
                       <td className="px-5 py-3.5">
                         <div className="flex items-center gap-3 min-w-[140px]">
                           <div className={`w-8 h-8 rounded-full ${avatarColor(chat.userName)} flex items-center justify-center flex-shrink-0`}>
-                            <span className="text-white fs10 font-bold">{initials}</span>
+                            <span className="text-white fontStyle9 font-bold">{initials}</span>
                           </div>
-                          <span className="fs9 font-semibold admin-text truncate max-w-[120px]">
+                          <span className="fontStyle9 font-semibold admin-text truncate max-w-[120px]">
                             {chat.userName}
                           </span>
                         </div>
@@ -224,14 +249,14 @@ export default function ManageChats() {
 
                       {/* MESSAGE */}
                       <td className="px-5 py-3.5 max-w-[300px]">
-                        <p className="fs9 admin-subtext truncate" title={chat.message}>
+                        <p className="fontStyle9 admin-subtext truncate" title={chat.message}>
                           {chat.message}
                         </p>
                       </td>
 
                       {/* TEMPLATE */}
                       <td className="px-5 py-3.5 max-w-[200px]">
-                        <p className="fs10 admin-subtext truncate" title={templateTitle}>
+                        <p className="fontStyle9 admin-subtext truncate" title={templateTitle}>
                           {templateTitle}
                         </p>
                       </td>
@@ -239,36 +264,55 @@ export default function ManageChats() {
                       {/* TYPE */}
                       <td className="px-5 py-3.5">
                         <span
-                          className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full fs10 font-medium ${
+                          className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full fontStyle9 font-medium ${
                             isReply
                               ? "admin-badge-warning"
                               : "admin-badge-success"
                           }`}
                         >
-                          <i className={`bx ${isReply ? "bx-reply" : "bx-message-dots"} text-xs`}></i>
+                          {isReply 
+                            ? <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/></svg>
+                            : <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"/></svg>
+                          }
                           {isReply ? "Reply" : "Message"}
                         </span>
                       </td>
 
                       {/* DATE */}
                       <td className="px-5 py-3.5">
-                        <span className="fs9 admin-muted whitespace-nowrap">{timeAgo(chat.createdAt)}</span>
+                        <span className="fontStyle9 admin-muted whitespace-nowrap">{timeAgo(chat.createdAt)}</span>
                       </td>
 
                       {/* ACTIONS */}
                       <td className="px-5 py-3.5">
-                        <button
-                          onClick={() => setDeleteId(chat._id)}
-                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg fs10 font-medium cursor-pointer transition-all duration-200 border"
-                          style={{
-                            background: "var(--admin-danger-soft)",
-                            color: "var(--admin-danger)",
-                            borderColor: "transparent",
-                          }}
-                        >
-                          <i className="bx bx-trash text-sm"></i>
-                          Delete
-                        </button>
+                        <div className="flex items-center gap-2">
+                          {!isReply && (
+                            <button
+                              onClick={() => { setReplyTo(chat); setReplyMsg(""); }}
+                              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg fontStyle9 font-medium cursor-pointer transition-all duration-200 border"
+                              style={{
+                                background: "var(--admin-info-soft)",
+                                color: "var(--admin-info)",
+                                borderColor: "transparent",
+                              }}
+                            >
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/></svg>
+                              Reply
+                            </button>
+                          )}
+                          <button
+                            onClick={() => setDeleteId(chat._id)}
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg fontStyle9 font-medium cursor-pointer transition-all duration-200 border"
+                            style={{
+                              background: "var(--admin-danger-soft)",
+                              color: "var(--admin-danger)",
+                              borderColor: "transparent",
+                            }}
+                          >
+                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                             Delete
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   );
@@ -281,7 +325,7 @@ export default function ManageChats() {
         {/* Footer */}
         {filtered.length > 0 && (
           <div className="px-5 py-3" style={{ borderTop: "1px solid var(--admin-border)" }}>
-            <p className="fs9 admin-muted">
+            <p className="fontStyle9 admin-muted">
               Showing <strong className="admin-text">{filtered.length}</strong> of <strong className="admin-text">{chats.length}</strong> messages
             </p>
           </div>
@@ -290,31 +334,84 @@ export default function ManageChats() {
 
       {/* ── Delete Confirmation Modal ── */}
       {deleteId && (
-        <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black/50 backdrop-blur-sm">
-          <div className="admin-card p-6 w-full max-w-sm mx-4 space-y-4">
+        <div className="fixed inset-0 z-[9998] flex items-center justify-center bg-black/50 backdrop-blur-sm">
+          <div className="admin-card p-6 w-full max-w-sm mx-4 space-y-4 relative z-[9999]">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: "var(--admin-danger-soft)" }}>
-                <i className="bx bx-trash text-xl" style={{ color: "var(--admin-danger)" }}></i>
+                <svg className="w-5 h-5" style={{ color: "var(--admin-danger)" }} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
               </div>
               <div>
-                <p className="fs7 font-bold admin-text">Delete Message?</p>
-                <p className="fs9 admin-muted">This will also remove all replies.</p>
+                <p className="fontStyle7 font-bold admin-text">Delete Message?</p>
+                <p className="fontStyle9 admin-muted">This will also remove all replies.</p>
               </div>
             </div>
             <div className="flex items-center gap-3 pt-2">
               <button
                 onClick={() => setDeleteId(null)}
-                className="flex-1 py-2.5 rounded-xl fs9 font-semibold admin-text cursor-pointer transition-all duration-200"
+                className="flex-1 py-2.5 rounded-xl fontStyle9 font-semibold admin-text cursor-pointer transition-all duration-200"
                 style={{ background: "var(--admin-hover)", border: "1px solid var(--admin-border)" }}
               >
                 Cancel
               </button>
               <button
                 onClick={() => handleDelete(deleteId)}
-                className="flex-1 py-2.5 rounded-xl fs9 font-bold text-white cursor-pointer hover:opacity-90 transition-opacity duration-200 border-none"
+                className="flex-1 py-2.5 rounded-xl fontStyle9 font-bold text-white cursor-pointer hover:opacity-90 transition-opacity duration-200 border-none"
                 style={{ background: "var(--admin-danger)" }}
               >
                 Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Reply Modal ── */}
+      {replyTo && (
+        <div
+          className="fixed inset-0 z-[9998] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
+          onClick={() => setReplyTo(null)}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="admin-card w-full max-w-md p-6 relative z-[9999]"
+          >
+            <button
+              onClick={() => setReplyTo(null)}
+              className="absolute top-4 right-4 text-[var(--admin-muted)] hover:text-[var(--admin-text)] p-1.5 rounded-lg cursor-pointer transition-colors duration-200 hover:bg-[var(--admin-hover)]"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 6L6 18M6 6l12 12"/></svg>
+            </button>
+
+            <p className="fontStyle7 font-bold admin-text m-0 mb-4">Reply to {replyTo.userName}</p>
+
+            <div className="p-3 rounded-xl mb-4" style={{ background: "var(--admin-hover)" }}>
+              <p className="fontStyle9 font-semibold admin-text m-0">{replyTo.userName}</p>
+              <p className="fontStyle9 admin-subtext m-0 mt-1">{replyTo.message}</p>
+            </div>
+
+            <textarea
+              value={replyMsg}
+              onChange={(e) => setReplyMsg(e.target.value)}
+              placeholder="Type your reply..."
+              rows={4}
+              className="admin-input resize-none mb-4"
+            />
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => setReplyTo(null)}
+                className="flex-1 py-2.5 rounded-xl fontStyle9 font-semibold admin-text cursor-pointer transition-all duration-200"
+                style={{ background: "var(--admin-hover)", border: "1px solid var(--admin-border)" }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleReply}
+                disabled={!replyMsg.trim() || replySending}
+                className="flex-1 py-2.5 rounded-xl fontStyle9 font-bold text-white cursor-pointer hover:opacity-90 transition-opacity duration-200 border-none disabled:opacity-50 disabled:cursor-not-allowed"
+                style={{ background: "var(--admin-accent)" }}
+              >
+                {replySending ? "Sending..." : "Send Reply"}
               </button>
             </div>
           </div>

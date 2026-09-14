@@ -1,4 +1,4 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 
 /* ════════════════════════════════════════════
    INITIAL DATA
@@ -89,7 +89,7 @@ const IconStar   = () => <svg width="12" height="12" viewBox="0 0 24 24" fill="c
 
 /* ── Shared class strings ── */
 const inp = [
-  "w-full px-3 py-2 rounded-xl outline-none transition-colors fs9 box-border",
+  "w-full min-h-[44px] px-3 py-2 rounded-xl outline-none transition-colors fontStyle9 box-border",
   "bg-[var(--admin-bg)]",
   "border border-[var(--admin-border)]",
   "text-[var(--admin-text)]",
@@ -97,7 +97,7 @@ const inp = [
   "focus:border-[var(--admin-accent)]",
 ].join(" ");
 
-const lbl = "block fs10 font-semibold uppercase tracking-wider text-[var(--admin-muted)] mb-1";
+const lbl = "block fontStyle9 font-semibold uppercase tracking-wider text-[var(--admin-muted)] mb-1";
 
 /* ════════════════════════════════════════════
    PLAN MODAL
@@ -120,14 +120,14 @@ function PlanModal({ mode, data, onClose, onSave }) {
 
   return (
     <div
-      className="fixed inset-0 z-[9999] flex items-center justify-center p-4 backdrop-blur-sm"
+      className="fixed inset-0 z-[9998] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
       onClick={(e) => e.target === e.currentTarget && onClose()}
     >
-      <div className="w-full max-w-2xl max-h-[90vh] rounded-2xl overflow-hidden shadow-2xl flex flex-col bg-[var(--admin-surface)] border border-[var(--admin-border)]">
+      <div className="w-full max-w-2xl max-h-[90vh] rounded-2xl overflow-hidden shadow-2xl flex flex-col bg-[var(--admin-surface)] border border-[var(--admin-border)] z-[9999]">
 
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 flex-shrink-0 border-b border-[var(--admin-border)]">
-          <p className="fs7 font-bold m-0 text-[var(--admin-text)]">
+          <p className="fontStyle7 font-bold m-0 text-[var(--admin-text)]">
             {mode === "add" ? "Add New Plan" : "Edit Plan"}
           </p>
           <button
@@ -175,7 +175,7 @@ function PlanModal({ mode, data, onClose, onSave }) {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label className={lbl}>Price Period</label>
-              <select className={inp} value={form.period} onChange={(e) => set("period", e.target.value)}>
+              <select className="admin-select" value={form.period} onChange={(e) => set("period", e.target.value)}>
                 <option value="one-time">one-time</option>
                 <option value="/month">/month</option>
                 <option value="/year">/year</option>
@@ -195,7 +195,7 @@ function PlanModal({ mode, data, onClose, onSave }) {
             >
               <span className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow-sm transition-all duration-200 ${form.highlight ? "left-[22px]" : "left-0.5"}`} />
             </button>
-            <span className="fs9 font-semibold text-[var(--admin-text)]">
+            <span className="fontStyle9 font-semibold text-[var(--admin-text)]">
               Mark as "Best Value" (highlighted card)
             </span>
           </div>
@@ -213,7 +213,7 @@ function PlanModal({ mode, data, onClose, onSave }) {
               <label className={`${lbl} mb-0`}>Features</label>
               <button
                 onClick={addFeature}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg fs10 font-bold cursor-pointer border-0 bg-[var(--admin-accent-soft)] text-[var(--admin-accent)] hover:opacity-80 transition-opacity"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg fontStyle9 font-bold cursor-pointer border-0 bg-[var(--admin-accent-soft)] text-[var(--admin-accent)] hover:opacity-80 transition-opacity"
               >
                 <IconPlus /> Add Feature
               </button>
@@ -256,13 +256,13 @@ function PlanModal({ mode, data, onClose, onSave }) {
         <div className="flex items-center justify-end gap-3 px-6 py-4 flex-shrink-0 border-t border-[var(--admin-border)]">
           <button
             onClick={onClose}
-            className="px-5 py-2 rounded-xl fs9 font-semibold cursor-pointer border border-[var(--admin-border)] bg-transparent text-[var(--admin-subtext)] hover:bg-[var(--admin-hover)] transition-colors"
+            className="px-5 py-2 rounded-xl fontStyle9 font-semibold cursor-pointer border border-[var(--admin-border)] bg-transparent text-[var(--admin-subtext)] hover:bg-[var(--admin-hover)] transition-colors"
           >
             Cancel
           </button>
           <button
             onClick={handleSave}
-            className="px-6 py-2 rounded-xl fs9 font-bold text-white border-0 cursor-pointer hover:opacity-90 transition-opacity bg-[var(--admin-accent)] [background:var(--admin-accent-grad)] shadow-[0_4px_14px_var(--admin-accent-soft)]"
+            className="px-6 py-2 rounded-xl fontStyle9 font-bold text-white border-0 cursor-pointer hover:opacity-90 transition-opacity bg-[var(--admin-accent)] [background:var(--admin-accent-grad)] shadow-[0_4px_14px_var(--admin-accent-soft)]"
           >
             {mode === "add" ? "Add Plan" : "Save Changes"}
           </button>
@@ -279,10 +279,10 @@ function PlanModal({ mode, data, onClose, onSave }) {
 function DeleteConfirm({ name, onClose, onConfirm }) {
   return (
     <div
-      className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+      className="fixed inset-0 z-[9998] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
       onClick={(e) => e.target === e.currentTarget && onClose()}
     >
-      <div className="w-full max-w-sm rounded-2xl p-8 text-center shadow-2xl bg-[var(--admin-surface)] border border-[var(--admin-border)]">
+      <div className="w-full max-w-sm rounded-2xl p-8 text-center shadow-2xl bg-[var(--admin-surface)] border border-[var(--admin-border)] z-[9999]">
         <div className="w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-4 bg-[var(--admin-danger-soft)]">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
             <path d="M3 6h18M8 6V4h8v2M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"
@@ -291,20 +291,20 @@ function DeleteConfirm({ name, onClose, onConfirm }) {
             />
           </svg>
         </div>
-        <p className="fs7 font-bold m-0 mb-2 text-[var(--admin-text)]">Delete Plan?</p>
-        <p className="fs9 m-0 mb-6 text-[var(--admin-muted)]">
+        <p className="fontStyle7 font-bold m-0 mb-2 text-[var(--admin-text)]">Delete Plan?</p>
+        <p className="fontStyle9 m-0 mb-6 text-[var(--admin-muted)]">
           "<strong className="text-[var(--admin-subtext)]">{name}</strong>" permanently delete ho jayega.
         </p>
         <div className="flex items-center justify-center gap-3">
           <button
             onClick={onClose}
-            className="px-6 py-2 rounded-xl fs9 font-semibold cursor-pointer border border-[var(--admin-border)] bg-transparent text-[var(--admin-subtext)] hover:bg-[var(--admin-hover)] transition-colors"
+            className="px-6 py-2 rounded-xl fontStyle9 font-semibold cursor-pointer border border-[var(--admin-border)] bg-transparent text-[var(--admin-subtext)] hover:bg-[var(--admin-hover)] transition-colors"
           >
             Cancel
           </button>
           <button
             onClick={onConfirm}
-            className="px-6 py-2 rounded-xl fs9 font-bold text-white border-0 cursor-pointer bg-[var(--admin-danger)] hover:opacity-85 transition-opacity"
+            className="px-6 py-2 rounded-xl fontStyle9 font-bold text-white border-0 cursor-pointer bg-[var(--admin-danger)] hover:opacity-85 transition-opacity"
           >
             Delete
           </button>
@@ -325,7 +325,7 @@ function PricingPreviewCard({ plan, billing, onEdit, onDelete }) {
 
       {plan.highlight && (
         <div className="flex justify-center -mb-px relative z-[2]">
-          <span className="px-5 py-1.5 rounded-full fs10 font-bold tracking-widest text-white [background:var(--admin-accent-grad)]">
+          <span className="px-5 py-1.5 rounded-full fontStyle9 font-bold tracking-widest text-white [background:var(--admin-accent-grad)]">
             {plan.highlightLabel}
           </span>
         </div>
@@ -338,19 +338,19 @@ function PricingPreviewCard({ plan, billing, onEdit, onDelete }) {
       }`}>
 
         {/* Badge */}
-        <span className="self-start px-3 py-1 rounded-full fs10 font-bold tracking-widest mb-4 border border-[var(--admin-border)] text-[var(--admin-text)]">
+        <span className="self-start px-3 py-1 rounded-full fontStyle9 font-bold tracking-widest mb-4 border border-[var(--admin-border)] text-[var(--admin-text)]">
           {plan.badge}
         </span>
 
         {/* Name + Subtitle */}
-        <p className="fs6 font-bold m-0 mb-1 text-[var(--admin-text)]">{plan.name}</p>
-        <p className="fs10 m-0 mb-4 text-[var(--admin-muted)]">{plan.subtitle}</p>
+        <p className="fontStyle7 font-bold m-0 mb-1 text-[var(--admin-text)]">{plan.name}</p>
+        <p className="fontStyle9 m-0 mb-4 text-[var(--admin-muted)]">{plan.subtitle}</p>
 
         {/* Price */}
         <div className="flex items-baseline gap-1 mb-4">
-          <span className="fs10 text-[var(--admin-muted)]">Rs.</span>
+          <span className="fontStyle9 text-[var(--admin-muted)]">Rs.</span>
           <span className="font-bold text-4xl leading-none text-[var(--admin-text)]">{price}</span>
-          <span className="fs10 text-[var(--admin-muted)]">{plan.period}</span>
+          <span className="fontStyle9 text-[var(--admin-muted)]">{plan.period}</span>
         </div>
 
         {/* Divider */}
@@ -366,7 +366,7 @@ function PricingPreviewCard({ plan, billing, onEdit, onDelete }) {
                   : <svg width="8" height="8" viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18M6 6l12 12" stroke="var(--admin-muted)" strokeWidth="2.5" strokeLinecap="round"/></svg>
                 }
               </span>
-              <span className={`fs10 ${f.included ? "text-[var(--admin-text)]" : "text-[var(--admin-muted)] line-through"}`}>
+              <span className={`fontStyle9 ${f.included ? "text-[var(--admin-text)]" : "text-[var(--admin-muted)] line-through"}`}>
                 {f.text}
               </span>
             </div>
@@ -374,7 +374,7 @@ function PricingPreviewCard({ plan, billing, onEdit, onDelete }) {
         </div>
 
         {/* CTA preview */}
-        <div className="w-full flex items-center justify-between px-4 py-3 rounded-xl fs10 font-semibold mb-3 bg-[var(--admin-surface)] text-[var(--admin-text)]">
+        <div className="w-full flex items-center justify-between px-4 py-3 rounded-xl fontStyle9 font-semibold mb-3 bg-[var(--admin-surface)] text-[var(--admin-text)]">
           <span>{plan.cta}</span>
           <IconArrow />
         </div>
@@ -383,13 +383,13 @@ function PricingPreviewCard({ plan, billing, onEdit, onDelete }) {
         <div className="flex gap-2">
           <button
             onClick={() => onEdit(plan)}
-            className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl fs10 font-semibold cursor-pointer border-0 transition-all duration-200 bg-[var(--admin-accent-soft)] text-[var(--admin-accent)] hover:opacity-80"
+            className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl fontStyle9 font-semibold cursor-pointer border-0 transition-all duration-200 bg-[var(--admin-accent-soft)] text-[var(--admin-accent)] hover:opacity-80"
           >
             <IconEdit /> Edit
           </button>
           <button
             onClick={() => onDelete(plan)}
-            className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl fs10 font-semibold cursor-pointer border-0 transition-all duration-200 bg-[var(--admin-danger-soft)] text-[var(--admin-danger)] hover:opacity-80"
+            className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl fontStyle9 font-semibold cursor-pointer border-0 transition-all duration-200 bg-[var(--admin-danger-soft)] text-[var(--admin-danger)] hover:opacity-80"
           >
             <IconDelete /> Delete
           </button>
@@ -427,14 +427,14 @@ export default function ManagePricing() {
     <div className="p-4 sm:p-7">
 
       {/* Page Header */}
-      <div className="flex items-center justify-between flex-wrap gap-3 mb-8">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-8">
         <div>
-          <h1 className="fs6 font-bold m-0 text-[var(--admin-text)]">Manage Pricing</h1>
-          <p className="fs10 mt-1 m-0 text-[var(--admin-muted)]">{plans.length} plans · Live preview below</p>
+          <h1 className="fontStyle7 font-bold m-0 text-[var(--admin-text)]">Manage Pricing</h1>
+          <p className="fontStyle9 mt-1 m-0 text-[var(--admin-muted)]">{plans.length} plans · Live preview below</p>
         </div>
         <button
           onClick={() => setModal({ mode: "add", data: { ...emptyPlan, features: [{ text: "", included: true }] } })}
-          className="flex items-center gap-2 px-5 py-2.5 rounded-xl fs9 font-bold text-white border-0 cursor-pointer hover:opacity-90 transition-opacity [background:var(--admin-accent-grad)] shadow-[0_4px_14px_rgba(99,102,241,0.3)]"
+          className="flex items-center gap-2 px-5 py-2.5 rounded-xl fontStyle9 font-bold text-white border-0 cursor-pointer hover:opacity-90 transition-opacity [background:var(--admin-accent-grad)] shadow-[0_4px_14px_rgba(99,102,241,0.3)]"
         >
           <IconPlus /> Add Plan
         </button>
@@ -447,7 +447,7 @@ export default function ManagePricing() {
         <div className="flex items-center justify-between px-4 sm:px-6 py-3 border-b border-[var(--admin-border)]">
           <div className="flex items-center gap-2 text-[var(--admin-muted)]">
             <IconStar />
-            <span className="fs10 font-bold tracking-widest uppercase">Live Preview</span>
+            <span className="fontStyle9 font-bold tracking-widest uppercase">Live Preview</span>
           </div>
 
           {/* Monthly / Yearly toggle */}
@@ -456,7 +456,7 @@ export default function ManagePricing() {
               <button
                 key={b}
                 onClick={() => setBilling(b)}
-                className={`flex items-center gap-2 px-3 sm:px-4 py-1.5 rounded-full fs10 font-semibold cursor-pointer border-0 transition-all duration-200 capitalize ${
+                className={`flex items-center gap-2 px-3 sm:px-4 py-1.5 rounded-full fontStyle9 font-semibold cursor-pointer border-0 transition-all duration-200 capitalize ${
                   billing === b
                     ? "bg-[var(--admin-accent)] text-[#0f172a]"
                     : "bg-transparent text-[var(--admin-text)]"
@@ -465,7 +465,7 @@ export default function ManagePricing() {
                 {b === "yearly" ? (
                   <>
                     Yearly
-                    <span className={`px-1.5 py-0.5 rounded-full fs10 font-bold ${
+                    <span className={`px-1.5 py-0.5 rounded-full fontStyle9 font-bold ${
                       billing === "yearly"
                         ? "[background:var(--admin-accent-grad)] text-white"
                         : "bg-[var(--admin-hover)] text-[var(--admin-text)]"
@@ -482,7 +482,7 @@ export default function ManagePricing() {
         {/* Cards grid */}
         <div className="p-4 sm:p-8">
           {plans.length === 0 ? (
-            <p className="text-center py-16 fs9 text-[var(--admin-muted)]">
+            <p className="text-center py-16 fontStyle9 text-[var(--admin-muted)]">
               No plans yet. Click "Add Plan" to create one.
             </p>
           ) : (

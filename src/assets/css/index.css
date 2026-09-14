@@ -3,7 +3,7 @@
 
 /* ---======== commens style ========------- */
 /* ---=================================----- */
-html,body{ display:block; background: var(--color5); overflow-x: hidden; transition: background 0.4s ease, color 0.4s ease;}
+html{scroll-behavior:smooth}html,body{ display:block; background: var(--color5); overflow-x:clip; transition: background 0.4s ease, color 0.4s ease;}
 a{text-decoration:none !important; }
 
 /* ---======== scroll styles ==========------- */
@@ -17,16 +17,16 @@ a{text-decoration:none !important; }
 :root {
     /* ---======= web-color =======---- */
     /* ---========================----- */
-    --color1:#d2e6f9;
-    --color2: linear-gradient(135deg, #1f2937, #111827);
-    --color3: linear-gradient(135deg, #2563eb, #1d4ed8);
-    --color4:#818181; 
-    --color5:#fff;
-    --color6:#000;  
-    --color7:#000;  
-    --color8:#494949;
-    --color9:#232323;
-    --color10:rgba(255, 255, 255, 0.4);
+    --color1:#e0e7ff;
+    --color2: linear-gradient(135deg, #111827, #030712);
+    --color3: linear-gradient(135deg, #4f46e5, #7c3aed);
+    --color4:#6b7280; 
+    --color5:#ffffff;
+    --color6:#111827;  
+    --color7:#111827;  
+    --color8:#374151;
+    --color9:#111827;
+    --color10:rgba(255, 255, 255, 0.8);
     --color11: rgba(0,0,0,0.03);
 
    /* ---======== Auth CSS Variables ========----- */
@@ -115,7 +115,7 @@ a{text-decoration:none !important; }
 
 /* ---======== commen class ========----- */
 /* ---==============================----- */
-.w-width{width:90%; margin: 0 auto;}
+.w-width{width:90%; margin: 0 auto; max-width: 1280px;}
 .bg-blur{backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);}
 
 .glow-gold{background:radial-gradient(circle,#fdc830,transparent 70%);}
@@ -123,6 +123,61 @@ a{text-decoration:none !important; }
 
 .bg-color2{background: var(--color2);}
 .bg-color3{background: var(--color3);}
+
+/* ---======== Wix-style professional cards ========----- */
+/* ---==========================================----- */
+.wix-card {
+  background: #ffffff;
+  border: 1px solid rgba(0,0,0,0.06);
+  border-radius: 16px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.03);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.wix-card:hover {
+  box-shadow: 0 4px 16px rgba(0,0,0,0.08), 0 8px 32px rgba(0,0,0,0.04);
+  transform: translateY(-2px);
+}
+
+/* ---======== Wix-style buttons ========----- */
+/* ---====================================----- */
+.wix-btn {display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 28px; font-weight: 600;
+  font-size: 0.95rem; border-radius: 8px; transition: all 0.2s ease; cursor: pointer; border: none;}
+.wix-btn-primary {background: var(--color3);
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(79, 70, 229, 0.25);
+}
+.wix-btn-primary:hover {
+  box-shadow: 0 4px 16px rgba(79, 70, 229, 0.35);
+  transform: translateY(-1px);
+}
+.wix-btn-secondary {
+  background: transparent;
+  color: var(--color6);
+  border: 1.5px solid rgba(0,0,0,0.12);
+}
+.wix-btn-secondary:hover {
+  border-color: var(--color6);
+  background: rgba(0,0,0,0.02);
+}
+
+/* ---======== Wix-style section spacing ========----- */
+/* ---==========================================----- */
+.wix-section {
+  padding: 80px 0;
+}
+.wix-section-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--color6);
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+.wix-section-subtitle {
+  font-size: 1.125rem;
+  color: var(--color4);
+  line-height: 1.6;
+  max-width: 600px;
+}
 
 /* ---======== Hero section style ========----- */
 /* ---====================================----- */
@@ -162,34 +217,89 @@ a{text-decoration:none !important; }
 /* ---======== header section style ========----- */
 /* ---======================================----- */
 
-.header{z-index: 9999;}
+.header{z-index: 9999; position: sticky; top: 0; transition: background 0.3s ease, box-shadow 0.3s ease;}
 .header nav ul li a{padding:1.8rem 0; cursor: pointer; }
 .header nav ul li ul li a{padding:1rem !important;}
 
-@media (max-width:1200px) {
-   .header{padding:1rem 0;} 
+/* Header blur on scroll (sticky glass effect) */
+.header_scrolled {
+  background: color-mix(in srgb, var(--color5) 80%, transparent) !important;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: 0 1px 20px rgba(0,0,0,0.06);
 }
+
+@media (max-width:1200px) {
+   .header{padding:0.75rem 0;}
+}
+
+/* ---======== mobile overlay slide-in ========----- */
+.mobile_overlay {
+  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s ease;
+}
+.mobile_overlay_closed {
+  transform: translateX(100%);
+  opacity: 0;
+  pointer-events: none !important;
+}
+.mobile_overlay_open {
+  transform: translateX(0);
+  opacity: 1;
+  pointer-events: auto !important;
+}
+
+/* Mobile overlay nav items */
+.mobile_nav_item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 20px;
+  border-radius: 14px;
+  transition: background 0.2s ease, transform 0.15s ease;
+  margin-bottom: 4px;
+}
+.mobile_nav_item:active {
+  transform: scale(0.97);
+}
+.mobile_nav_item:hover {
+  background: var(--color11);
+}
+
+/* Mobile search bar */
+.mobile_search_bar {
+  border: 1.5px solid var(--color11);
+  border-radius: 999px;
+  padding: 12px 18px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--color11);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.mobile_search_bar:focus-within {
+  border-color: var(--color6);
+  box-shadow: 0 0 0 3px rgba(99,102,241,0.08);
+}
+
+/* Hide scrollbar utility */
+.no-scrollbar { scrollbar-width: none; -ms-overflow-style: none; }
+.no-scrollbar::-webkit-scrollbar { display: none; }
 
 
 /* ---======== scroll-icon section section style ========----- */
 /* ---===================================================----- */
 .scroll_icon_section {overflow: hidden;position: relative;}
 .scroll_icon_section::before,
-.scroll_icon_section::after {content: "";position: absolute;top: 0;width: 120px;height: 100%;z-index: 5;pointer-events: none;}
-.scroll_icon_section::before {left: 0; background: linear-gradient(to right, var(--color5), transparent);}
-.scroll_icon_section::after {right: 0; background: linear-gradient(to left, var(--color5), transparent);}
-.scroll_icon_section .scroll_track {width: max-content;animation: scrollMove 4s linear infinite;}
-.scroll_icon_section .scroll_track2 {width: max-content;animation: scrollMove2 4s linear infinite;}
+.scroll_icon_section::after {content: "";position: absolute;top: 0;width: 180px;height: 100%;z-index: 5;pointer-events: none;}
+.scroll_icon_section::before {left: 0; background: linear-gradient(to right, var(--color5) 10%, transparent);}
+.scroll_icon_section::after {right: 0; background: linear-gradient(to left, var(--color5) 10%, transparent);}
+.scroll_icon_section .scroll_track {width: max-content;animation: scrollMove 12s linear infinite;}
+.scroll_icon_section .scroll_track2 {width: max-content;animation: scrollMove2 12s linear infinite;}
 .scroll_icon_section .scroll_item {flex-shrink: 0;}
-/* .scroll_icon_section .scroll_item .scroll_icon {background: var(--color2);}  */  
-.scroll_icon_section .scroll_track .scroll_list .scroll_item{box-shadow: rgba(0, 0, 0, 0.05) 0px 6px 24px 0px, rgba(0, 0, 0, 0.08) 0px 0px 0px 1px;}
-/* ANIMATION - RIGHT - SIDE */
 @keyframes scrollMove { 
 0% {transform: translateX(0);}
 100% {transform: translateX(-10%);}
 }
-
-/* ANIMATION - LEFT - SIDE */
 @keyframes scrollMove2 {
 0% {transform: translateX(-10%);}
 100% {transform: translateX(0%);}

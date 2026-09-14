@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+﻿import { useState, useEffect } from "react";
 import {
   adminGetContentsAPI,
   adminCreateContentAPI,
@@ -39,13 +39,13 @@ const IconSocial = () => <svg width="14" height="14" viewBox="0 0 24 24" fill="n
 
 /* ── Shared input ── */
 const inp = [
-  "w-full px-3 py-2.5 rounded-xl outline-none transition-colors fs9 box-border",
+  "w-full px-3 py-2.5 rounded-xl outline-none transition-colors fontStyle9 box-border",
   "bg-(--admin-bg) border border-(--admin-border)",
   "text-(--admin-text) placeholder:text-(--admin-muted)",
   "focus:border-(--admin-accent)",
 ].join(" ");
 
-const lbl = "block fs10 font-semibold uppercase tracking-wider text-(--admin-muted) mb-1.5";
+const lbl = "block fontStyle9 font-semibold uppercase tracking-wider text-(--admin-muted) mb-1.5";
 
 /* Social platform options */
 const platformOptions = [
@@ -81,14 +81,14 @@ function ContentModal({ mode, data, onClose, onSave, saving }) {
 
   return (
     <div
-      className="fixed inset-0 z-9999 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+      className="fixed inset-0 z-[9998] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
       onClick={(e) => e.target === e.currentTarget && onClose()}
     >
-      <div className="w-full max-w-lg rounded-2xl overflow-hidden shadow-2xl bg-(--admin-surface) border border-(--admin-border)">
+      <div className="w-full max-w-lg rounded-2xl overflow-hidden shadow-2xl bg-(--admin-surface) border border-(--admin-border) relative z-[9999]">
 
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-(--admin-border)">
-          <p className="fs7 font-bold m-0 text-(--admin-text)">
+        <div className="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-(--admin-border)">
+          <p className="fontStyle7 font-bold m-0 text-(--admin-text)">
             {mode === "add" ? "Add New Section" : "Edit Section"}
           </p>
           <button
@@ -100,7 +100,7 @@ function ContentModal({ mode, data, onClose, onSave, saving }) {
         </div>
 
         {/* Body */}
-        <div className="px-6 py-5 flex flex-col gap-4 max-h-[70vh] overflow-y-auto">
+        <div className="p-4 sm:p-6 flex flex-col gap-4 max-h-[70vh] overflow-y-auto">
 
           {/* Section Key */}
           <div>
@@ -111,7 +111,7 @@ function ContentModal({ mode, data, onClose, onSave, saving }) {
               onChange={(e) => set("section", e.target.value.toLowerCase().replace(/\s+/g, "-"))}
               placeholder="e.g. hero, about, features, footer"
             />
-            <p className="fs10 text-(--admin-muted) mt-1 m-0">Lowercase only, no spaces (use dash)</p>
+            <p className="fontStyle9 text-(--admin-muted) mt-1 m-0">Lowercase only, no spaces (use dash)</p>
           </div>
 
           {/* Title */}
@@ -161,7 +161,7 @@ function ContentModal({ mode, data, onClose, onSave, saving }) {
 
           {/* ════ Footer Section ════ */}
           <div className="flex items-center gap-2 pt-2">
-            <span className="fs10 font-bold uppercase tracking-widest text-(--admin-accent)">
+            <span className="fontStyle9 font-bold uppercase tracking-widest text-(--admin-accent)">
               Footer &amp; Branding
             </span>
             <div className="flex-1 h-px bg-(--admin-border)" />
@@ -191,7 +191,7 @@ function ContentModal({ mode, data, onClose, onSave, saving }) {
 
           {/* ════ Social Links Section ════ */}
           <div className="flex items-center gap-2 pt-2">
-            <span className="fs10 font-bold uppercase tracking-widest text-(--admin-accent)">
+            <span className="fontStyle9 font-bold uppercase tracking-widest text-(--admin-accent)">
               Social Links
             </span>
             <div className="flex-1 h-px bg-(--admin-border)" />
@@ -200,7 +200,7 @@ function ContentModal({ mode, data, onClose, onSave, saving }) {
           {form.socialLinks.map((link, i) => (
             <div key={i} className="flex items-center gap-2">
               <select
-                className={`${inp} w-36 shrink-0`}
+                className="admin-select w-36 shrink-0"
                 value={link.platform}
                 onChange={(e) => updateSocialLink(i, "platform", e.target.value)}
               >
@@ -226,7 +226,7 @@ function ContentModal({ mode, data, onClose, onSave, saving }) {
 
           <button
             onClick={addSocialLink}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-xl fs10 font-semibold cursor-pointer border border-dashed border-(--admin-border) bg-transparent text-(--admin-muted) hover:border-(--admin-accent) hover:text-(--admin-accent) transition-colors w-fit"
+            className="flex items-center gap-1.5 px-4 py-2 rounded-xl fontStyle9 font-semibold cursor-pointer border border-dashed border-(--admin-border) bg-transparent text-(--admin-muted) hover:border-(--admin-accent) hover:text-(--admin-accent) transition-colors w-fit"
           >
             <IconPlus /> Add Social Link
           </button>
@@ -234,17 +234,17 @@ function ContentModal({ mode, data, onClose, onSave, saving }) {
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-(--admin-border)">
+        <div className="flex items-center justify-end gap-3 px-4 sm:px-6 py-3 sm:py-4 border-t border-(--admin-border)">
           <button
             onClick={onClose}
-            className="px-5 py-2 rounded-xl fs9 font-semibold cursor-pointer border border-(--admin-border) bg-transparent text-(--admin-subtext) hover:bg-(--admin-hover) transition-colors"
+            className="px-5 py-2 rounded-xl fontStyle9 font-semibold cursor-pointer border border-(--admin-border) bg-transparent text-(--admin-subtext) hover:bg-(--admin-hover) transition-colors"
           >
             Cancel
           </button>
           <button
             onClick={handleSave}
             disabled={saving}
-            className="px-6 py-2 rounded-xl fs9 font-bold text-white border-0 cursor-pointer hover:opacity-90 transition-opacity"
+            className="px-6 py-2 rounded-xl fontStyle9 font-bold text-white border-0 cursor-pointer hover:opacity-90 transition-opacity"
             style={{ background: "var(--admin-accent-grad)", boxShadow: "0 4px 14px rgba(99,102,241,0.25)", opacity: saving ? 0.6 : 1 }}
           >
             {saving ? "Saving..." : mode === "add" ? "Add Section" : "Save Changes"}
@@ -271,15 +271,15 @@ function JsonModal({ item, onClose }) {
 
   return (
     <div
-      className="fixed inset-0 z-9999 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+      className="fixed inset-0 z-[9998] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
       onClick={(e) => e.target === e.currentTarget && onClose()}
     >
-      <div className="w-full max-w-lg rounded-2xl overflow-hidden shadow-2xl bg-(--admin-surface) border border-(--admin-border)">
-        <div className="flex items-center justify-between px-6 py-4 border-b border-(--admin-border)">
+      <div className="w-full max-w-lg rounded-2xl overflow-hidden shadow-2xl bg-(--admin-surface) border border-(--admin-border) relative z-[9999]">
+        <div className="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-(--admin-border)">
           <div className="flex items-center gap-2">
             <span className="text-(--admin-accent)"><IconJson /></span>
-            <p className="fs7 font-bold m-0 text-(--admin-text)">JSON Preview</p>
-            <span className={`px-2.5 py-0.5 rounded-full fs10 font-bold ${sectionColor(item.section)}`}>
+            <p className="fontStyle7 font-bold m-0 text-(--admin-text)">JSON Preview</p>
+            <span className={`px-2.5 py-0.5 rounded-full fontStyle9 font-bold ${sectionColor(item.section)}`}>
               {item.section}
             </span>
           </div>
@@ -290,11 +290,11 @@ function JsonModal({ item, onClose }) {
             <IconClose />
           </button>
         </div>
-        <div className="px-6 py-5">
+        <div className="p-4 sm:p-6">
           <div className="relative rounded-xl overflow-hidden" style={{ background: "#0d1117" }}>
             <button
               onClick={handleCopy}
-              className="absolute top-3 right-3 flex items-center gap-1.5 px-3 py-1.5 rounded-lg fs10 font-semibold border-0 cursor-pointer transition-all"
+              className="absolute top-3 right-3 flex items-center gap-1.5 px-3 py-1.5 rounded-lg fontStyle9 font-semibold border-0 cursor-pointer transition-all"
               style={{
                 background: copied ? "rgba(52,211,153,0.15)" : "rgba(255,255,255,0.08)",
                 color: copied ? "#34d399" : "rgba(255,255,255,0.5)",
@@ -303,7 +303,7 @@ function JsonModal({ item, onClose }) {
               <IconCopy /> {copied ? "Copied!" : "Copy"}
             </button>
             <pre
-              className="p-5 fs10 overflow-x-auto m-0"
+              className="p-5 fontStyle9 overflow-x-auto m-0"
               style={{ color: "#e2e8f0", fontFamily: "'Fira Code', monospace", lineHeight: 1.7 }}
             >
               {json}
@@ -321,30 +321,30 @@ function JsonModal({ item, onClose }) {
 function DeleteConfirm({ section, onClose, onConfirm }) {
   return (
     <div
-      className="fixed inset-0 z-9999 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+      className="fixed inset-0 z-[9998] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
       onClick={(e) => e.target === e.currentTarget && onClose()}
     >
-      <div className="w-full max-w-sm rounded-2xl p-8 text-center shadow-2xl bg-(--admin-surface) border border-(--admin-border)">
+      <div className="w-full max-w-sm rounded-2xl p-5 sm:p-8 text-center shadow-2xl bg-(--admin-surface) border border-(--admin-border) relative z-[9999]">
         <div className="w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-4 bg-(--admin-danger-soft)">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
             <path d="M3 6h18M8 6V4h8v2M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"
               stroke="var(--admin-danger)" strokeWidth="2" strokeLinecap="round"/>
           </svg>
         </div>
-        <p className="fs7 font-bold m-0 mb-2 text-(--admin-text)">Delete Section?</p>
-        <p className="fs9 m-0 mb-6 text-(--admin-muted)">
+        <p className="fontStyle7 font-bold m-0 mb-2 text-(--admin-text)">Delete Section?</p>
+        <p className="fontStyle9 m-0 mb-6 text-(--admin-muted)">
           "<strong className="text-(--admin-subtext)">{section}</strong>" section permanently delete ho jayega.
         </p>
         <div className="flex items-center justify-center gap-3">
           <button
             onClick={onClose}
-            className="px-6 py-2 rounded-xl fs9 font-semibold cursor-pointer border border-(--admin-border) bg-transparent text-(--admin-subtext) hover:bg-(--admin-hover) transition-colors"
+            className="px-6 py-2 rounded-xl fontStyle9 font-semibold cursor-pointer border border-(--admin-border) bg-transparent text-(--admin-subtext) hover:bg-(--admin-hover) transition-colors"
           >
             Cancel
           </button>
           <button
             onClick={onConfirm}
-            className="px-6 py-2 rounded-xl fs9 font-bold text-white border-0 cursor-pointer bg-(--admin-danger) hover:opacity-85 transition-opacity"
+            className="px-6 py-2 rounded-xl fontStyle9 font-bold text-white border-0 cursor-pointer bg-(--admin-danger) hover:opacity-85 transition-opacity"
           >
             Delete
           </button>
@@ -366,27 +366,27 @@ function ContentCard({ item, onEdit, onDelete, onViewJson }) {
 
       {/* Top row — section badge + actions */}
       <div className="flex items-center justify-between gap-2">
-        <span className={`px-3 py-1 rounded-full fs10 font-bold tracking-wider uppercase ${sectionColor(item.section)}`}>
+        <span className={`px-3 py-1 rounded-full fontStyle9 font-bold tracking-wider uppercase ${sectionColor(item.section)}`}>
           {item.section}
         </span>
-        <span className="fs10 text-(--admin-muted)">ID: {item._id?.slice(-6)}</span>
+        <span className="fontStyle9 text-(--admin-muted)">ID: {item._id?.slice(-6)}</span>
       </div>
 
       {/* Title */}
       <div>
-        <p className="fs7 font-bold m-0 text-(--admin-text) leading-snug">{item.title}</p>
-        <p className="fs9 mt-1.5 m-0 text-(--admin-muted) leading-relaxed">{item.description}</p>
+        <p className="fontStyle7 font-bold m-0 text-(--admin-text) leading-snug">{item.title}</p>
+        <p className="fontStyle9 mt-1.5 m-0 text-(--admin-muted) leading-relaxed">{item.description}</p>
       </div>
 
       {/* Button info */}
       {(item.buttonText || item.buttonLink) && (
         <div className="flex items-center gap-2 px-3 py-2 rounded-xl border border-(--admin-border) bg-(--admin-bg)">
           <span className="text-(--admin-accent) flex-shrink-0"><IconLink /></span>
-          <span className="fs10 font-semibold text-(--admin-subtext)">{item.buttonText}</span>
+          <span className="fontStyle9 font-semibold text-(--admin-subtext)">{item.buttonText}</span>
           {item.buttonLink && (
             <>
-              <span className="text-(--admin-muted) fs10">→</span>
-              <span className="fs10 text-(--admin-muted)">{item.buttonLink}</span>
+              <span className="text-(--admin-muted) fontStyle9">→</span>
+              <span className="fontStyle9 text-(--admin-muted)">{item.buttonLink}</span>
             </>
           )}
         </div>
@@ -396,10 +396,10 @@ function ContentCard({ item, onEdit, onDelete, onViewJson }) {
       {hasFooter && (
         <div className="px-3 py-2 rounded-xl border border-(--admin-border) bg-(--admin-bg)">
           {item.copyrightText && (
-            <p className="fs10 m-0 text-(--admin-subtext)">{item.copyrightText}</p>
+            <p className="fontStyle9 m-0 text-(--admin-subtext)">{item.copyrightText}</p>
           )}
           {item.footerText && (
-            <p className="fs10 m-0 mt-1 text-(--admin-muted)">{item.footerText}</p>
+            <p className="fontStyle9 m-0 mt-1 text-(--admin-muted)">{item.footerText}</p>
           )}
         </div>
       )}
@@ -413,7 +413,7 @@ function ContentCard({ item, onEdit, onDelete, onViewJson }) {
               href={s.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="px-2.5 py-1 rounded-lg fs10 font-semibold no-underline capitalize bg-(--admin-accent-soft) text-(--admin-accent) hover:opacity-75 transition-opacity"
+              className="px-2.5 py-1 rounded-lg fontStyle9 font-semibold no-underline capitalize bg-(--admin-accent-soft) text-(--admin-accent) hover:opacity-75 transition-opacity"
             >
               {s.platform}
             </a>
@@ -428,19 +428,19 @@ function ContentCard({ item, onEdit, onDelete, onViewJson }) {
       <div className="flex items-center gap-2">
         <button
           onClick={() => onEdit(item)}
-          className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl fs10 font-semibold cursor-pointer border-0 bg-(--admin-accent-soft) text-(--admin-accent) hover:opacity-75 transition-opacity"
+          className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl fontStyle9 font-semibold cursor-pointer border-0 bg-(--admin-accent-soft) text-(--admin-accent) hover:opacity-75 transition-opacity"
         >
           <IconEdit /> Edit
         </button>
         <button
           onClick={() => onViewJson(item)}
-          className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl fs10 font-semibold cursor-pointer border border-(--admin-border) bg-(--admin-hover) text-(--admin-subtext) hover:opacity-75 transition-opacity"
+          className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl fontStyle9 font-semibold cursor-pointer border border-(--admin-border) bg-(--admin-hover) text-(--admin-subtext) hover:opacity-75 transition-opacity"
         >
           <IconJson /> JSON
         </button>
         <button
           onClick={() => onDelete(item)}
-          className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl fs10 font-semibold cursor-pointer border-0 bg-(--admin-danger-soft) text-(--admin-danger) hover:opacity-75 transition-opacity"
+          className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl fontStyle9 font-semibold cursor-pointer border-0 bg-(--admin-danger-soft) text-(--admin-danger) hover:opacity-75 transition-opacity"
         >
           <IconDelete /> Delete
         </button>
@@ -533,16 +533,16 @@ export default function ManageContent() {
     <div className="p-7">
 
       {/* ── Page Header ── */}
-      <div className="flex items-center justify-between flex-wrap gap-3 mb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between flex-wrap gap-3 mb-6">
         <div>
-          <h1 className="fs6 font-bold m-0 text-(--admin-text)">Manage Content</h1>
-          <p className="fs10 mt-1 m-0 text-(--admin-muted)">
+          <h1 className="fontStyle7 font-bold m-0 text-(--admin-text)">Manage Content</h1>
+          <p className="fontStyle9 mt-1 m-0 text-(--admin-muted)">
             {items.length} sections · website content manage karo
           </p>
         </div>
         <button
           onClick={() => setModal({ mode: "add", data: { ...emptyForm } })}
-          className="flex items-center gap-2 px-5 py-2.5 rounded-xl fs9 font-bold text-white border-0 cursor-pointer hover:opacity-90 transition-opacity"
+          className="flex items-center gap-2 px-5 py-2.5 rounded-xl fontStyle9 font-bold text-white border-0 cursor-pointer hover:opacity-90 transition-opacity"
           style={{ background: "var(--admin-accent-grad)", boxShadow: "0 4px 14px rgba(99,102,241,0.25)" }}
         >
           <IconPlus /> Add Section
@@ -564,13 +564,13 @@ export default function ManageContent() {
 
       {/* ── Cards Grid ── */}
       {loading ? (
-        <div className="text-center py-16 fs9 text-(--admin-muted)">Loading content...</div>
+        <div className="text-center py-16 fontStyle9 text-(--admin-muted)">Loading content...</div>
       ) : filtered.length === 0 ? (
         <div className="admin-card p-16 text-center">
-          <p className="fs9 text-(--admin-muted) m-0">No sections found.</p>
+          <p className="fontStyle9 text-(--admin-muted) m-0">No sections found.</p>
         </div>
       ) : (
-        <div className="grid gap-5" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))" }}>
+        <div className="grid gap-5" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))" }}>
           {filtered.map((item) => (
             <ContentCard
               key={item._id}

@@ -1,4 +1,4 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 
 /* ── Icons ── */
 const IconUser     = () => <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>;
@@ -19,8 +19,8 @@ const TABS = [
 ];
 
 /* ── Reusable field components ── */
-const inputCls = "w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl px-4 py-2.5 fs9 text-[var(--admin-text)] outline-none placeholder:text-[var(--admin-muted)] focus:border-[var(--admin-accent)] focus:ring-2 focus:ring-[var(--admin-accent-soft)] transition-all duration-200";
-const labelCls = "block fs10 font-semibold uppercase tracking-wider text-[var(--admin-muted)] mb-1.5";
+const inputCls = "w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl px-4 py-2.5 fontStyle9 text-[var(--admin-text)] outline-none placeholder:text-[var(--admin-muted)] focus:border-[var(--admin-accent)] focus:ring-2 focus:ring-[var(--admin-accent-soft)] transition-all duration-200";
+const labelCls = "block fontStyle9 font-semibold uppercase tracking-wider text-[var(--admin-muted)] mb-1.5";
 
 function Field({ label, children }) {
   return (
@@ -34,8 +34,8 @@ function Field({ label, children }) {
 function SectionTitle({ title, desc }) {
   return (
     <div className="pb-4 mb-5 border-b border-[var(--admin-border)]">
-      <p className="fs7 font-bold text-[var(--admin-text)] m-0">{title}</p>
-      {desc && <p className="fs10 text-[var(--admin-muted)] mt-1 m-0">{desc}</p>}
+      <p className="fontStyle7 font-bold text-[var(--admin-text)] m-0">{title}</p>
+      {desc && <p className="fontStyle9 text-[var(--admin-muted)] mt-1 m-0">{desc}</p>}
     </div>
   );
 }
@@ -63,8 +63,8 @@ function NotifRow({ label, desc, checked, onChange }) {
   return (
     <div className="flex items-center justify-between py-3.5 border-b border-[var(--admin-border)] last:border-0">
       <div>
-        <p className="fs9 font-semibold text-[var(--admin-text)] m-0">{label}</p>
-        <p className="fs10 text-[var(--admin-muted)] mt-0.5 m-0">{desc}</p>
+        <p className="fontStyle9 font-semibold text-[var(--admin-text)] m-0">{label}</p>
+        <p className="fontStyle9 text-[var(--admin-muted)] mt-0.5 m-0">{desc}</p>
       </div>
       <Toggle checked={checked} onChange={onChange} />
     </div>
@@ -72,10 +72,10 @@ function NotifRow({ label, desc, checked, onChange }) {
 }
 
 /* ── Save Button ── */
-function SaveBtn({ loading }) {
+function SaveBtn({ loading, className = "" }) {
   return (
     <button
-      className="flex items-center gap-2 px-6 py-2.5 rounded-xl fs9 font-bold text-white border-none cursor-pointer transition-opacity duration-200 hover:opacity-90 shadow-[0_4px_14px_rgba(99,102,241,0.3)]"
+      className={`flex items-center gap-2 px-6 py-2.5 rounded-xl fontStyle9 font-bold text-white border-none cursor-pointer transition-opacity duration-200 hover:opacity-90 shadow-[0_4px_14px_rgba(99,102,241,0.3)] ${className}`}
       style={{ background: "var(--admin-accent-grad)" }}
     >
       {loading ? (
@@ -103,7 +103,7 @@ function ProfilePanel() {
       {/* Avatar */}
       <div className="flex items-center gap-5">
         <div className="relative shrink-0">
-          <div className="w-20 h-20 rounded-2xl bg-[var(--admin-accent-soft)] flex items-center justify-center fs5 font-extrabold text-[var(--admin-accent)]">
+          <div className="w-20 h-20 rounded-2xl bg-[var(--admin-accent-soft)] flex items-center justify-center fontStyle7 font-extrabold text-[var(--admin-accent)]">
             A
           </div>
           <button className="absolute -bottom-1.5 -right-1.5 w-7 h-7 rounded-full bg-[var(--admin-accent)] text-white flex items-center justify-center border-2 border-[var(--admin-surface)] cursor-pointer hover:opacity-90 transition-opacity">
@@ -111,9 +111,9 @@ function ProfilePanel() {
           </button>
         </div>
         <div>
-          <p className="fs9 font-semibold text-[var(--admin-text)] m-0">Profile Photo</p>
-          <p className="fs10 text-[var(--admin-muted)] mt-0.5 m-0">JPG, PNG up to 2MB</p>
-          <button className="mt-2 fs10 font-semibold text-[var(--admin-accent)] hover:underline cursor-pointer bg-transparent border-none p-0">
+          <p className="fontStyle9 font-semibold text-[var(--admin-text)] m-0">Profile Photo</p>
+          <p className="fontStyle9 text-[var(--admin-muted)] mt-0.5 m-0">JPG, PNG up to 2MB</p>
+          <button className="mt-2 fontStyle9 font-semibold text-[var(--admin-accent)] hover:underline cursor-pointer bg-transparent border-none p-0">
             Upload new photo
           </button>
         </div>
@@ -133,7 +133,7 @@ function ProfilePanel() {
       </Field>
       <Field label="Username">
         <div className="relative">
-          <span className="absolute left-4 top-1/2 -translate-y-1/2 fs9 text-[var(--admin-muted)]">@</span>
+          <span className="absolute left-4 top-1/2 -translate-y-1/2 fontStyle9 text-[var(--admin-muted)]">@</span>
           <input className={`${inputCls} pl-8`} defaultValue="admin" placeholder="username" />
         </div>
       </Field>
@@ -141,8 +141,8 @@ function ProfilePanel() {
         <textarea className={`${inputCls} resize-none`} rows={3} placeholder="Write a short bio..." />
       </Field>
 
-      <div className="flex justify-end pt-2">
-        <SaveBtn loading={saving} onClick={save} />
+      <div className="flex sm:justify-end pt-2">
+        <SaveBtn loading={saving} onClick={save} className="w-full sm:w-auto" />
       </div>
     </div>
   );
@@ -193,15 +193,15 @@ function SecurityPanel() {
             <IconShield />
           </div>
           <div>
-            <p className="fs9 font-semibold text-[var(--admin-text)] m-0">Two-Factor Authentication</p>
-            <p className="fs10 text-[var(--admin-muted)] mt-0.5 m-0">Add an extra layer of security</p>
+            <p className="fontStyle9 font-semibold text-[var(--admin-text)] m-0">Two-Factor Authentication</p>
+            <p className="fontStyle9 text-[var(--admin-muted)] mt-0.5 m-0">Add an extra layer of security</p>
           </div>
         </div>
-        <span className="px-2.5 py-1 rounded-full fs10 font-bold admin-badge-warning">Off</span>
+        <span className="px-2.5 py-1 rounded-full fontStyle9 font-bold admin-badge-warning">Off</span>
       </div>
 
-      <div className="flex justify-end pt-2">
-        <SaveBtn loading={saving} onClick={save} />
+      <div className="flex sm:justify-end pt-2">
+        <SaveBtn loading={saving} onClick={save} className="w-full sm:w-auto" />
       </div>
     </div>
   );
@@ -223,14 +223,14 @@ function NotificationsPanel() {
       <SectionTitle title="Notification Preferences" desc="Choose what you want to be notified about." />
 
       <div className="admin-card px-5">
-        <p className="fs10 font-bold uppercase tracking-wider text-[var(--admin-muted)] pt-4 pb-2 m-0">Email Notifications</p>
+        <p className="fontStyle9 font-bold uppercase tracking-wider text-[var(--admin-muted)] pt-4 pb-2 m-0">Email Notifications</p>
         <NotifRow label="New Orders"        desc="Get notified when a new order is placed"      checked={notifs.email_orders}   onChange={() => toggle("email_orders")}   />
         <NotifRow label="Product Updates"   desc="Receive emails about product changes"         checked={notifs.email_updates}  onChange={() => toggle("email_updates")}  />
         <NotifRow label="Security Alerts"   desc="Important security notifications"             checked={notifs.email_security} onChange={() => toggle("email_security")} />
       </div>
 
       <div className="admin-card px-5">
-        <p className="fs10 font-bold uppercase tracking-wider text-[var(--admin-muted)] pt-4 pb-2 m-0">Push Notifications</p>
+        <p className="fontStyle9 font-bold uppercase tracking-wider text-[var(--admin-muted)] pt-4 pb-2 m-0">Push Notifications</p>
         <NotifRow label="Order Updates"     desc="Real-time order status changes"               checked={notifs.push_orders}    onChange={() => toggle("push_orders")}    />
         <NotifRow label="New Messages"      desc="When someone sends you a message"             checked={notifs.push_messages}  onChange={() => toggle("push_messages")}  />
         <NotifRow label="Weekly Reports"    desc="Summary of your weekly performance"           checked={notifs.push_reports}   onChange={() => toggle("push_reports")}   />
@@ -259,13 +259,13 @@ function AppearancePanel() {
       {/* Theme */}
       <div>
         <p className={labelCls}>Theme</p>
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           {themes.map((t) => (
             <button key={t.id} onClick={() => setTheme(t.id)}
               className={`admin-card p-4 flex flex-col items-center gap-2 cursor-pointer transition-all duration-200 border-2
                 ${theme === t.id ? "border-[var(--admin-accent)]" : "border-transparent"}`}>
               <div className={`w-full h-10 rounded-lg ${t.bg} border ${t.border}`} />
-              <p className="fs10 font-semibold text-[var(--admin-text)] m-0">{t.label}</p>
+              <p className="fontStyle9 font-semibold text-[var(--admin-text)] m-0">{t.label}</p>
             </button>
           ))}
         </div>
@@ -288,15 +288,15 @@ function AppearancePanel() {
 
       {/* Font */}
       <Field label="Font Family">
-        <select className={inputCls} value={font} onChange={(e) => setFont(e.target.value)}>
+        <select className="admin-select" value={font} onChange={(e) => setFont(e.target.value)}>
           {["Google Sans","System UI","Roboto","Poppins","DM Sans"].map(f => (
             <option key={f}>{f}</option>
           ))}
         </select>
       </Field>
 
-      <div className="flex justify-end pt-2">
-        <SaveBtn />
+      <div className="flex sm:justify-end pt-2">
+        <SaveBtn className="w-full sm:w-auto" />
       </div>
     </div>
   );
@@ -323,13 +323,13 @@ function PrivacyPanel() {
 
       {/* Danger Zone */}
       <div className="admin-card p-5 border border-[var(--admin-danger)] rounded-2xl">
-        <p className="fs9 font-bold text-[var(--admin-danger)] m-0 mb-1">Danger Zone</p>
-        <p className="fs10 text-[var(--admin-muted)] m-0 mb-4">These actions are irreversible. Please proceed with caution.</p>
+        <p className="fontStyle9 font-bold text-[var(--admin-danger)] m-0 mb-1">Danger Zone</p>
+        <p className="fontStyle9 text-[var(--admin-muted)] m-0 mb-4">These actions are irreversible. Please proceed with caution.</p>
         <div className="flex flex-col sm:flex-row gap-3">
-          <button className="flex-1 py-2.5 rounded-xl fs10 font-semibold border border-[var(--admin-border)] text-[var(--admin-subtext)] bg-transparent hover:bg-[var(--admin-hover)] transition-colors cursor-pointer">
+          <button className="flex-1 py-2.5 rounded-xl fontStyle9 font-semibold border border-[var(--admin-border)] text-[var(--admin-subtext)] bg-transparent hover:bg-[var(--admin-hover)] transition-colors cursor-pointer">
             Export My Data
           </button>
-          <button className="flex-1 py-2.5 rounded-xl fs10 font-bold border-none admin-badge-danger cursor-pointer hover:opacity-80 transition-opacity">
+          <button className="flex-1 py-2.5 rounded-xl fontStyle9 font-bold border-none admin-badge-danger cursor-pointer hover:opacity-80 transition-opacity">
             Delete Account
           </button>
         </div>
@@ -350,9 +350,11 @@ export default function Setting() {
     <div className="p-6 flex flex-col gap-6">
 
       {/* ── Header ── */}
-      <div>
-        <h1 className="fs6 font-bold text-[var(--admin-text)] m-0">Settings</h1>
-        <p className="fs10 text-[var(--admin-muted)] mt-1 m-0">Manage your account preferences</p>
+      <div className="flex flex-col sm:flex-row sm:items-center">
+        <div>
+          <h1 className="fontStyle7 font-bold text-[var(--admin-text)] m-0">Settings</h1>
+          <p className="fontStyle9 text-[var(--admin-muted)] mt-1 m-0">Manage your account preferences</p>
+        </div>
       </div>
 
       <div className="flex flex-col lg:flex-row gap-5 items-start">
@@ -363,7 +365,7 @@ export default function Setting() {
             <button
               key={tab.id}
               onClick={() => setActive(tab.id)}
-              className={`flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl fs9 font-semibold transition-all duration-200 cursor-pointer border-none text-left whitespace-nowrap w-full
+              className={`flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl fontStyle9 font-semibold transition-all duration-200 cursor-pointer border-none text-left whitespace-nowrap lg:w-full
                 ${active === tab.id
                   ? "bg-[var(--admin-accent-soft)] text-[var(--admin-accent)]"
                   : "bg-transparent text-[var(--admin-subtext)] hover:bg-[var(--admin-hover)] hover:text-[var(--admin-text)]"

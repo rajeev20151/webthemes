@@ -1,7 +1,7 @@
 import {Link} from "react-router-dom";
 import { useState } from "react";
 import SEOHead from "../components/SEOHead";
-import { createContactAPI } from "../services/api"; 
+import { useCreateContactMutation } from "../store/apiSlice"; 
 
 /* ── Icons ── */
 const IconMail     = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><rect x="2" y="4" width="20" height="16" rx="3" stroke="currentColor" strokeWidth="1.8"/><path d="M2 8l10 7 10-7" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/></svg>;
@@ -66,8 +66,8 @@ export default function Contact() {
   const [errors,  setErrors]  = useState({ name: "", email: "", topic: "", message: "" });
   const [touched, setTouched] = useState({ name: false, email: false, topic: false, message: false });
   const [sent,    setSent]    = useState(false);
-  const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
+  const [createContact, { isLoading: submitting }] = useCreateContactMutation();
 
   /* update field value + live-validate if already touched */
   const set = (k, v) => {
@@ -106,9 +106,8 @@ export default function Contact() {
     if (hasError) return;
 
     setSubmitError("");
-    setSubmitting(true);
     try {
-      const res = await createContactAPI(form);
+      const res = await createContact(form).unwrap();
       if (res.success) {
         setSent(true);
       } else {
@@ -116,8 +115,6 @@ export default function Contact() {
       }
     } catch (err) {
       setSubmitError("Could not send your message. Please check your connection and try again.");
-    } finally {
-      setSubmitting(false);
     }
   };
 
@@ -149,7 +146,7 @@ export default function Contact() {
 
   return (
     <section className="relative min-h-screen py-24 overflow-hidden bg-[var(--color5)] text-[var(--color6)]">
-      <SEOHead title="Contact Us" description="Get in touch with TemplateWorld. Have questions about our templates? We're here to help." />
+      <SEOHead title="Contact Us" description="Get in touch with {site}. Have questions about our templates? We're here to help." />
 
       {/* ── Decorative blobs ── */}
       <div className="pointer-events-none absolute -top-32 -left-32 w-[520px] h-[520px] rounded-full opacity-[0.07] blur-[100px] [background:var(--color3)]" />

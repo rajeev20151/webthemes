@@ -1,40 +1,21 @@
-import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import bgImage from "../assets/images/background5.jpg";
-import { getContentsAPI } from "../services/api";
+import { useGetContentsQuery, useGetTemplatesQuery } from "../store/apiSlice";
+import { imgUrl } from "../utils/themeHelpers";
 
 export default function Hero() {
 
-  const [contents, setContents] = useState(null);
-  
-  useEffect(() => {
-    const fetchContent = async () => {
-      try {
-        const res = await getContentsAPI();
-        if (res.success && res.contents.length > 0) {
-          setContents(res.contents[0]);
-        }
-      } catch (err) {
-        console.error(err);
-      }
-    };
-    fetchContent();
-  }, []);
+  const { data: contentsData, isLoading } = useGetContentsQuery();
+  const contents = contentsData?.contents?.[0] || null;
 
+  const { data: templatesData } = useGetTemplatesQuery();
+  const templates = templatesData?.templates || [];
 
+  const heroImages = templates
+    .slice(0, 10)
+    .map((t) => imgUrl(t.images?.[0]))
+    .filter(Boolean);
 
-  const images = [
-    bgImage,
-    bgImage,
-    bgImage,
-    bgImage,
-    bgImage,
-    bgImage,
-    bgImage,
-    bgImage,
-  ];
-
-  const duplicatedImages = [...images, ...images];
+  const duplicatedImages = [...heroImages, ...heroImages];
 
   return (
     <section className="hero relative ">
@@ -45,7 +26,7 @@ export default function Hero() {
       data-selected=""
       aria-labelledby="headlessui-tabs-tab-:ro:">
       <Link className="block h-[70vh] sm:h-[50vh] md:h-[50vh] lg:h-[80vh] xl:h-screen overflow-hidden bg-gray-50 ring max-sm:h-100"
-        href={bgImage}>
+      >
         <div className="flex size-full items-center justify-center">
           <div className="size-530 shrink-0 scale-50 sm:scale-75 lg:scale-100 bg-[var(--color5)]">
             <div className="relative top-(--top,30%) right-(--right,54%) grid size-full origin-top-left rotate-x-55 rotate-y-0 -rotate-z-45 grid-cols-4 gap-5 transform-3d">
@@ -56,7 +37,7 @@ export default function Hero() {
                   <img
                     key={`col1-${index}`}
                     src={img}
-                    className="aspect-970/580 ring rounded-2xl"
+                    className="w-full aspect-[970/580] object-cover object-top ring rounded-2xl"
                     width="970"
                     height="580"
                     loading="lazy"
@@ -72,7 +53,7 @@ export default function Hero() {
                   <img
                     key={`col2-${index}`}
                     src={img}
-                    className="aspect-970/436 ring rounded-2xl"
+                    className="w-full aspect-[970/580] object-cover object-top ring rounded-2xl"
                     width="970"
                     height="436"
                     loading="lazy"
@@ -88,7 +69,7 @@ export default function Hero() {
                   <img
                     key={`col3-${index}`}
                     src={img}
-                    className="aspect-971/395 ring rounded-2xl"
+                    className="w-full aspect-[970/580] object-cover object-top ring rounded-2xl"
                     width="971"
                     height="395"
                     loading="lazy"
@@ -104,7 +85,7 @@ export default function Hero() {
                   <img
                     key={`col4-${index}`}
                     src={img}
-                    className="aspect-972/854 ring rounded-2xl"
+                    className="w-full aspect-[970/580] object-cover object-top ring rounded-2xl"
                     width="972"
                     height="854"
                     loading="lazy"
@@ -127,9 +108,16 @@ export default function Hero() {
         <div className="hero-content w-full sm:px-6 md:px-8 max-w-sm sm:max-w-md md:max-w-xl lg:max-w-2xl xl:max-w-6xl 
         rounded-3xl border border-3 border-[var(--color5)] text-center bg-blur p-6 sm:p-8 bg-[var(--color10)]">
 
-          <h1 className="text-2xl sm:text-3xl md:text-4xl text-[var(--color6)] font-bold fontStyle3 mb-8 sm:mb-10">
-            {contents?.title}
-          </h1>
+          {isLoading ? (
+            <div
+              aria-hidden="true"
+              className="h-[38px] sm:h-[46px] md:h-[58px] w-2/3 sm:w-1/2 mx-auto rounded-xl bg-[var(--color6)]/10 animate-pulse mb-8 sm:mb-10"
+            />
+          ) : (
+            <h1 className="text-2xl sm:text-3xl md:text-4xl text-[var(--color6)] font-bold fontStyle3 mb-8 sm:mb-10">
+              {contents?.title}
+            </h1>
+          )}
   
           <Link
             to="/demo"

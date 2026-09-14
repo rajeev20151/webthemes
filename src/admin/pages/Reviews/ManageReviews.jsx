@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+﻿import { useState, useEffect } from "react";
 import { adminGetReviewsAPI, adminDeleteReviewAPI } from "../../services/adminApi";
 
 /* ── Time Ago Helper ── */
@@ -26,7 +26,7 @@ function Stars({ rating }) {
   return (
     <div className="flex items-center gap-0.5">
       {[1, 2, 3, 4, 5].map((s) => (
-        <i key={s} className={`bx ${s <= rating ? "bxs-star" : "bx-star"} text-yellow-400 text-sm`}></i>
+        <svg key={s} className={`w-4 h-4 ${s <= rating ? "text-yellow-400" : "text-yellow-400/30"}`} fill={s <= rating ? "currentColor" : "none"} stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg>
       ))}
     </div>
   );
@@ -90,10 +90,10 @@ export default function ManageReviews() {
 
   /* ── Stats Cards ── */
   const statCards = [
-    { label: "Total Reviews",  value: stats.total,                icon: "bx-star",     color: "text-yellow-400", border: "border-yellow-500/20" },
-    { label: "Avg Rating",     value: stats.avgRating?.toFixed(1) || "0", icon: "bx-line-chart", color: "text-emerald-400", border: "border-emerald-500/20" },
-    { label: "5-Star",         value: stats.distribution?.[5] || 0, icon: "bxs-star",   color: "text-green-400",  border: "border-green-500/20" },
-    { label: "Templates",      value: stats.templatesWithReviews,  icon: "bx-layout",   color: "text-violet-400", border: "border-violet-500/20" },
+    { label: "Total Reviews",  value: stats.total,                color: "text-yellow-400", border: "border-yellow-500/20", icon: <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg> },
+    { label: "Avg Rating",     value: stats.avgRating?.toFixed(1) || "0", color: "text-emerald-400", border: "border-emerald-500/20", icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg> },
+    { label: "5-Star",         value: stats.distribution?.[5] || 0, color: "text-green-400",  border: "border-green-500/20", icon: <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg> },
+    { label: "Templates",      value: stats.templatesWithReviews,  color: "text-violet-400", border: "border-violet-500/20", icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"/></svg> },
   ];
 
   const filterTabs = [
@@ -108,7 +108,7 @@ export default function ManageReviews() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <p className="fs8 admin-muted">Loading reviews...</p>
+        <p className="fontStyle9 admin-muted">Loading reviews...</p>
       </div>
     );
   }
@@ -119,15 +119,15 @@ export default function ManageReviews() {
       {/* ── Header ── */}
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div>
-          <h1 className="fs5 font-bold admin-text">Manage Reviews</h1>
-          <p className="fs9 admin-muted mt-1">
+          <h1 className="fontStyle7 font-bold admin-text">Manage Reviews</h1>
+          <p className="fontStyle9 admin-muted mt-1">
             {stats.total} reviews · {stats.avgRating?.toFixed(2)} avg rating · {stats.templatesWithReviews} templates
           </p>
         </div>
       </div>
 
       {/* ── Stats Cards ── */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {statCards.map((card, i) => (
           <div
             key={i}
@@ -135,11 +135,11 @@ export default function ManageReviews() {
           >
             <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${card.color}`}
                  style={{ background: "var(--admin-hover)" }}>
-              <i className={`bx ${card.icon} text-xl ${card.color}`}></i>
+              {card.icon}
             </div>
             <div>
-              <p className={`fs5 font-bold ${card.color}`}>{card.value}</p>
-              <p className="fs10 admin-muted">{card.label}</p>
+              <p className={`fontStyle7 font-bold ${card.color}`}>{card.value}</p>
+              <p className="fontStyle9 admin-muted">{card.label}</p>
             </div>
           </div>
         ))}
@@ -148,21 +148,21 @@ export default function ManageReviews() {
       {/* ── Rating Distribution Bar ── */}
       {stats.total > 0 && (
         <div className="admin-card px-5 py-4">
-          <p className="fs9 font-semibold admin-text mb-3">Rating Distribution</p>
+          <p className="fontStyle9 font-semibold admin-text mb-3">Rating Distribution</p>
           <div className="space-y-2">
             {[5, 4, 3, 2, 1].map((star) => {
               const count = stats.distribution?.[star] || 0;
               const pct = stats.total > 0 ? ((count / stats.total) * 100).toFixed(0) : 0;
               return (
                 <div key={star} className="flex items-center gap-3">
-                  <span className="fs10 admin-muted w-6 text-right">{star}★</span>
+                  <span className="fontStyle9 admin-muted w-6 text-right">{star}★</span>
                   <div className="flex-1 h-2 rounded-full" style={{ background: "var(--admin-hover)" }}>
                     <div
                       className="h-full rounded-full bg-yellow-400 transition-all duration-500"
                       style={{ width: `${pct}%` }}
                     />
                   </div>
-                  <span className="fs10 admin-muted w-12 text-right">{count} ({pct}%)</span>
+                  <span className="fontStyle9 admin-muted w-12 text-right">{count} ({pct}%)</span>
                 </div>
               );
             })}
@@ -174,13 +174,13 @@ export default function ManageReviews() {
       <div className="admin-card px-5 py-4">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="relative w-full sm:w-80">
-            <i className="bx bx-search absolute left-3 top-1/2 -translate-y-1/2 text-lg admin-muted"></i>
+            <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-[var(--admin-muted)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
             <input
               type="text"
               placeholder="Search user, title, comment, template..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 rounded-xl fs9 outline-none transition-colors duration-200"
+              className="w-full pl-10 pr-4 py-2.5 rounded-xl fontStyle9 outline-none transition-colors duration-200"
               style={{
                 background: "var(--admin-bg)",
                 color: "var(--admin-text)",
@@ -194,7 +194,7 @@ export default function ManageReviews() {
               <button
                 key={tab.key}
                 onClick={() => setFilter(tab.key)}
-                className={`px-3.5 py-1.5 rounded-full fs10 font-medium transition-all duration-200 cursor-pointer border ${
+                className={`px-3.5 py-1.5 rounded-full fontStyle9 font-medium transition-all duration-200 cursor-pointer border ${
                   filter === tab.key
                     ? "text-white border-transparent"
                     : "admin-text border-[var(--admin-border)] hover:border-[var(--admin-accent)]"
@@ -215,7 +215,7 @@ export default function ManageReviews() {
             <thead>
               <tr style={{ borderBottom: "1px solid var(--admin-border)" }}>
                 {["USER", "REVIEW", "TEMPLATE", "RATING", "DATE", "ACTIONS"].map((h) => (
-                  <th key={h} className="px-5 py-3.5 text-left fs10 font-semibold admin-muted uppercase tracking-wider">
+                  <th key={h} className="px-5 py-3.5 text-left fontStyle9 font-semibold admin-muted uppercase tracking-wider">
                     {h}
                   </th>
                 ))}
@@ -225,9 +225,9 @@ export default function ManageReviews() {
               {filtered.length === 0 ? (
                 <tr>
                   <td colSpan={6} className="px-5 py-12 text-center">
-                    <i className="bx bx-star text-4xl admin-muted block mb-2"></i>
-                    <p className="fs8 font-semibold admin-text">No reviews found</p>
-                    <p className="fs9 admin-muted">
+                    <svg className="w-10 h-10 text-[var(--admin-muted)] block mb-2 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg>
+                    <p className="fontStyle9 font-semibold admin-text">No reviews found</p>
+                    <p className="fontStyle9 admin-muted">
                       {search ? "Try a different search term." : "No reviews submitted yet."}
                     </p>
                   </td>
@@ -248,9 +248,9 @@ export default function ManageReviews() {
                       <td className="px-5 py-3.5">
                         <div className="flex items-center gap-3 min-w-[130px]">
                           <div className={`w-8 h-8 rounded-full ${avatarColor(review.userName)} flex items-center justify-center flex-shrink-0`}>
-                            <span className="text-white fs10 font-bold">{initials}</span>
+                            <span className="text-white fontStyle9 font-bold">{initials}</span>
                           </div>
-                          <span className="fs9 font-semibold admin-text truncate max-w-[110px]">
+                          <span className="fontStyle9 font-semibold admin-text truncate max-w-[110px]">
                             {review.userName}
                           </span>
                         </div>
@@ -258,9 +258,9 @@ export default function ManageReviews() {
 
                       {/* REVIEW (title + truncated comment) */}
                       <td className="px-5 py-3.5 max-w-[280px]">
-                        <p className="fs9 font-semibold admin-text truncate">{review.title}</p>
+                        <p className="fontStyle9 font-semibold admin-text truncate">{review.title}</p>
                         <p
-                          className={`fs10 admin-subtext mt-0.5 ${isExpanded ? "whitespace-pre-line" : "truncate"}`}
+                          className={`fontStyle9 admin-subtext mt-0.5 ${isExpanded ? "whitespace-pre-line" : "truncate"}`}
                           title={review.comment}
                         >
                           {review.comment}
@@ -268,7 +268,7 @@ export default function ManageReviews() {
                         {review.comment.length > 80 && (
                           <button
                             onClick={() => setExpandedId(isExpanded ? null : review._id)}
-                            className="fs10 text-blue-400 hover:text-blue-300 mt-0.5 bg-transparent border-none p-0 cursor-pointer"
+                            className="fontStyle9 text-blue-400 hover:text-blue-300 mt-0.5 bg-transparent border-none p-0 cursor-pointer"
                           >
                             {isExpanded ? "Show less" : "Show more"}
                           </button>
@@ -277,7 +277,7 @@ export default function ManageReviews() {
 
                       {/* TEMPLATE */}
                       <td className="px-5 py-3.5 max-w-[180px]">
-                        <p className="fs10 admin-subtext truncate" title={templateTitle}>
+                        <p className="fontStyle9 admin-subtext truncate" title={templateTitle}>
                           {templateTitle}
                         </p>
                       </td>
@@ -286,27 +286,27 @@ export default function ManageReviews() {
                       <td className="px-5 py-3.5">
                         <div className="flex items-center gap-2">
                           <Stars rating={review.rating} />
-                          <span className="fs10 font-semibold admin-text">{review.rating}</span>
+                          <span className="fontStyle9 font-semibold admin-text">{review.rating}</span>
                         </div>
                       </td>
 
                       {/* DATE */}
                       <td className="px-5 py-3.5">
-                        <span className="fs9 admin-muted whitespace-nowrap">{timeAgo(review.createdAt)}</span>
+                        <span className="fontStyle9 admin-muted whitespace-nowrap">{timeAgo(review.createdAt)}</span>
                       </td>
 
                       {/* ACTIONS */}
                       <td className="px-5 py-3.5">
                         <button
                           onClick={() => setDeleteId(review._id)}
-                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg fs10 font-medium cursor-pointer transition-all duration-200 border"
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg fontStyle9 font-medium cursor-pointer transition-all duration-200 border"
                           style={{
                             background: "var(--admin-danger-soft)",
                             color: "var(--admin-danger)",
                             borderColor: "transparent",
                           }}
                         >
-                          <i className="bx bx-trash text-sm"></i>
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                           Delete
                         </button>
                       </td>
@@ -321,7 +321,7 @@ export default function ManageReviews() {
         {/* Footer */}
         {filtered.length > 0 && (
           <div className="px-5 py-3" style={{ borderTop: "1px solid var(--admin-border)" }}>
-            <p className="fs9 admin-muted">
+            <p className="fontStyle9 admin-muted">
               Showing <strong className="admin-text">{filtered.length}</strong> of <strong className="admin-text">{reviews.length}</strong> reviews
             </p>
           </div>
@@ -330,28 +330,28 @@ export default function ManageReviews() {
 
       {/* ── Delete Confirmation Modal ── */}
       {deleteId && (
-        <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black/50 backdrop-blur-sm">
-          <div className="admin-card p-6 w-full max-w-sm mx-4 space-y-4">
+        <div className="fixed inset-0 z-[9998] flex items-center justify-center bg-black/50 backdrop-blur-sm">
+          <div className="admin-card p-6 w-full max-w-sm mx-4 space-y-4 relative z-[9999]">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: "var(--admin-danger-soft)" }}>
-                <i className="bx bx-trash text-xl" style={{ color: "var(--admin-danger)" }}></i>
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: "var(--admin-danger)" }}><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
               </div>
               <div>
-                <p className="fs7 font-bold admin-text">Delete Review?</p>
-                <p className="fs9 admin-muted">This action cannot be undone.</p>
+                <p className="fontStyle7 font-bold admin-text">Delete Review?</p>
+                <p className="fontStyle9 admin-muted">This action cannot be undone.</p>
               </div>
             </div>
             <div className="flex items-center gap-3 pt-2">
               <button
                 onClick={() => setDeleteId(null)}
-                className="flex-1 py-2.5 rounded-xl fs9 font-semibold admin-text cursor-pointer transition-all duration-200"
+                className="flex-1 py-2.5 rounded-xl fontStyle9 font-semibold admin-text cursor-pointer transition-all duration-200"
                 style={{ background: "var(--admin-hover)", border: "1px solid var(--admin-border)" }}
               >
                 Cancel
               </button>
               <button
                 onClick={() => handleDelete(deleteId)}
-                className="flex-1 py-2.5 rounded-xl fs9 font-bold text-white cursor-pointer hover:opacity-90 transition-opacity duration-200 border-none"
+                className="flex-1 py-2.5 rounded-xl fontStyle9 font-bold text-white cursor-pointer hover:opacity-90 transition-opacity duration-200 border-none"
                 style={{ background: "var(--admin-danger)" }}
               >
                 Delete

@@ -1,23 +1,9 @@
-import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { getContentsAPI } from "../services/api";
+import { useGetContentsQuery } from "../store/apiSlice";
 
 export default function CTA(){
-  const [contents, setContents] = useState(null);
-
-  useEffect(() => {
-    const fetchContent = async () => {
-      try {
-        const res = await getContentsAPI();
-        if (res.success && res.contents.length > 0) {
-          setContents(res.contents[0]);
-        }
-      } catch (err) {
-        console.error(err);
-      }
-    };
-    fetchContent();
-  }, []);
+  const { data: contentsData } = useGetContentsQuery();
+  const contents = contentsData?.contents?.[0] || null;
 
    return(
      /// =========  cta-section ============ ///

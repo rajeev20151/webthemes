@@ -1,26 +1,37 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import CTA from "../sections/CTA";
-import { getContentsAPI } from "../services/api";
+import { useGetContentsQuery, useSubscribeNewsletterMutation } from "../store/apiSlice";
 
 
 export default function Footer(){
   
-  const [contents, setContents] = useState(null);
-  
-  useEffect(() => {
-    const fetchContent = async () => {
-      try {
-        const res = await getContentsAPI();
-        if (res.success && res.contents.length > 0) {
-          setContents(res.contents[0]);
-        }
-      } catch (err) {
-        console.error(err);
-      }
-    };
-    fetchContent();
-  }, []);
+  const { data: contentsData } = useGetContentsQuery();
+  const contents = contentsData?.success && contentsData?.contents?.length > 0 ? contentsData.contents[0] : null;
+
+  const [subscribe, { isLoading }] = useSubscribeNewsletterMutation();
+  const [footerEmail, setFooterEmail] = useState("");
+  const [status, setStatus] = useState(null);
+  const [message, setMessage] = useState("");
+
+  const handleFooterSubscribe = async (e) => {
+    e.preventDefault();
+    if (!footerEmail || !footerEmail.trim()) {
+      setStatus("error");
+      setMessage("Please enter your email");
+      return;
+    }
+    try {
+      const res = await subscribe({ email: footerEmail.trim() }).unwrap();
+      setStatus("success");
+      setMessage(res.message || "Subscribed successfully!");
+      setFooterEmail("");
+    } catch (err) {
+      setStatus("error");
+      setMessage(err?.data?.message || "Something went wrong");
+    }
+    setTimeout(() => { setStatus(null); setMessage(""); }, 3000);
+  };
 
    return(
       /// ============ footer section =============== ///
@@ -99,18 +110,18 @@ export default function Footer(){
                 <Link to="about" className="fontStyle8 hover:text-[var(--color5)] hover:pl-2 
                 transition-all duration-300 inline-block">About Us</Link>
               </li>
-              <li className="text-gray-400">
+              {/* <li className="text-gray-400">
                 <Link to="PricingPage" className="fontStyle8 hover:text-[var(--color5)] hover:pl-2 
                 transition-all duration-300 inline-block">Pricing Plans</Link>
-              </li>
+              </li> */}
               <li className="text-gray-400">
-                <Link to="#" className="fontStyle8 hover:text-[var(--color5)] hover:pl-2 
+                <Link to="demo" className="fontStyle8 hover:text-[var(--color5)] hover:pl-2 
                 transition-all duration-300 inline-block">Reviews</Link>
               </li>
-              {/* <li className="text-gray-400">
+              <li className="text-gray-400">
                 <Link to="blog" className="fontStyle8 hover:text-[var(--color5)] hover:pl-2 
                 transition-all duration-300 inline-block">Blog</Link>
-              </li> */}
+              </li>
               <li className="text-gray-400">
                 <Link to="contact" className="fontStyle8 hover:text-[var(--color5)] hover:pl-2 
                 transition-all duration-300 inline-block">Contact</Link>
@@ -125,18 +136,25 @@ export default function Footer(){
               Subscribe to get updates about new templates and exclusive offers.
             </p>
             
-            <div className="flex items-center gap-2 max-w-sm lg:max-w-full bg-[var(--color9)] rounded-full p-1">
+            <form onSubmit={handleFooterSubscribe} className="flex items-center gap-2 max-w-sm lg:max-w-full bg-[var(--color9)] border-2 border-[var(--color5)] rounded-full p-1">
             <input 
             type="email" 
             placeholder="Your email" 
+            value={footerEmail}
+            onChange={(e) => setFooterEmail(e.target.value)}
             className="flex-1 min-w-0 px-4 py-2.5 bg-transparent text-[var(--color5)] fontStyle8
             border-none placeholder:text-gray-400 outline-none text-sm sm:text-base" 
             />
-            <button className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-[var(--color5)] flex items-center justify-center
-            hover:scale-110 transition-all duration-300 flex-shrink-0">
-            <i className="bx bx-right-arrow-alt text-[var(--color6)] text-xl sm:text-2xl"></i>
+            <button type="submit" disabled={isLoading} className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-[var(--color5)] flex items-center justify-center
+            hover:scale-110 transition-all duration-300 flex-shrink-0 disabled:opacity-60 disabled:cursor-not-allowed">
+            <i className={`bx ${isLoading ? 'bx-loader-alt bx-spin' : 'bx-right-arrow-alt'} text-[var(--color6)] text-xl sm:text-2xl`}></i>
             </button>
-            </div>
+            </form>
+            {status && (
+              <p className={`fontStyle10 text-center mt-2 ${status === "success" ? "text-green-400" : "text-red-400"}`}>
+                {message}
+              </p>
+            )}
             
             <div className="mt-5 sm:mt-6">
               <h5 className="fontStyle7 text-[var(--color5)] font-semibold mb-2 sm:mb-3">Support</h5>

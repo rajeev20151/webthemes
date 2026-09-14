@@ -1,8 +1,11 @@
 import { Link, useNavigate } from "react-router-dom";
 import logo from "../assets/icons/logo.png";
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
-import { useAuth } from "../context/AuthContext";
-import { getTemplatesAPI, API_BASE } from "../services/api";
+import { useDispatch, useSelector } from "react-redux";
+import { logout } from "../store/slices/authSlice";
+import { selectCartItems } from "../store/slices/cartSlice";
+import { API_BASE } from "../services/api";
+import { useLazyGetTemplatesQuery } from "../store/apiSlice";
 
 // ── static fallback nav (unchanged) ───────────────────────────────────────────
 
@@ -10,15 +13,15 @@ const desktopNav = [
   { to: "/",            label: "Home",    icon: "bx-home"         },
   // { to: "/PricingPage", label: "Pricing", icon: "bx-purchase-tag" },
   { to: "/demo",        label: "Demos",   icon: "bx-play-circle"  },
-  // { to: "/blog",        label: "Blog",    icon: "bx-news"         },
+  { to: "/blog",        label: "Blog",    icon: "bx-news"         },
 ];
 
 const mobileNav = [
   { to: "/",            label: "Home",    icon: "bx-home"         },
   // { to: "/PricingPage", label: "Pricing", icon: "bx-purchase-tag" },
   { to: "/demo",       label: "Demos",   icon: "bx-play-circle"  },
-  { to: "/reviews",     label: "Reviews", icon: "bx-star"         },
-  // { to: "/blog",        label: "Blog",    icon: "bx-news"         },
+  // { to: "/reviews",     label: "Reviews", icon: "bx-star"         },
+  { to: "/blog",        label: "Blog",    icon: "bx-news"         },
   { to: "/contact",     label: "Contact", icon: "bx-envelope"     },
 ];
 
@@ -103,26 +106,41 @@ function SuggestionList({ suggestions, query, onSelect }) {
 
   return (
     <div className="absolute left-0 right-0 top-full mt-2 bg-[var(--color5)] border border-[var(--color6)]/15 rounded-2xl shadow-2xl overflow-hidden z-[9999999]">
-      {suggestions.map((t) => (
-        <button
-          key={t.id}
-          onMouseDown={(e) => { e.preventDefault(); onSelect(t); }}
-          className="w-full flex items-center gap-3 px-4 py-3 hover:bg-[var(--color11)] transition-colors duration-150 text-left border-0 bg-transparent cursor-pointer border-b border-[var(--color6)]/5 last:border-b-0"
-        >
-          {t.image && (
-            <img src={t.image} alt="" className="w-10 h-7 object-cover rounded-md shrink-0 opacity-80" />
-          )}
-          <div className="flex-1 min-w-0">
-            <p className="fontStyle9 text-[var(--color6)] truncate">
-              {highlight(t.title)}
-            </p>
-            <p className="fontStyle10 text-[var(--color4)] truncate opacity-60">{t.category}</p>
-          </div>
-          <span className={`fontStyle10 font-bold px-2 py-0.5 rounded-full shrink-0 ${t.tag === "FREE" ? "text-green-500 bg-green-500/10" : "text-orange-400 bg-orange-400/10"}`}>
-            {t.tag}
-          </span>
-        </button>
-      ))}
+      <div className="max-h-[340px] overflow-y-auto overscroll-contain scrollbar-thin">
+        {suggestions.map((t) => (
+          <button
+            key={t.id}
+            onMouseDown={(e) => { e.preventDefault(); onSelect(t); }}
+            className="w-full flex items-center gap-3 px-4 py-3 hover:bg-[var(--color11)] transition-colors duration-150 text-left border-0 bg-transparent cursor-pointer border-b border-[var(--color6)]/5 last:border-b-0"
+          >
+            {t.image && (
+              <img src={t.image} alt="" className="w-14 h-10 object-cover rounded-lg shrink-0" />
+            )}
+            <div className="flex-1 min-w-0">
+              <p className="fontStyle9 text-[var(--color6)] truncate">
+                {highlight(t.title)}
+              </p>
+              <p className="fontStyle10 text-[var(--color4)] truncate opacity-60">
+              {t.category}
+              {t.frameworks && t.frameworks.length > 0 && (
+              <span className="opacity-70">
+              {" • "}
+              {t.frameworks.map((f, i) => (
+              <span key={f}>
+              {i > 0 && ", "}
+              {highlight(f)}
+              </span>
+              ))}
+              </span>
+              )}
+              </p>
+            </div>
+            <span className={`fontStyle10 font-bold px-2.5 py-0.5 rounded-full shrink-0 ${t.tag === "FREE" ? "text-green-500 bg-green-500/10" : "text-orange-400 bg-orange-400/10"}`}>
+              {t.tag}
+            </span>
+          </button>
+        ))}
+      </div>
     </div>
   );
 }
@@ -130,8 +148,12 @@ function SuggestionList({ suggestions, query, onSelect }) {
 // ── component ─────────────────────────────────────────────────────────────────
 
 export default function Navbar() {
-  const { user, logout } = useAuth();
+  const dispatch = useDispatch();
+  const { user } = useSelector((state) => state.auth);
+  const cart = useSelector(selectCartItems);
   const navigate = useNavigate();
+
+  const [fetchTemplates, { data: templatesData }] = useLazyGetTemplatesQuery();
 
   const [changeMode,   setChangeMode]   = useState(false);
   const [menuOpen,     setMenuOpen]     = useState(false);
@@ -140,6 +162,7 @@ export default function Navbar() {
   const [searchOpen,   setSearchOpen]   = useState(false);
   const [searchQuery,  setSearchQuery]  = useState("");
   const [mobileQuery,  setMobileQuery]  = useState("");
+  const [scrolled,     setScrolled]     = useState(false);
 
   // ── all templates cached once for instant suggestions + mega menu ──
   const [allTemplates,       setAllTemplates]       = useState([]);
@@ -154,21 +177,20 @@ export default function Navbar() {
   const megaMenuTabs = useMemo(() => buildMegaMenuTabs(allTemplates), [allTemplates]);
   const activeTabData = megaMenuTabs.find((t) => t.id === activeTab) || megaMenuTabs[0];
 
-  // Fetch once when component mounts
+  // ── update allTemplates when RTK Query data arrives ──
   useEffect(() => {
-    getTemplatesAPI()
-      .then((data) => {
-        const raw = Array.isArray(data) ? data : data.templates ?? [];
-        setAllTemplates(raw.map((t) => ({
-          id:       t._id,
-          title:    t.name || "Untitled",
-          category: t.category || t.subtitle || "General",
-          tag:      t.price === 0 ? "FREE" : "PRO",
-          image:    resolveImage(t),
-        })));
-      })
-      .catch(() => {});
-  }, []);
+    if (templatesData) {
+      const raw = Array.isArray(templatesData) ? templatesData : templatesData.templates ?? [];
+      setAllTemplates(raw.map((t) => ({
+        id:       t._id,
+        title:    t.name || "Untitled",
+        category: t.category || t.subtitle || "General",
+        tag:      t.price === 0 ? "FREE" : "PRO",
+        image:    resolveImage(t),
+        frameworks: Array.isArray(t.frameworks) ? t.frameworks : [],
+      })));
+    }
+  }, [templatesData]);
 
   // Keep activeTab valid once dynamic tabs load / change
   useEffect(() => {
@@ -179,13 +201,18 @@ export default function Navbar() {
   }, [megaMenuTabs, activeTab]);
 
   // ── debounced suggestion filter ────────────────────────────────────────────
-  const getSuggestions = useCallback((q) => {
-    if (!q.trim()) return [];
-    const lower = q.toLowerCase();
-    return allTemplates
-      .filter((t) => t.title.toLowerCase().includes(lower) || t.category.toLowerCase().includes(lower))
-      .slice(0, 6);
-  }, [allTemplates]);
+const getSuggestions = useCallback((q) => {
+  if (!q.trim()) return [];
+  const lower = q.toLowerCase();
+  return allTemplates
+    .filter((t) =>
+      t.title.toLowerCase().includes(lower) ||
+      t.category.toLowerCase().includes(lower) ||
+      t.tag.toLowerCase().includes(lower) ||
+      (t.frameworks || []).some((f) => f.toLowerCase().includes(lower))
+    )
+    .slice(0, 6);
+}, [allTemplates]);
 
   const handleDesktopQueryChange = (val) => {
     setSearchQuery(val);
@@ -212,12 +239,21 @@ export default function Navbar() {
   }, []);
 
   useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 10);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  useEffect(() => {
     document.body.style.overflow = menuOpen ? "hidden" : "";
     return () => { document.body.style.overflow = ""; };
   }, [menuOpen]);
 
   useEffect(() => {
-    if (searchOpen && desktopSearchRef.current) desktopSearchRef.current.focus();
+    if (searchOpen) {
+      if (!allTemplates.length) fetchTemplates();
+      if (desktopSearchRef.current) desktopSearchRef.current.focus();
+    }
     if (!searchOpen) { setSearchQuery(""); setDesktopSuggestions([]); }
   }, [searchOpen]);
 
@@ -278,14 +314,14 @@ export default function Navbar() {
   };
 
   const handleLogout = () => {
-    logout();
+    dispatch(logout());
     navigate("/");
   };
 
   return (
     <>
       {/* ===== Main Header ===== */}
-      <header className={`header sticky top-0 ${changeMode ? "bg-[var(--color1)]" : "bg-[var(--color5)] border-b border-gray-200"}`}>
+      <header className={`header ${scrolled ? "header_scrolled" : ""} ${changeMode ? "bg-[var(--color1)]" : "bg-[var(--color5)] border-b border-gray-200"}`}>
         <div className="w-width">
           <div className="flex justify-between items-center">
 
@@ -306,7 +342,7 @@ export default function Navbar() {
                 </li>
 
                 {/* ── Templates mega menu ── */}
-                <li className="relative group">
+                <li className="relative group" onMouseEnter={() => { if (!allTemplates.length) fetchTemplates(); }}>
                   <Link
                     to="/templates"
                     className="hover:opacity-70 transition duration-300 flex items-center gap-1.5"
@@ -457,46 +493,62 @@ export default function Navbar() {
               </button>
 
               {user ? (
-                <div className="relative group">
-                  <button className="fontStyle8 bg-[var(--color6)] text-[var(--color5)] pl-1.5 pr-4 py-1.5 rounded-full hover:opacity-90 transition duration-300 flex items-center gap-2 border-0 cursor-pointer">
-                    <span className="w-7 h-7 rounded-full bg-[var(--color5)] text-[var(--color6)] flex items-center justify-center fontStyle9 font-bold uppercase">
-                      {user.name.charAt(0)}
-                    </span>
-                    {user.name.split(" ")[0]}
-                    <i className="bx bx-chevron-down text-sm transition-transform duration-300 group-hover:rotate-180"></i>
-                  </button>
-                  <div className="absolute right-0 top-full pt-3 hidden group-hover:block z-[9999]">
-                    <div className="bg-[var(--color5)] border border-[var(--color11)] rounded-2xl shadow-2xl w-56 overflow-hidden">
-                      <div className="px-4 py-4 border-b border-[var(--color11)]">
-                        <div className="flex items-center gap-3">
-                          <span className="w-9 h-9 rounded-full bg-[var(--color6)] text-[var(--color5)] flex items-center justify-center fontStyle8 font-bold uppercase shrink-0">
-                            {user.name.charAt(0)}
-                          </span>
-                          <div className="min-w-0">
-                            <p className="fontStyle8 font-semibold text-[var(--color6)] truncate">{user.name}</p>
-                            {user.email && <p className="fontStyle10 text-[var(--color6)] opacity-40 truncate">{user.email}</p>}
+                <div className="flex items-center gap-3">
+                  {/* Cart circle with count — only when cart has items */}
+                  {cart.length > 0 && (
+                    <Link
+                      to="/cart"
+                      className="relative w-9 h-9 rounded-full bg-[var(--color6)] text-[var(--color5)] flex items-center justify-center hover:opacity-90 transition duration-300"
+                    >
+                      <i className="bx bx-cart text-lg"></i>
+                      <span className="absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center px-1">
+                        {cart.length}
+                      </span>
+                    </Link>
+                  )}
+
+                  {/* User dropdown */}
+                  <div className="relative group">
+                    <button className="fontStyle8 bg-[var(--color6)] text-[var(--color5)] pl-1.5 pr-4 py-1.5 rounded-full hover:opacity-90 transition duration-300 flex items-center gap-2 border-0 cursor-pointer">
+                      <span className="w-7 h-7 rounded-full bg-[var(--color5)] text-[var(--color6)] flex items-center justify-center fontStyle9 font-bold uppercase">
+                        {user.name.charAt(0)}
+                      </span>
+                      {user.name.split(" ")[0]}
+                      <i className="bx bx-chevron-down text-sm transition-transform duration-300 group-hover:rotate-180"></i>
+                    </button>
+                    <div className="absolute right-0 top-full pt-3 hidden group-hover:block z-[9999]">
+                      <div className="bg-[var(--color5)] border border-[var(--color11)] rounded-2xl shadow-2xl w-56 overflow-hidden">
+                        <div className="px-4 py-4 border-b border-[var(--color11)]">
+                          <div className="flex items-center gap-3">
+                            <span className="w-9 h-9 rounded-full bg-[var(--color6)] text-[var(--color5)] flex items-center justify-center fontStyle8 font-bold uppercase shrink-0">
+                              {user.name.charAt(0)}
+                            </span>
+                            <div className="min-w-0">
+                              <p className="fontStyle8 font-semibold text-[var(--color6)] truncate">{user.name}</p>
+                              {user.email && <p className="fontStyle10 text-[var(--color6)] opacity-40 truncate">{user.email}</p>}
+                            </div>
                           </div>
                         </div>
-                      </div>
-                      <div className="py-1.5 px-1.5">
-                        <Link
-                          to="/profile"
-                          className="flex items-center gap-3 px-3 py-2.5 fontStyle9 text-[var(--color6)] hover:bg-[var(--color11)] rounded-xl transition duration-200"
-                        >
-                          <span className="w-8 h-8 rounded-lg bg-[var(--color11)] flex items-center justify-center shrink-0">
-                            <i className="bx bx-user text-base text-[var(--color6)] opacity-60"></i>
-                          </span>
-                          <span>Profile</span>
-                        </Link>
-                        <button
-                          onClick={handleLogout}
-                          className="w-full text-left flex items-center gap-3 px-3 py-2.5 fontStyle9 text-red-500 hover:bg-red-500/10 rounded-xl transition duration-200 bg-transparent border-0 cursor-pointer"
-                        >
-                          <span className="w-8 h-8 rounded-lg bg-red-500/10 flex items-center justify-center shrink-0">
-                            <i className="bx bx-log-out text-base"></i>
-                          </span>
-                          <span>Logout</span>
-                        </button>
+                        <div className="py-1.5 px-1.5">
+                          <Link
+                            to="/profile"
+                            className="flex items-center gap-3 px-3 py-2.5 fontStyle9 text-[var(--color6)] hover:bg-[var(--color11)] rounded-xl transition duration-200"
+                          >
+                            <span className="w-8 h-8 rounded-lg bg-[var(--color11)] flex items-center justify-center shrink-0">
+                              <i className="bx bx-user text-base text-[var(--color6)] opacity-60"></i>
+                            </span>
+                            <span>Profile</span>
+                          </Link>
+                          <button
+                            onClick={handleLogout}
+                            className="w-full text-left flex items-center gap-3 px-3 py-2.5 fontStyle9 text-red-500 hover:bg-red-500/10 rounded-xl transition duration-200 bg-transparent border-0 cursor-pointer"
+                          >
+                            <span className="w-8 h-8 rounded-lg bg-red-500/10 flex items-center justify-center shrink-0">
+                              <i className="bx bx-log-out text-base"></i>
+                            </span>
+                            <span>Logout</span>
+                          </button>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -513,28 +565,46 @@ export default function Navbar() {
             </div>
 
             {/* ===== Mobile controls ===== */}
-            <div className="flex items-center gap-4 lg:hidden">
-              {user ? (
-                <button
-                  onClick={logout}
-                  className="fontStyle8 hover:opacity-70 transition duration-300 text-red-500 flex items-center gap-1 bg-transparent border-0 cursor-pointer"
+            <div className="flex items-center gap-3 lg:hidden">
+              {user && cart.length > 0 && (
+                <Link
+                  to="/cart"
+                  className="relative w-10 h-10 rounded-xl bg-[var(--color11)] text-[var(--color6)] flex items-center justify-center hover:bg-[var(--color6)] hover:text-[var(--color5)] transition-all duration-300"
                 >
-                  <i className="bx bx-log-out text-base"></i> Logout
-                </button>
-              ) : (
-                <Link to="/login" className="fontStyle8 hover:opacity-70 transition duration-300 text-[var(--color6)] flex items-center gap-1">
-                  Log In
+                  <i className="bx bx-cart text-lg"></i>
+                  <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center px-1">
+                    {cart.length}
+                  </span>
                 </Link>
               )}
-              <div onClick={toggleMode} className="cursor-pointer text-2xl text-[var(--color6)]">
-                <i className={`bx ${changeMode ? "bx-moon" : "bx-sun"}`}></i>
-              </div>
+              {user ? (
+                <Link
+                  to="/profile"
+                  className="w-10 h-10 rounded-xl bg-[var(--color6)] text-[var(--color5)] flex items-center justify-center fontStyle9 font-bold uppercase hover:opacity-80 transition-all duration-300"
+                >
+                  {user.name.charAt(0)}
+                </Link>
+              ) : (
+                <Link to="/login" className="fontStyle9 bg-[var(--color6)] text-[var(--color5)] px-4 py-2 rounded-xl hover:opacity-90 transition-all duration-300 flex items-center gap-1.5">
+                  <i className="bx bx-log-in text-base"></i>
+                </Link>
+              )}
+              <button
+                onClick={toggleMode}
+                className="w-10 h-10 rounded-xl bg-[var(--color11)] text-[var(--color6)] flex items-center justify-center hover:bg-[var(--color6)] hover:text-[var(--color5)] transition-all duration-300"
+              >
+                <i className={`bx ${changeMode ? "bx-moon" : "bx-sun"} text-lg`}></i>
+              </button>
               <button
                 onClick={() => setMenuOpen(!menuOpen)}
-                className="text-[var(--color6)] text-2xl cursor-pointer bg-transparent"
+                className="w-10 h-10 rounded-xl bg-[var(--color11)] flex items-center justify-center text-[var(--color6)] hover:bg-[var(--color6)] hover:text-[var(--color5)] transition-all duration-300"
                 aria-label="Toggle menu"
               >
-                <i className="bx bx-menu"></i>
+                {menuOpen ? (
+                  <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                ) : (
+                  <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+                )}
               </button>
             </div>
 
@@ -542,40 +612,45 @@ export default function Navbar() {
         </div>
       </header>
 
-      {/* ===== Mobile Overlay ===== */}
+      {/* ===== Mobile Overlay (Slide-in) ===== */}
       <div
-        className={`mobile_overlay fixed inset-0 z-[99999] lg:hidden flex flex-col transition-all duration-300 bg-[var(--color5)] ${
-          menuOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+        className={`mobile_overlay fixed inset-0 z-[99999] lg:hidden flex flex-col bg-[var(--color5)] ${
+          menuOpen ? "mobile_overlay_open" : "mobile_overlay_closed"
         }`}
       >
-        <div className="flex justify-between items-center px-6 py-5 border-b border-[var(--color11)]">
-          <Link to="/" onClick={closeMobileMenu}>
-            <img src={logo} alt="Logo" className="w-14" />
+        {/* Top bar */}
+        <div className="flex justify-between items-center px-5 py-4 border-b border-[var(--color11)]">
+          <Link to="/" onClick={closeMobileMenu} className="flex items-center gap-3">
+            <img src={logo} alt="Logo" className="w-10" />
           </Link>
-          <button onClick={closeMobileMenu} className="text-[var(--color6)] text-3xl cursor-pointer bg-transparent leading-none" aria-label="Close menu">
-            <i className="bx bx-x"></i>
+          <button
+            onClick={closeMobileMenu}
+            className="w-10 h-10 rounded-xl bg-[var(--color11)] flex items-center justify-center text-[var(--color6)] hover:bg-red-500/10 hover:text-red-500 transition-all duration-200"
+            aria-label="Close menu"
+          >
+            <i className="bx bx-x text-xl"></i>
           </button>
         </div>
 
-        {/* Mobile search + suggestions */}
-        <div className="px-6 py-4 border-b border-[var(--color11)] relative">
-          <form onSubmit={handleMobileSearch} className="flex items-center gap-3 border border-[var(--color11)] rounded-full px-4 py-2.5">
-            <i className="bx bx-search text-xl text-[var(--color6)] opacity-50 shrink-0"></i>
+        {/* Search */}
+        <div className="px-5 py-4 relative">
+          <form onSubmit={handleMobileSearch} className="mobile_search_bar">
+            <i className="bx bx-search text-lg text-[var(--color6)] opacity-40 shrink-0"></i>
             <input
               ref={mobileSearchRef}
               type="text"
               value={mobileQuery}
               onChange={(e) => handleMobileQueryChange(e.target.value)}
               placeholder="Search templates..."
-              className="flex-1 bg-transparent outline-none fontStyle8 text-[var(--color6)] placeholder-opacity-40 text-sm"
+              className="flex-1 bg-transparent outline-none fontStyle8 text-[var(--color6)] placeholder-[var(--color6)] placeholder-opacity-30 text-[15px]"
             />
             {mobileQuery && (
               <button
                 type="button"
                 onClick={() => { setMobileQuery(""); setMobileSuggestions([]); }}
-                className="text-[var(--color6)] opacity-50 hover:opacity-100 transition duration-200 bg-transparent"
+                className="w-7 h-7 rounded-full bg-[var(--color6)]/10 flex items-center justify-center text-[var(--color6)] hover:bg-red-500/15 hover:text-red-500 transition-all duration-200"
               >
-                <i className="bx bx-x text-xl"></i>
+                <i className="bx bx-x text-sm"></i>
               </button>
             )}
           </form>
@@ -586,37 +661,42 @@ export default function Navbar() {
           />
         </div>
 
-        <nav className="flex-1 overflow-y-auto px-6 pt-2">
-          <ul className="mobile_overlay_nav flex flex-col">
+        {/* Nav items */}
+        <nav className="flex-1 overflow-y-auto px-5 pb-4">
+          <div className="space-y-1">
+            {/* Home */}
+            <Link to="/" className="mobile_nav_item text-[var(--color6)] fontStyle7 font-medium" onClick={closeMobileMenu}>
+              <span className="w-10 h-10 rounded-xl bg-[var(--color11)] flex items-center justify-center shrink-0">
+                <i className="bx bx-home text-lg"></i>
+              </span>
+              <span className="flex-1">Home</span>
+              <i className="bx bx-chevron-right text-lg opacity-20"></i>
+            </Link>
 
-            <li className="border-b border-[var(--color11)]">
-              <Link to="/" className="block py-5 text-[var(--color6)] fontStyle4 font-medium hover:opacity-60 transition duration-300 flex items-center gap-3" onClick={closeMobileMenu}>
-                <i className="bx bx-home text-xl shrink-0"></i> Home
-              </Link>
-            </li>
-
-            <li className="border-b border-[var(--color11)]">
+            {/* Templates (expandable) */}
+            <div>
               <button
-                onClick={() => setMegaOpen(!megaOpen)}
-                className="w-full bg-transparent text-left py-5 flex justify-between items-center text-[var(--color6)] fontStyle4 font-medium hover:opacity-60 transition duration-300"
+                onClick={() => { setMegaOpen(!megaOpen); if (!allTemplates.length) fetchTemplates(); }}
+                className="w-full mobile_nav_item text-[var(--color6)] fontStyle7 font-medium"
               >
-                <span className="flex items-center gap-3">
-                  <i className="bx bx-layout text-xl shrink-0"></i> Templates
+                <span className="w-10 h-10 rounded-xl bg-[rgba(99,102,241,0.1)] flex items-center justify-center shrink-0">
+                  <i className="bx bx-layout text-lg text-[var(--color4)]"></i>
                 </span>
-                <i className={`bx bx-chevron-down text-2xl transition-transform duration-300 ${megaOpen ? "rotate-180" : ""}`}></i>
+                <span className="flex-1 text-left">Templates</span>
+                <i className={`bx bx-chevron-right text-lg opacity-20 transition-transform duration-300 ${megaOpen ? "rotate-90" : ""}`}></i>
               </button>
 
               {megaOpen && megaMenuTabs.length > 0 && (
-                <div className="pb-5">
-                  <div className="flex gap-2 overflow-x-auto pb-3 mb-4 border-b border-[var(--color11)]">
+                <div className="ml-4 mt-1 mb-3 pl-6 border-l-2 border-[var(--color11)]">
+                  <div className="flex gap-2 overflow-x-auto pb-3 pt-2 no-scrollbar">
                     {megaMenuTabs.map((tab) => (
                       <button
                         key={tab.id}
                         onClick={() => setActiveTab(tab.id)}
-                        className={`shrink-0 px-3 py-1.5 rounded-full fontStyle9 text-xs font-semibold transition duration-200 border-0 cursor-pointer
+                        className={`shrink-0 px-4 py-2 rounded-full fontStyle9 text-xs font-semibold transition-all duration-200 border-0 cursor-pointer
                           ${activeTab === tab.id
-                            ? "bg-[var(--color4)] text-[var(--color5)]"
-                            : "bg-[var(--color11)] text-[var(--color6)] opacity-70"
+                            ? "bg-[var(--color6)] text-[var(--color5)] shadow-lg"
+                            : "bg-[var(--color11)] text-[var(--color6)]"
                           }`}
                       >
                         {tab.label}
@@ -624,18 +704,18 @@ export default function Navbar() {
                     ))}
                   </div>
 
-                  <ul className="space-y-1">
+                  <ul className="space-y-0.5 mt-1">
                     {activeTabData?.links.map((item) => (
                       <li key={item.id ?? item.to}>
                         <Link
                           to={item.to}
-                          className="flex items-center gap-3 py-2.5 text-[var(--color6)] fontStyle8 hover:opacity-60 transition duration-300"
+                          className="flex items-center gap-3 py-2.5 px-2 text-[var(--color6)] fontStyle8 rounded-lg hover:bg-[var(--color11)] transition duration-200"
                           onClick={closeMobileMenu}
                         >
-                          <i className="bx bx-chevron-right text-sm opacity-40"></i>
+                          <i className="bx bx-link-external text-xs opacity-30"></i>
                           <div>
-                            <p className="font-medium">{item.label}</p>
-                            <p className="text-xs opacity-50">{item.desc}</p>
+                            <p className="font-medium text-[15px]">{item.label}</p>
+                            <p className="text-xs opacity-40 mt-0.5">{item.desc}</p>
                           </div>
                         </Link>
                       </li>
@@ -643,55 +723,64 @@ export default function Navbar() {
                   </ul>
                 </div>
               )}
-            </li>
+            </div>
 
+            {/* Remaining nav items */}
             {mobileNav.slice(1).map((item, i) => (
-              <li key={item.to} className={i < mobileNav.length - 2 ? "border-b border-[var(--color11)]" : ""}>
-                <Link
-                  to={item.to}
-                  className="block py-5 text-[var(--color6)] fontStyle4 font-medium hover:opacity-60 transition duration-300 flex items-center gap-3"
-                  onClick={closeMobileMenu}
-                >
-                  <i className={`bx ${item.icon} text-xl shrink-0`}></i> {item.label}
-                </Link>
-              </li>
-            ))}
-
-            {user && (
-              <>
-                <li className="border-t border-[var(--color11)] mt-2 pt-2">
-                  <Link
-                    to="/profile"
-                    className="block py-4 text-[var(--color6)] fontStyle4 font-medium hover:opacity-60 transition duration-300 flex items-center gap-3"
-                    onClick={closeMobileMenu}
-                  >
-                    <i className="bx bx-user text-xl shrink-0"></i> Profile
-                  </Link>
-                </li>
-                <li>
-                  <button
-                    onClick={() => { logout(); closeMobileMenu(); navigate("/"); }}
-                    className="w-full bg-transparent border-0 text-left py-4 text-red-500 fontStyle4 font-medium hover:opacity-60 transition duration-300 flex items-center gap-3 cursor-pointer"
-                  >
-                    <i className="bx bx-log-out text-xl shrink-0"></i> Logout
-                  </button>
-                </li>
-              </>
-            )}
-
-          </ul>
-        </nav>
-
-        <div className="px-6 py-6 border-t border-[var(--color11)]">
-          <div className="flex flex-wrap gap-x-5 gap-y-2 justify-center mb-5">
-            {["Terms","Privacy Policy","Refund Policy","License"].map((l) => (
-              <Link key={l} to={`/${l.toLowerCase().replace(/ /g,"-")}`} className="fontStyle9 text-[var(--color6)] opacity-40 hover:opacity-70 transition duration-300" onClick={closeMobileMenu}>{l}</Link>
+              <Link
+                key={item.to}
+                to={item.to}
+                className="mobile_nav_item text-[var(--color6)] fontStyle7 font-medium"
+                onClick={closeMobileMenu}
+              >
+                <span className="w-10 h-10 rounded-xl bg-[var(--color11)] flex items-center justify-center shrink-0">
+                  <i className={`bx ${item.icon} text-lg`}></i>
+                </span>
+                <span className="flex-1">{item.label}</span>
+                <i className="bx bx-chevron-right text-lg opacity-20"></i>
+              </Link>
             ))}
           </div>
-          <div className="flex justify-center gap-6">
-            <a href="#" className="text-[var(--color6)] opacity-50 hover:opacity-100 transition duration-300" aria-label="Twitter"><i className="bx bxl-twitter text-2xl"></i></a>
-            <a href="#" className="text-[var(--color6)] opacity-50 hover:opacity-100 transition duration-300" aria-label="Meta"><i className="bx bxl-meta text-2xl"></i></a>
-            <a href="#" className="text-[var(--color6)] opacity-50 hover:opacity-100 transition duration-300" aria-label="Discord"><i className="bx bxl-discord-alt text-2xl"></i></a>
+
+          {/* User section at bottom of nav */}
+          {user && (
+            <div className="mt-4 pt-4 border-t border-[var(--color11)] space-y-1">
+              <Link to="/profile" className="mobile_nav_item text-[var(--color6)] fontStyle7 font-medium" onClick={closeMobileMenu}>
+                <span className="w-10 h-10 rounded-xl bg-[var(--color11)] flex items-center justify-center shrink-0">
+                  <i className="bx bx-user text-lg"></i>
+                </span>
+                <span className="flex-1">Profile</span>
+                <i className="bx bx-chevron-right text-lg opacity-20"></i>
+              </Link>
+              <button
+                onClick={() => { dispatch(logout()); closeMobileMenu(); navigate("/"); }}
+                className="w-full mobile_nav_item text-red-500 fontStyle7 font-medium"
+              >
+                <span className="w-10 h-10 rounded-xl bg-red-500/10 flex items-center justify-center shrink-0">
+                  <i className="bx bx-log-out text-lg"></i>
+                </span>
+                <span className="flex-1 text-left">Logout</span>
+              </button>
+            </div>
+          )}
+        </nav>
+
+        {/* Bottom CTA */}
+        <div className="px-5 py-4 border-t border-[var(--color11)]">
+          {!user && (
+            <Link
+              to="/login"
+              onClick={closeMobileMenu}
+              className="flex items-center justify-center gap-2 w-full py-3.5 rounded-2xl bg-[var(--color6)] text-[var(--color5)] fontStyle8 font-semibold hover:opacity-90 transition duration-300"
+            >
+              <i className="bx bx-log-in text-lg"></i>
+              Log In
+            </Link>
+          )}
+          <div className="flex justify-center gap-5 mt-4">
+            {["Terms","Privacy","Refund"].map((l) => (
+              <Link key={l} to={`/${l.toLowerCase().replace(/ /g,"-")}`} className="fontStyle10 text-[var(--color6)] opacity-30 hover:opacity-60 transition duration-300" onClick={closeMobileMenu}>{l}</Link>
+            ))}
           </div>
         </div>
       </div>

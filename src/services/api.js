@@ -107,5 +107,14 @@ export const createContactAPI = (data) =>
     method: "POST",
     body: JSON.stringify(data),
   });
+
+// ─── Blog APIs (Public) ───────────────────────────────────────
+export const getBlogsAPI = (params = {}) => {
+  const qs = new URLSearchParams(params).toString();
+  return request(`/blogs${qs ? `?${qs}` : ""}`, { method: "GET" });
+};
+
+export const getBlogBySlugAPI = (slug) =>
+  request(`/blogs/${slug}`, { method: "GET" });
  
  

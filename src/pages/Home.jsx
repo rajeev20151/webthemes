@@ -1,10 +1,13 @@
 import Hero from "../sections/Hero";
 import Features from "../sections/Features";
+import Stats from "../sections/Stats";
 import FAQ from "../sections/FAQ";
 import PopularTemplates from "../sections/PopularTemplates";
+import TemplateSlider from "../sections/TemplateSlider";
 import Reviews from "../sections/Reviews";
 import TechScroll from "../sections/TechScroll";
 import SEOHead from "../components/SEOHead";
+import { SITE_NAME, SITE_URL } from "../config/siteConfig";
 
 export default function Home(){
    return(
@@ -15,19 +18,22 @@ export default function Home(){
        jsonLd={{
          "@context": "https://schema.org",
          "@type": "WebSite",
-         "name": "TemplateWorld",
-         "url": window.location.origin,
+         "name": SITE_NAME,
+         "url": SITE_URL,
          "potentialAction": {
            "@type": "SearchAction",
-           "target": `${window.location.origin}/templates?q={search_term_string}`,
+           "target": `${SITE_URL}/templates?q={search_term_string}`,
            "query-input": "required name=search_term_string"
          }
        }}
      />
      <Hero />
-     <Features />
-     <TechScroll />
-     <PopularTemplates />
+      <Features />
+     
+      <TechScroll />
+      <PopularTemplates />
+      <TemplateSlider />
+      {/* <Stats /> */}
      <Reviews />
     </>
    ) 

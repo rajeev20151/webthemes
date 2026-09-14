@@ -2,25 +2,29 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import {BrowserRouter} from 'react-router-dom';
 import {HelmetProvider} from 'react-helmet-async';
+import {Provider} from 'react-redux';
+import {store} from './store';
 import App from './App.jsx'
+import { AuthProvider } from './context/AuthContext';
+import { CartProvider } from './context/CartContext';
 import "boxicons/css/boxicons.min.css";
 import "./assets/css/index.css";
 import '@fortawesome/fontawesome-free/css/all.min.css'
 import ScrollToTop from "./components/ScrollToTop";
-import { AuthProvider } from './context/AuthContext.jsx';
-import { CartProvider } from './context/CartContext.jsx';
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <BrowserRouter>
-      <HelmetProvider>
-      <AuthProvider>        
+    <Provider store={store}>
+      <AuthProvider>
         <CartProvider>
-        <ScrollToTop /> 
-        <App />
-       </CartProvider> 
+          <BrowserRouter>
+            <HelmetProvider>
+              <ScrollToTop />
+              <App />
+            </HelmetProvider>
+          </BrowserRouter>
+        </CartProvider>
       </AuthProvider>
-      </HelmetProvider>       
-    </BrowserRouter>
+    </Provider>
   </StrictMode>
 )

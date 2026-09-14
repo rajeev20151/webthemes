@@ -153,7 +153,7 @@ export default function ForgotPassword() {
 
   return (
     <div className="w-width py-12 sm:py-12 md:py-20">
-      <SEOHead title="Forgot Password" description="Reset your TemplateWorld account password." />
+      <SEOHead title="Forgot Password" description="Reset your {site} account password." />
       <BreadCrumb_Nav
         items={[
           { label: "Home", path: "/" },
@@ -215,7 +215,7 @@ export default function ForgotPassword() {
               <p className="fontStyle10 text-[var(--color10)] leading-relaxed">
                 "The best investment we made for our brand."
               </p>
-              <span className="fontStyle10 text-white/30 mt-1 block">— Rajeev Sharma, Founder</span>
+              {/* <span className="fontStyle10 text-white/30 mt-1 block">— Rajeev Sharma, Founder</span> */}
             </div>
           </div>
 

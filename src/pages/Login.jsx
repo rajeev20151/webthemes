@@ -4,6 +4,8 @@ import BreadCrumb_Nav from "../components/BreadCrumb_Nav";
 import SEOHead from "../components/SEOHead";
 import { useAuth } from "../context/AuthContext";
 import { loginAPI } from "../services/api";
+import { useDispatch } from "react-redux";
+import { setCredentials } from "../store/slices/authSlice";
 
 function AuthDots() {
   return (
@@ -37,6 +39,7 @@ export default function Login() {
   const navigate  = useNavigate();
   const location = useLocation();
   const { login } = useAuth();  
+  const dispatch = useDispatch();
 
   const [mounted, setMounted]   = useState(false);
   const [form, setForm]         = useState({ email: "", password: "" });
@@ -71,6 +74,7 @@ export default function Login() {
       const data = await loginAPI(form.email, form.password);
       if (data.success) {
         login(data.user, data.token); // AuthContext me save
+        dispatch(setCredentials({ user: data.user, token: data.token }));
         const redirectTo = location.state?.from || "/";
         navigate(redirectTo, { replace: true });
       } else if (data.needsVerification) {
@@ -88,7 +92,7 @@ export default function Login() {
   return (
     <>
       <div className="w-width py-12 sm:py-12 md:py-20">
-        <SEOHead title="Login" description="Login to your TemplateWorld account to download templates and manage your purchases." />
+        <SEOHead title="Login" description="Login to your {site} account to download templates and manage your purchases." />
         <BreadCrumb_Nav items={[{ label: "Home", path: "/" }, { label: "Login", path: "/login" }]} />
 
         <div className="min-h-screen bg-[var(--color5)] flex items-center justify-center">
@@ -128,7 +132,7 @@ export default function Login() {
               </div>
               <div className={`hidden sm:block relative z-10 border-t border-white/10 pt-6 mt-8 ${slideIn("delay-300")}`}>
                 <p className="fontStyle10 text-[var(--color10)] leading-relaxed">"The best investment we made for our brand."</p>
-                <span className="fontStyle10 text-[var(--color5)] mt-1 block">— Rajeev Sharma, Founder</span>
+                {/* <span className="fontStyle10 text-[var(--color5)] mt-1 block">— Rajeev Sharma, Founder</span> */}
               </div>
             </div>
 
