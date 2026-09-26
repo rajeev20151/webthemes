@@ -11,7 +11,9 @@ export default function TemplateSlider() {
   const { data: templatesData, isLoading: loading } =
     useGetPopularTemplatesQuery(12);
 
-  const templates = templatesData?.templates ?? [];
+  const templates = [...(templatesData?.templates ?? [])].sort(
+  (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+  );
 
   if (loading) {
     return (

@@ -11,7 +11,11 @@ export default function DemoListItem({ demo }) {
     >
       <Link to={`/template/${demo.slug}`} className="flex-shrink-0 rounded-xl overflow-hidden bg-[var(--color1)] block w-[clamp(80px,18vw,130px)] aspect-[13/9]">
         {demo.image && (
-          <img src={demo.image} alt={demo.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+        <img
+        src={demo.image}
+        alt={demo.title}
+        className="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-105"
+        />
         )}
       </Link>
 

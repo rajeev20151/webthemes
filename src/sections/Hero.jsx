@@ -8,7 +8,9 @@ export default function Hero() {
   const contents = contentsData?.contents?.[0] || null;
 
   const { data: templatesData } = useGetTemplatesQuery();
-  const templates = templatesData?.templates || [];
+  const templates = [...(templatesData?.templates || [])].sort(
+  (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+  );
 
   const heroImages = templates
     .slice(0, 10)

@@ -40,7 +40,9 @@ function StarRating({ rating = 0, reviews = 0 }) {
 
 export default function PopularTemplates() {
   const { data: templatesData, isLoading: loading } = useGetPopularTemplatesQuery(9);
-  const templates = templatesData?.templates ?? [];
+  const templates = [...(templatesData?.templates ?? [])].sort(
+  (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+  );
 
   // Batch fetch all ratings in ONE call
   const templateIds = templates.map((t) => t._id).filter(Boolean);

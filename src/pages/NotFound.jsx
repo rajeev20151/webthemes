@@ -9,7 +9,7 @@ import SEOHead from "../components/SEOHead";
 const QUICK_LINKS = [
   { label: "Home",      to: "/",          icon: "bx-home-alt-2"   },
   { label: "Templates", to: "/templates", icon: "bx-layout"       },
-  { label: "Pricing",   to: "/pricingpage",   icon: "bx-purchase-tag" },
+  // { label: "Pricing",   to: "/pricingpage",   icon: "bx-purchase-tag" },
   { label: "Contact",   to: "/contact",   icon: "bx-envelope"     },
 ];
 
