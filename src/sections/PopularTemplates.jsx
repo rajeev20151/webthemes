@@ -39,10 +39,11 @@ function StarRating({ rating = 0, reviews = 0 }) {
 }
 
 export default function PopularTemplates() {
-  const { data: templatesData, isLoading: loading } = useGetPopularTemplatesQuery(9);
-  const templates = [...(templatesData?.templates ?? [])].sort(
-  (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-  );
+const { data: templatesData, isLoading: loading } = useGetPopularTemplatesQuery(100);
+
+const templates = [...(templatesData?.templates ?? [])]
+  .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+  .slice(0, 9);
 
   // Batch fetch all ratings in ONE call
   const templateIds = templates.map((t) => t._id).filter(Boolean);
@@ -110,17 +111,18 @@ export default function PopularTemplates() {
                   </Link>
                   </div>
 
-                <div className="absolute top-4 left-4">
-                <span className="bg-white/90 backdrop-blur-sm text-black px-3 py-1 rounded-full fontStyle10 font-semibold uppercase tracking-wider">
+                <div className="absolute top-4 left-4 z-10">
+                <span className="inline-flex items-center gap-1.5 bg-[var(--color5)] text-[var(--color6)] border-2 border-[var(--color6)] px-3 py-1 rounded-full fontStyle10 font-bold uppercase tracking-wider shadow-[3px_3px_0px_var(--color6)] -rotate-3 transition-all duration-300 group-hover:rotate-0 group-hover:shadow-[1px_1px_0px_var(--color6)]">
+                <span className="w-2 h-2 rounded-full bg-[var(--color6)] animate-pulse"></span>
                 {t.subtitle}
                 </span>
                 </div>
                 </div>
 
                 <div className="flex items-center justify-between mb-2">
-                  <h3 className="fontStyle7 text-[var(--color6)] font-bold group-hover:text-gray-600 transition-colors duration-300 text-left">
-                    <Link to={`/template/${t.slug}`}>{t.name}</Link>
-                  </h3>
+                <h3 className="fontStyle7 text-[var(--color6)] font-bold group-hover:text-gray-600 transition-colors duration-300 text-left truncate">
+                <Link to={`/template/${t.slug}`}>{t.name}</Link>
+                </h3>
                   <span className="flex items-center gap-1.5 flex-shrink-0 ml-2">
                     {t.price > 0 ? (
                       <>

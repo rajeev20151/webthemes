@@ -32,31 +32,54 @@ const FEATURES = [
 ];
 
 function FeatureCard({ icon, title, desc, index }) {
+  const number = String(index + 1).padStart(2, "0");
+
   return (
     <div
-      className="group relative p-8 border-[2px] border-[var(--color6)]/10 bg-[var(--color5)] rounded-2xl text-center
-        shadow-[12px_12px_0px_var(--color6)]
-        -translate-y-1.5
-        hover:shadow-[0_4px_20px_rgba(0,0,0,0.04)]
-        hover:translate-y-0
-        transition-all duration-400 ease-out"
+      className="group relative flex flex-col h-full p-6 sm:p-7 rounded-2xl overflow-hidden
+        bg-[var(--color5)] border-2 border-[var(--color6)]
+        shadow-[6px_6px_0px_var(--color6)] sm:shadow-[8px_8px_0px_var(--color6)]
+        transition-all duration-300
+        hover:shadow-[2px_2px_0px_var(--color6)] hover:translate-x-1 hover:translate-y-1 sm:hover:translate-x-1.5 sm:hover:translate-y-1.5"
     >
-      <div className="mb-6">
-        <div
-          className="relative w-16 h-16 bg-[var(--color6)] rounded-full flex items-center justify-center mx-auto
-            scale-110 rotate-6
-            group-hover:scale-100 group-hover:rotate-0 transition-all duration-400"
-        >
-          <i className={`bx ${icon} text-[var(--color5)] text-3xl relative z-10`}></i>
-        </div>
+      {/* Big outlined number */}
+      <span
+        className="absolute top-3 right-5 fontStyle3 font-bold leading-none select-none pointer-events-none
+          text-[var(--color6)]/10 group-hover:text-[var(--color6)]/25 transition-colors duration-300"
+      >
+        {number}
+      </span>
+
+      {/* Icon tile */}
+      <div
+        className="relative w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-color3 flex items-center justify-center mb-6
+          border-2 border-[var(--color6)] shadow-[3px_3px_0px_var(--color6)]
+          -rotate-6 group-hover:rotate-0 group-hover:scale-105
+          transition-all duration-300"
+      >
+        <i className={`bx ${icon} text-white text-3xl`}></i>
       </div>
-      <h3 className="fontStyle6 text-[var(--color6)] font-bold mb-4
-        group-hover:text-[var(--color6)] transition-colors duration-300">
-        {title}
-      </h3>
-      <p className="fontStyle8 text-[var(--color8)] leading-relaxed">
-        {desc}
-      </p>
+
+      {/* Text */}
+      <h3 className="fontStyle6 text-[var(--color6)] font-bold mb-3">{title}</h3>
+      <p className="fontStyle8 text-[var(--color8)] leading-relaxed mb-6">{desc}</p>
+
+      {/* Footer */}
+      <div className="flex items-center justify-between mt-auto pt-4 border-t-2 border-dashed border-[var(--color6)]/15">
+        <span className="fontStyle10 font-bold uppercase tracking-widest text-[var(--color4)]">
+          Feature {number}
+        </span>
+        <span
+          className="w-8 h-8 rounded-full border-2 border-[var(--color6)] flex items-center justify-center
+            text-[var(--color6)] group-hover:bg-[var(--color6)] group-hover:text-[var(--color5)]
+            transition-all duration-300"
+        >
+          <i className="bx bx-right-arrow-alt text-lg transition-transform duration-300 group-hover:translate-x-0.5"></i>
+        </span>
+      </div>
+
+      {/* Bottom accent bar */}
+      <span className="absolute bottom-0 left-0 h-1.5 w-0 bg-color3 group-hover:w-full transition-all duration-500 ease-out"></span>
     </div>
   );
 }
@@ -64,15 +87,15 @@ function FeatureCard({ icon, title, desc, index }) {
 export default function Features() {
   return (
     <section className="relative py-16 sm:py-20 md:py-24 overflow-hidden">
-      {/* <div className="glow-gold absolute -top-40 -right-40 w-96 h-96 opacity-30 pointer-events-none"></div> */}
-      {/* <div className="glow-orange absolute -bottom-40 -left-40 w-96 h-96 opacity-20 pointer-events-none"></div> */}
-
       <div className="w-width relative z-10">
+        {/* ── Heading ── */}
         <div className="text-center max-w-2xl mx-auto mb-12 sm:mb-14 md:mb-16">
           <span
-            className="inline-block fontStyle10 font-bold uppercase tracking-widest text-[var(--color4)]
-              border border-[var(--color6)]/18 px-4 py-1.5 rounded-full mb-4 sm:mb-5"
+            className="inline-flex items-center gap-2 fontStyle10 font-bold uppercase tracking-widest text-[var(--color6)]
+              bg-[var(--color5)] border-2 border-[var(--color6)] shadow-[3px_3px_0px_var(--color6)]
+              px-4 py-1.5 rounded-full mb-5 sm:mb-6 -rotate-2"
           >
+            <span className="w-2 h-2 rounded-full bg-[#4ade80] border border-[var(--color6)] animate-pulse"></span>
             Why Choose Us
           </span>
           <h2 className="fontStyle4 text-[var(--color6)] font-bold leading-tight mb-4">
@@ -83,9 +106,12 @@ export default function Features() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-7 lg:gap-8">
+        {/* ── Cards ── */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 sm:gap-9 lg:gap-10 pb-4">
           {FEATURES.map((f, i) => (
-            <FeatureCard key={f.title} {...f} index={i} />
+            <div key={f.title} className={i % 3 === 1 ? "lg:mt-10" : ""}>
+              <FeatureCard {...f} index={i} />
+            </div>
           ))}
         </div>
       </div>

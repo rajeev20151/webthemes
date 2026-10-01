@@ -162,28 +162,12 @@ export default function Themes() {
           />
 
           <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 items-start mt-5">
-            <div className="w-full lg:flex-1 min-w-0">
-              <h1 className="fontStyle5 font-bold text-[var(--color6)] mb-2 leading-tight tracking-tight">
+            <div className="w-full lg:flex-1 min-w-0 flex flex-col lg:block">
+              <h1 className="fontStyle5 font-bold text-[var(--color6)] mb-4 sm:mb-5 leading-tight tracking-tight order-1">
                 {theme.name}
               </h1>
 
-              <div className="flex items-center gap-3 mb-5">
-                <StarRating rating={theme.rating || 0} />
-                <Link to="#reviews" className="fontStyle9 text-[var(--color4)] hover:text-[var(--color6)] transition-colors duration-200 underline-offset-2 hover:underline">
-                  {reviewCount} customers reviews
-                </Link>
-              </div>
-
-              <MobileThemeInfo
-                theme={theme}
-                isFree={isFree}
-                resolvedPreviewUrl={resolvedPreviewUrl}
-                resolvedDownloadUrl={resolvedDownloadUrl}
-                email={email}
-                setEmail={setEmail}
-              />
-
-              <div className="order-first lg:order-none">
+              <div className="order-2">
                 <ImageGallery
                   resolvedImages={resolvedImages}
                   activeImage={activeImage}
@@ -195,7 +179,25 @@ export default function Themes() {
                 />
               </div>
 
-              <div className="border-b border-[var(--color6)]/10 mb-6 flex gap-4 sm:gap-6">
+              <div className="flex items-center gap-3 mb-5 order-3">
+                <StarRating rating={theme.rating || 0} />
+                <Link to="#reviews" className="fontStyle9 text-[var(--color4)] hover:text-[var(--color6)] transition-colors duration-200 underline-offset-2 hover:underline">
+                  {reviewCount} customers reviews
+                </Link>
+              </div>
+
+              <div className="order-4">
+                <MobileThemeInfo
+                  theme={theme}
+                  isFree={isFree}
+                  resolvedPreviewUrl={resolvedPreviewUrl}
+                  resolvedDownloadUrl={resolvedDownloadUrl}
+                  email={email}
+                  setEmail={setEmail}
+                />
+              </div>
+
+              <div className="order-5 mt-6 lg:mt-0 border-b border-[var(--color6)]/10 mb-6 flex gap-4 sm:gap-6">
                 {["description", "reviews", "discussion"].map((tab) => (
                   <button
                     key={tab}
@@ -208,7 +210,7 @@ export default function Themes() {
               </div>
 
               {activeTab === "description" && (
-                <div className="space-y-6 sm:space-y-8">
+                <div className="space-y-6 sm:space-y-8 order-6">
                   <p className="fontStyle6 text-[var(--color6)] font-bold leading-relaxed">
                     {theme.subtitle || theme.name}
                   </p>
@@ -267,14 +269,20 @@ export default function Themes() {
               )}
 
               {activeTab === "reviews" && (
-                <ReviewsSection onCountChange={setReviewCount} templateId={theme?._id} />
+                <div className="order-6">
+                  <ReviewsSection onCountChange={setReviewCount} templateId={theme?._id} />
+                </div>
               )}
 
               {activeTab === "discussion" && (
-                <ChatSection templateId={theme?._id} />
+                <div className="order-6">
+                  <ChatSection templateId={theme?._id} />
+                </div>
               )}
 
-              <RelatedProducts relatedProducts={relatedProducts} />
+              <div className="order-7">
+                <RelatedProducts relatedProducts={relatedProducts} />
+              </div>
             </div>
 
             <ThemeSidebar

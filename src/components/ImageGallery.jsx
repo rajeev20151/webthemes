@@ -67,13 +67,13 @@ export default function ImageGallery({ resolvedImages, activeImage, setActiveIma
 </div>
       {resolvedImages.length > 1 && (
         <div className="flex gap-2 p-3 overflow-x-auto">
-          {resolvedImages.map((img, i) => (
+          {resolvedImages.slice(1).map((img, i) => (
             <button
-              key={i}
-              onClick={() => setActiveImage(i)}
-              className={`flex-shrink-0 w-16 h-11 sm:w-20 sm:h-14 rounded-lg overflow-hidden border-2 transition-all duration-200 ${activeImage === i ? "border-[var(--color6)] opacity-100 shadow-md" : "border-transparent opacity-50 hover:opacity-80"}`}
+              key={i + 1}
+              onClick={() => setActiveImage(i + 1)}
+              className={`flex-shrink-0 w-16 h-11 sm:w-20 sm:h-14 rounded-lg overflow-hidden border-2 transition-all duration-200 ${activeImage === i + 1 ? "border-[var(--color6)] opacity-100 shadow-md" : "border-transparent opacity-50 hover:opacity-80"}`}
             >
-              <img src={img} alt="" className="w-full h-full object-cover" />
+              <img src={img} alt={`Image ${i + 2}`} className="w-full h-full object-cover" />
             </button>
           ))}
         </div>

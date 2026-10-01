@@ -96,10 +96,10 @@ export default function Blog() {
           style={{
             backgroundImage: "radial-gradient(circle, var(--color6) 1px, transparent 1px)",
             backgroundSize: "28px 28px",
-            opacity: 0.03,
+            opacity: 0.05,
           }}
         />
-        <div className="w-width relative z-10 px-4 sm:px-6 md:px-0">
+        <div className="w-width relative z-10">
           <BreadCrumb_Nav
             items={[
               { label: "Home", path: "/" },
@@ -107,18 +107,18 @@ export default function Blog() {
             ]}
           />
           <div className="max-w-2xl" style={fadeUp()}>
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[var(--color6)]/8 border border-[var(--color6)]/12 mb-5 sm:mb-6">
-              <span className="w-1.5 h-1.5 rounded-full bg-[var(--color6)] animate-pulse"></span>
-              <span className="fontStyle10 font-semibold text-[var(--color6)] uppercase tracking-wider">Blog & Insights</span>
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[var(--color5)] border-2 border-[var(--color6)] shadow-[3px_3px_0px_var(--color6)] -rotate-2 mb-6 sm:mb-7">
+              <span className="w-2 h-2 rounded-full bg-[#4ade80] border border-[var(--color6)] animate-pulse"></span>
+              <span className="fontStyle10 font-bold text-[var(--color6)] uppercase tracking-widest">Blog & Insights</span>
             </div>
-            <h1 className="fontStyle3 sm:fontStyle1 md:fontStyle2 font-black text-[var(--color6)] leading-[1.1] mb-5 sm:mb-6">
+            <h1 className="fontStyle3 font-black text-[var(--color6)] leading-[1.1] mb-5 sm:mb-6">
               Ideas That Shape
-              <br />
-              <span className="sm:inline" style={{ WebkitTextStroke: "2px var(--color6)", color: "transparent" }}>
+              <br className="hidden sm:block" />
+              <span style={{ WebkitTextStroke: "1.5px var(--color6)", color: "transparent" }}>
                 Digital Products.
               </span>
             </h1>
-            <p className="fontStyle9 sm:fontStyle8 text-[var(--color4)] leading-relaxed max-w-lg">
+            <p className="fontStyle8 text-[var(--color4)] leading-relaxed max-w-lg">
               Deep dives into design systems, frontend architecture, and the real-world strategies behind products that scale.
             </p>
           </div>
@@ -128,7 +128,7 @@ export default function Blog() {
       {/* ─── FEATURED POST ─── */}
       {featured && (
         <section className="pb-14 sm:pb-18">
-          <div className="w-width px-4 sm:px-6 md:px-0">
+          <div className="w-width">
             <div style={fadeUp(0.1)}>
               <FeaturedCard post={featured} />
             </div>
@@ -138,20 +138,20 @@ export default function Blog() {
 
       {/* ─── FILTER BAR ─── */}
       <section className="pb-8 sm:pb-10">
-        <div className="w-width px-4 sm:px-6 md:px-0">
-          <div className="pb-5 sm:pb-6 border-b border-[var(--color6)]/10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 sm:gap-5">
+        <div className="w-width">
+          <div className="pb-5 sm:pb-6 border-b-2 border-dashed border-[var(--color6)]/15 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 sm:gap-5">
             {/* Category tabs */}
-            <div className="flex items-center gap-0.5 overflow-x-auto pb-1 sm:pb-0 -mx-4 px-4 sm:mx-0 sm:px-0 scrollbar-hide">
+            <div className="flex items-center gap-2.5 overflow-x-auto py-2 px-1 -mx-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
               {CATEGORIES.map((cat) => {
                 const active = activeCategory === cat;
                 return (
                   <button
                     key={cat}
                     onClick={() => setActiveCategory(cat)}
-                    className={`relative fontStyle10 sm:fontStyle9 font-semibold px-3.5 sm:px-4 py-2 whitespace-nowrap rounded-lg transition-all duration-200
+                    className={`fontStyle10 sm:text-[0.88rem] font-bold px-4 py-2 whitespace-nowrap rounded-full border-2 cursor-pointer transition-all duration-200
                       ${active
-                        ? "text-[var(--color5)] bg-[var(--color6)]"
-                        : "text-[var(--color4)] hover:text-[var(--color6)] hover:bg-[var(--color6)]/5"
+                        ? "bg-[var(--color6)] text-[var(--color5)] border-[var(--color6)] shadow-[3px_3px_0px_var(--color4)] -translate-y-0.5"
+                        : "bg-[var(--color5)] text-[var(--color4)] border-[var(--color6)]/20 hover:border-[var(--color6)] hover:text-[var(--color6)]"
                       }`}
                   >
                     {cat}
@@ -161,8 +161,8 @@ export default function Blog() {
             </div>
 
             {/* Search */}
-            <div className="relative w-full sm:w-auto">
-              <svg className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--color4)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <div className="relative w-full lg:w-auto lg:flex-shrink-0">
+              <svg className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--color4)] pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <circle cx="11" cy="11" r="8" />
                 <path d="M21 21l-4.35-4.35" strokeLinecap="round" />
               </svg>
@@ -171,14 +171,15 @@ export default function Blog() {
                 placeholder="Search articles..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full sm:w-60 pl-10 pr-10 py-2.5 rounded-xl border border-[var(--color6)]/12 bg-white
-                  fontStyle9 text-[var(--color6)] placeholder-[var(--color4)]/60 outline-none
-                  focus:border-[var(--color6)] focus:ring-2 focus:ring-[var(--color6)]/10 transition-all duration-200"
+                className="w-full lg:w-72 pl-10 pr-10 py-2.5 rounded-xl border-2 border-[var(--color6)]/25
+                  bg-[var(--color5)] fontStyle9 text-[var(--color6)] placeholder:text-[var(--color4)] outline-none
+                  focus:border-[var(--color6)] focus:shadow-[3px_3px_0px_var(--color6)] transition-all duration-200"
               />
               {search && (
                 <button
                   onClick={() => setSearch("")}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--color4)] hover:text-[var(--color6)] transition-colors"
+                  aria-label="Clear search"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--color4)] hover:text-[var(--color6)] transition-colors cursor-pointer"
                 >
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" d="M6 18L18 6M6 6l12 12" />
@@ -192,48 +193,49 @@ export default function Blog() {
 
       {/* ─── GRID + SIDEBAR ─── */}
       <section className="pb-20 sm:pb-28">
-        <div className="w-width px-4 sm:px-6 md:px-0">
+        <div className="w-width">
           <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] xl:grid-cols-[1fr_320px] gap-10 lg:gap-14 items-start">
 
             {/* Grid */}
             <div>
               <div className="flex items-center gap-3 mb-6 sm:mb-8">
-                <h2 className="fontStyle7 font-bold text-[var(--color6)]">
+                <h2 className="fontStyle5 font-bold text-[var(--color6)]">
                   {activeCategory === "All" ? "All Articles" : activeCategory}
                 </h2>
-                <span className="fontStyle10 font-semibold text-[var(--color4)] bg-[var(--color6)]/6 px-2.5 py-1 rounded-full">
+                <span className="fontStyle10 font-bold text-[var(--color6)] bg-[var(--color5)] border-2 border-[var(--color6)] shadow-[2px_2px_0px_var(--color6)] px-3 py-0.5 rounded-full">
                   {filtered.length}
                 </span>
+                <span className="flex-1 border-t-2 border-dashed border-[var(--color6)]/15"></span>
               </div>
 
               {loading ? (
                 <div className="py-20 sm:py-24 text-center">
-                  <div className="w-8 h-8 border-2 border-[var(--color6)] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                  <div className="w-10 h-10 border-[3px] border-[var(--color6)] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
                   <p className="fontStyle9 text-[var(--color4)]">Loading articles...</p>
                 </div>
               ) : filtered.length > 0 ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-7">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 sm:gap-9 pb-2">
                   {filtered.map((post, i) => (
                     <BlogCard key={post.id} post={post} index={i} TAG_COLORS={TAG_COLORS} />
                   ))}
                 </div>
               ) : (
-                <div className="py-20 sm:py-24 text-center">
-                  <div className="w-16 h-16 rounded-2xl bg-[var(--color6)]/5 flex items-center justify-center mx-auto mb-5">
-                    <svg className="w-7 h-7 text-[var(--color6)]/25" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <div className="py-16 sm:py-20 flex flex-col items-center text-center">
+                  <div className="w-20 h-20 rounded-3xl mb-6 flex items-center justify-center bg-[var(--color11)] border-2 border-dashed border-[var(--color4)] opacity-70">
+                    <svg className="w-8 h-8 text-[var(--color4)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                       <circle cx="11" cy="11" r="8" />
                       <path d="M21 21l-4.35-4.35" strokeLinecap="round" />
                     </svg>
                   </div>
-                  <p className="fontStyle8 text-[var(--color4)] mb-1">
+                  <p className="fontStyle7 text-[var(--color4)] mb-1">
                     No articles found
                     {search && (
-                      <> for <span className="font-semibold text-[var(--color6)]">"{search}"</span></>
+                      <> for <span className="font-bold text-[var(--color6)]">"{search}"</span></>
                     )}
                   </p>
                   <button
                     onClick={() => { setSearch(""); setActiveCategory("All"); }}
-                    className="mt-3 fontStyle9 font-semibold text-[var(--color6)] hover:underline underline-offset-4"
+                    className="mt-4 fontStyle9 font-bold px-6 py-2.5 rounded-full bg-[var(--color5)] text-[var(--color6)] border-2 border-[var(--color6)] shadow-[3px_3px_0px_var(--color6)] hover:shadow-[1px_1px_0px_var(--color6)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all duration-300 cursor-pointer"
                   >
                     Clear filters
                   </button>
@@ -243,11 +245,11 @@ export default function Blog() {
               {/* Load more */}
               {filtered.length > 0 && (
                 <div className="mt-14 sm:mt-16 text-center">
-                  <Link to="" className="group fontStyle8 sm:fontStyle7 inline-flex items-center gap-3 pl-7 sm:pl-8 pr-3 py-3 text-[var(--color5)]
-                    bg-[var(--color6)] rounded-full shadow-[4px_4px_0px_var(--color6)] hover:shadow-[2px_2px_0px_var(--color6)]
-                    transition-all duration-300 hover:translate-x-[2px] hover:translate-y-[2px]">
+                  <Link to="" className="group fontStyle7 inline-flex items-center gap-3 pl-8 pr-3 py-3 text-[var(--color5)]
+                    bg-[var(--color6)] rounded-full shadow-[4px_4px_0px_var(--color4)] hover:shadow-[1px_1px_0px_var(--color4)]
+                    transition-all duration-300 hover:translate-x-[3px] hover:translate-y-[3px]">
                     <span className="font-bold">Load More</span>
-                    <span className="flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-[var(--color5)]
+                    <span className="flex items-center justify-center w-10 h-10 rounded-full bg-[var(--color5)]
                       transition-all duration-300 group-hover:rotate-90">
                       <svg className="w-5 h-5 text-[var(--color6)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M5 15l7-7 7 7" />
@@ -259,7 +261,7 @@ export default function Blog() {
             </div>
 
             {/* Sidebar */}
-            <div className="lg:sticky lg:top-8 order-first lg:order-last">
+            <div className="lg:sticky lg:top-36">
               <Sidebar posts={posts} CATEGORIES={CATEGORIES} />
             </div>
           </div>

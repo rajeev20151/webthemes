@@ -65,6 +65,7 @@ export default function TemplateModal({ mode, data, onClose, onSave, saving }) {
       return arr;
     });
     setExistingUrls((prev) => {
+      if (!prev.length) return prev;
       const arr = [...prev];
       const [item] = arr.splice(from, 1);
       arr.splice(to, 0, item);

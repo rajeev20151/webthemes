@@ -27,6 +27,18 @@ const features = [
   },
 ];
 
+const TILES = [
+  { icon: "bx-code-alt", bg: "from-purple-500 to-blue-500" },
+  { icon: "bx-palette", bg: "from-pink-500 to-orange-500" },
+  { icon: "bx-rocket", bg: "from-green-500 to-teal-500" },
+  { icon: "bx-diamond", bg: "from-yellow-500 to-red-500" },
+  { icon: "bx-heart", bg: "from-indigo-500 to-purple-500" },
+  { icon: "bx-trophy", bg: "from-cyan-500 to-blue-500" },
+  { icon: "bx-world", bg: "from-rose-500 to-pink-500" },
+  { icon: "bx-bulb", bg: "from-amber-500 to-orange-500" },
+  { icon: "bx-star", bg: "from-emerald-500 to-green-500" },
+];
+
 export default function About() {
   const { data: contentsData } = useGetContentsQuery();
   const contents = contentsData?.contents?.[0] || null;
@@ -48,9 +60,10 @@ export default function About() {
             ]}
           />
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center mt-10">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-14 lg:gap-16 items-center mt-10">
             <div>
-              <span className="inline-block px-5 py-1 bg-[var(--color6)] text-[var(--color5)] rounded-full fontStyle8 font-semibold mb-6">
+              <span className="inline-flex items-center gap-2 px-4 py-1.5 bg-[var(--color5)] text-[var(--color6)] border-2 border-[var(--color6)] shadow-[3px_3px_0px_var(--color6)] rounded-full fontStyle10 font-bold uppercase tracking-widest -rotate-2 mb-6">
+                <span className="w-2 h-2 rounded-full bg-[#4ade80] border border-[var(--color6)] animate-pulse"></span>
                 ABOUT US
               </span>
               <h1 className="fontStyle3 text-[var(--color6)] font-bold mb-6 leading-tight">
@@ -74,42 +87,27 @@ export default function About() {
               </Link>
             </div>
 
-            <div className="relative">
-              <div className="relative z-10 p-8 border-[2px] border-[var(--color6)] bg-[var(--color5)] rounded-3xl shadow-[12px_12px_0px_var(--color6)]">
-                <div className="grid grid-cols-3 gap-6">
-                  <div className="aspect-square bg-gradient-to-br from-purple-500 to-blue-500 rounded-2xl flex items-center justify-center">
-                    <i className="bx bx-code-alt text-white text-5xl"></i>
-                  </div>
-                  <div className="aspect-square bg-gradient-to-br from-pink-500 to-orange-500 rounded-2xl flex items-center justify-center">
-                    <i className="bx bx-palette text-white text-5xl"></i>
-                  </div>
-                  <div className="aspect-square bg-gradient-to-br from-green-500 to-teal-500 rounded-2xl flex items-center justify-center">
-                    <i className="bx bx-rocket text-white text-5xl"></i>
-                  </div>
-                  <div className="aspect-square bg-gradient-to-br from-yellow-500 to-red-500 rounded-2xl flex items-center justify-center">
-                    <i className="bx bx-diamond text-white text-5xl"></i>
-                  </div>
-                  <div className="aspect-square bg-gradient-to-br from-indigo-500 to-purple-500 rounded-2xl flex items-center justify-center">
-                    <i className="bx bx-heart text-white text-5xl"></i>
-                  </div>
-                  <div className="aspect-square bg-gradient-to-br from-cyan-500 to-blue-500 rounded-2xl flex items-center justify-center">
-                    <i className="bx bx-trophy text-white text-5xl"></i>
-                  </div>
-                  <div className="aspect-square bg-gradient-to-br from-rose-500 to-pink-500 rounded-2xl flex items-center justify-center">
-                    <i className="bx bx-world text-white text-5xl"></i>
-                  </div>
-                  <div className="aspect-square bg-gradient-to-br from-amber-500 to-orange-500 rounded-2xl flex items-center justify-center">
-                    <i className="bx bx-bulb text-white text-5xl"></i>
-                  </div>
-                  <div className="aspect-square bg-gradient-to-br from-emerald-500 to-green-500 rounded-2xl flex items-center justify-center">
-                    <i className="bx bx-star text-white text-5xl"></i>
-                  </div>
+            <div className="relative mt-4 lg:mt-0">
+              <div className="relative z-10 p-5 sm:p-8 border-2 border-[var(--color6)] bg-[var(--color5)] rounded-3xl shadow-[6px_6px_0px_var(--color6)] sm:shadow-[12px_12px_0px_var(--color6)]">
+                <div className="grid grid-cols-3 gap-3 sm:gap-6">
+                  {TILES.map((t, i) => (
+                    <div
+                      key={t.icon}
+                      className={`group aspect-square bg-gradient-to-br ${t.bg} rounded-2xl flex items-center justify-center
+                        border-2 border-[var(--color6)] shadow-[3px_3px_0px_var(--color6)]
+                        ${i % 2 === 0 ? "-rotate-3" : "rotate-3"}
+                        hover:rotate-0 hover:scale-105 hover:shadow-[1px_1px_0px_var(--color6)]
+                        transition-all duration-300`}
+                    >
+                      <i className={`bx ${t.icon} text-white text-3xl sm:text-5xl transition-transform duration-300 group-hover:scale-110`}></i>
+                    </div>
+                  ))}
                 </div>
-                <div className="absolute -top-4 -right-4 bg-[var(--color6)] text-[var(--color5)] px-6 py-3 rounded-full shadow-lg fontStyle8 font-bold">
+                <div className="absolute -top-4 -right-2 sm:-right-4 bg-[var(--color5)] text-[var(--color6)] border-2 border-[var(--color6)] shadow-[3px_3px_0px_var(--color6)] px-4 sm:px-6 py-2 sm:py-3 rounded-full fontStyle8 font-bold rotate-3">
                   {new Date().getFullYear()} Features
                 </div>
               </div>
-              <div className="absolute top-8 left-8 w-full h-full border-[2px] border-[var(--color6)] rounded-3xl -z-10"></div>
+              <div className="hidden sm:block absolute top-8 left-8 w-full h-full border-2 border-dashed border-[var(--color6)]/40 rounded-3xl -z-10"></div>
             </div>
           </div>
         </div>
@@ -118,8 +116,9 @@ export default function About() {
       {/* ── What We Offer ── */}
       <section className="bg-[var(--color5)] py-16 sm:py-20">
         <div className="w-width">
-          <div className="text-center mb-12">
-            <span className="inline-block px-5 py-1 bg-[var(--color6)] text-[var(--color5)] rounded-full fontStyle8 font-semibold mb-4">
+          <div className="text-center mb-12 sm:mb-14">
+            <span className="inline-flex items-center gap-2 px-4 py-1.5 bg-[var(--color5)] text-[var(--color6)] border-2 border-[var(--color6)] shadow-[3px_3px_0px_var(--color6)] rounded-full fontStyle10 font-bold uppercase tracking-widest rotate-2 mb-5">
+              <span className="w-2 h-2 rounded-full bg-[#fde047] border border-[var(--color6)] animate-pulse"></span>
               WHY CHOOSE US
             </span>
             <h2 className="fontStyle4 font-bold text-[var(--color6)]">
@@ -127,29 +126,40 @@ export default function About() {
             </h2>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-7 sm:gap-8 pb-4">
             {features.map((f, i) => (
               <div
                 key={i}
-                className="rounded-2xl border border-[var(--color6)]/10 bg-[var(--color11)] p-6 text-center hover:border-[var(--color6)]/25 transition-colors duration-200"
+                className="group relative flex flex-col h-full p-6 rounded-2xl overflow-hidden
+                  bg-[var(--color5)] border-2 border-[var(--color6)]
+                  shadow-[6px_6px_0px_var(--color6)] sm:shadow-[8px_8px_0px_var(--color6)]
+                  transition-all duration-300
+                  hover:shadow-[2px_2px_0px_var(--color6)] hover:translate-x-1 hover:translate-y-1 sm:hover:translate-x-1.5 sm:hover:translate-y-1.5"
               >
-                <div className="w-14 h-14 rounded-2xl bg-[var(--color6)]/10 flex items-center justify-center mx-auto mb-4">
-                  <i
-                    className={`bx ${f.icon} text-2xl text-[var(--color6)]`}
-                  ></i>
+                {/* Big faded number */}
+                <span className="absolute top-3 right-4 fontStyle5 font-bold leading-none select-none pointer-events-none text-[var(--color6)]/10 group-hover:text-[var(--color6)]/25 transition-colors duration-300">
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+
+                {/* Icon tile */}
+                <div className="w-14 h-14 rounded-2xl bg-color3 flex items-center justify-center mb-5 border-2 border-[var(--color6)] shadow-[3px_3px_0px_var(--color6)] -rotate-6 group-hover:rotate-0 group-hover:scale-105 transition-all duration-300">
+                  <i className={`bx ${f.icon} text-2xl text-white`}></i>
                 </div>
-                <h3 className="fontStyle8 font-bold text-[var(--color6)] mb-2">
+
+                <h3 className="fontStyle7 font-bold text-[var(--color6)] mb-2">
                   {f.title}
                 </h3>
                 <p className="fontStyle9 text-[var(--color4)] leading-relaxed">
                   {f.desc}
                 </p>
+
+                {/* Bottom accent bar */}
+                <span className="absolute bottom-0 left-0 h-1.5 w-0 bg-color3 group-hover:w-full transition-all duration-500 ease-out"></span>
               </div>
             ))}
           </div>
         </div>
       </section>
-
 
       <FAQ />
     </>

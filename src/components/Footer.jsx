@@ -39,12 +39,12 @@ export default function Footer(){
       <>
       <CTA />
       <footer className="footer_section py-12 sm:py-16 md:py-20 bg-[var(--color6)]">
-      <div className="w-width px-4 sm:px-6 lg:px-1">
+      <div className="w-width">
          
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 sm:gap-10 lg:gap-12 mb-12 sm:mb-14 md:mb-16">
           
           {/* Col 1 - Brand + Social */}
-          <div className="footer_col">
+          <div className="footer_col sm:col-span-2 lg:col-span-1">
             <div className="mb-5 sm:mb-6">
               <h3 className="fontStyle5 text-[var(--color5)] font-bold mb-3 sm:mb-4">TemplateHub</h3>
               <p className="fontStyle8 text-gray-400 leading-relaxed text-sm sm:text-base">
@@ -76,28 +76,28 @@ export default function Footer(){
             <h4 className="fontStyle6 text-[var(--color5)] font-bold mb-4 sm:mb-6">Templates</h4>
             <ul className="space-y-2 sm:space-y-3">  
               <li className="text-gray-400">
-                <Link to="#" className="fontStyle8 inline-block hover:text-[var(--color5)] hover:pl-2 
+                <Link to="/templates?q=Business" className="fontStyle8 inline-block hover:text-[var(--color5)] hover:pl-2 
                 transition-all duration-300">Business Websites</Link>
               </li>
               <li className="text-gray-400">
-                <Link to="#" className="fontStyle8 hover:text-[var(--color5)] hover:pl-2 
-                transition-all duration-300 inline-block">E-commerce Stores</Link>
+                <Link to="/templates?q=Restaurant" className="fontStyle8 hover:text-[var(--color5)] hover:pl-2 
+                transition-all duration-300 inline-block">Restaurant</Link>
               </li>
               <li className="text-gray-400">
-                <Link to="#" className="fontStyle8 hover:text-[var(--color5)] hover:pl-2 
+                <Link to="/templates?q=Portfolio" className="fontStyle8 hover:text-[var(--color5)] hover:pl-2 
                 transition-all duration-300 inline-block">Portfolio Sites</Link>
               </li>
               <li className="text-gray-400">
-                <Link to="#" className="fontStyle8 hover:text-[var(--color5)] hover:pl-2 
-                transition-all duration-300 inline-block">Landing Pages</Link>
+                <Link to="/templates?q=Fitness" className="fontStyle8 hover:text-[var(--color5)] hover:pl-2 
+                transition-all duration-300 inline-block">Fitness</Link>
               </li>
               <li className="text-gray-400">
-                <Link to="#" className="fontStyle8 hover:text-[var(--color5)] hover:pl-2 
-                transition-all duration-300 inline-block">Admin Dashboards</Link>
+                <Link to="/templates?q=Car+Rental" className="fontStyle8 hover:text-[var(--color5)] hover:pl-2 
+                transition-all duration-300 inline-block">Car Rental</Link>
               </li>
               <li className="text-gray-400">
-                <Link to="#" className="fontStyle8 hover:text-[var(--color5)] hover:pl-2 
-                transition-all duration-300 inline-block">SaaS Templates</Link>
+                <Link to="/templates?q=Legal" className="fontStyle8 hover:text-[var(--color5)] hover:pl-2 
+                transition-all duration-300 inline-block">Law & Legal</Link>
               </li>
             </ul>
           </div>

@@ -162,7 +162,7 @@ export default function ForgotPassword() {
         ]}
       />
 
-      <div className="min-h-screen bg-[var(--color5)] flex items-center justify-center">
+      <div className="bg-[var(--color5)] md:min-h-screen md:flex md:items-center md:justify-center">
         <div className={`w-full max-w-[900px] grid grid-cols-1 md:grid-cols-2 rounded-[20px] sm:rounded-[28px] overflow-hidden
           border-2 border-[var(--color6)] shadow-[8px_8px_0_var(--color6)] sm:shadow-[14px_14px_0_var(--color6)]
           transition-all duration-500 ease-out

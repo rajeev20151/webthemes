@@ -44,15 +44,14 @@ function SkeletonGrid({ count = 12 }) {
 
 /* ── Tech Badge ── */
 function TechBadge({ tech }) {
-  const isWP = tech === "WORDPRESS";
+  const isFree = tech === "FREE";
   return (
-    <span
-      className={`fontStyle10 font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full border inline-block ${
-        isWP
-          ? "bg-[rgba(0,0,0,0.06)] text-[var(--color6)] border-[rgba(0,0,0,0.14)]"
-          : "bg-[rgba(243,115,53,0.08)] text-[var(--color3)] border-[rgba(243,115,53,0.22)]"
-      }`}
-    >
+    <span className="inline-flex items-center gap-1.5 fontStyle10 font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-[var(--color5)] text-[var(--color6)] border-2 border-[var(--color6)] shadow-[3px_3px_0px_var(--color6)] -rotate-3 transition-all duration-300 group-hover:rotate-0 group-hover:shadow-[1px_1px_0px_var(--color6)]">
+      <span
+        className={`w-2 h-2 rounded-full border border-[var(--color6)] ${
+          isFree ? "bg-[#4ade80]" : "bg-[#fde047]"
+        }`}
+      ></span>
       {tech}
     </span>
   );
@@ -313,83 +312,110 @@ export default function Templates() {
               <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-5 lg:gap-6 mb-10 sm:mb-12">
                 {templates.length > 0 ? (
                   templates.map((template) => (
-                    <div
+                   <div
                       key={template.id}
-                      className="group border-[2px] border-[var(--color6)] rounded-2xl shadow-[6px_6px_0px_var(--color6)] sm:shadow-[8px_8px_0px_var(--color6)] hover:shadow-[3px_3px_0px_var(--color6)] bg-[var(--color11)] overflow-hidden cursor-pointer hover:border-[var(--color6)]/35 hover:-translate-y-1 transition-all duration-300"
-                    >
-                      <div
-                      className="relative overflow-hidden bg-[var(--color1)] "
-                      style={{ aspectRatio: "13/10" }}
+                      className="group flex flex-col h-full bg-[var(--color5)] border-2 border-[var(--color6)] rounded-2xl overflow-hidden cursor-pointer
+                      shadow-[6px_6px_0px_var(--color6)] sm:shadow-[8px_8px_0px_var(--color6)]
+                      transition-all duration-300
+                      hover:shadow-[2px_2px_0px_var(--color6)] hover:translate-x-1 hover:translate-y-1 sm:hover:translate-x-1.5 sm:hover:translate-y-1.5"
                       >
-                      <img
-                      src={template.image}
-                      alt={template.title}
-                      loading="lazy"
-                      className="w-full h-full object-cover object-top transition-transform duration-700 ease-out group-hover:scale-105"
-                      />
+                      {/* ── Image ── */}
+                      <div
+                        className="relative overflow-hidden bg-[var(--color1)] border-b-2 border-[var(--color6)]"
+                        style={{ aspectRatio: "13/10" }}
+                      >
+                        <img
+                          src={template.image}
+                          alt={template.title}
+                          loading="lazy"
+                          className="w-full h-full object-cover object-top transition-transform duration-700 ease-out group-hover:scale-105"
+                        />
 
-                      <div className="absolute top-3 left-3 z-20">
-                      <TechBadge tech={template.tag} />
-                      </div>
+                        <div className="absolute top-3 left-3 z-20">
+                          <TechBadge tech={template.tag} />
+                        </div>
 
                       <div className="absolute top-3 right-3 z-20">
-                      <span className="fontStyle10 font-semibold px-2.5 py-1 rounded-full bg-black/50 backdrop-blur-sm text-white flex items-center gap-1">
-                      <i className="bx bx-show text-xs"></i>
-                      {template.views}
+                      <span className="inline-flex items-center gap-1.5 fontStyle10 font-bold px-3 py-1 rounded-full bg-[var(--color5)] text-[var(--color6)] border-2 border-[var(--color6)] shadow-[3px_3px_0px_var(--color6)] rotate-3 transition-all duration-300 group-hover:rotate-0 group-hover:shadow-[1px_1px_0px_var(--color6)]">
+                        <i className="bx bx-show text-base leading-none"></i>
+                        {template.views ?? 0}
                       </span>
                       </div>
 
-                      <div className="absolute inset-0 z-10 bg-black/55 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-4">
-                      <Link
-                      to={`/template/${template.slug}`}
-                      className="w-10 h-10 sm:w-11 sm:h-11 bg-[var(--color5)] rounded-full flex items-center justify-center text-[var(--color6)] hover:bg-[var(--color6)] hover:text-[var(--color5)] transition-all duration-200 translate-y-3 group-hover:translate-y-0"
-                      >
-                      <i className="bx bx-link-external text-lg"></i>
-                      </Link>
-
-                      <Link
-                      to={`/template/${template.slug}`}
-                      className="w-10 h-10 sm:w-11 sm:h-11 bg-[var(--color5)] rounded-full flex items-center justify-center text-[var(--color6)] hover:bg-[var(--color6)] hover:text-[var(--color5)] transition-all duration-200 translate-y-3 group-hover:translate-y-0 delay-75"
-                      >
-                      <i className="bx bx-heart text-lg"></i>
-                      </Link>
-                      </div>
+                        {/* Hover overlay */}
+                        <div className="absolute inset-0 z-10 bg-black/55 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-4">
+                          {["bx-link-external", "bx-heart"].map((icon, i) => (
+                            <Link
+                              key={icon}
+                              to={`/template/${template.slug}`}
+                              className={`w-11 h-11 bg-white text-[#111827] border-2 border-[#111827] rounded-full flex items-center justify-center shadow-[3px_3px_0px_#111827] hover:bg-[#111827] hover:text-white hover:shadow-[1px_1px_0px_#111827] transition-all duration-200 translate-y-3 group-hover:translate-y-0 ${i === 1 ? "delay-75" : ""}`}
+                            >
+                              <i className={`bx ${icon} text-lg`}></i>
+                            </Link>
+                          ))}
+                        </div>
                       </div>
 
-                      <div className="p-3 sm:p-4">
-                        {template.frameworks.length > 0 && (
-                          <span className="fontStyle10 text-[var(--color5)] p-1 px-3 rounded-full bg-color3 text-xs sm:text-sm inline-block mb-2">
-                            {template.frameworks.join(", ")}
-                          </span>
-                        )}
-                        <div className="flex items-center justify-between gap-2 mt-2">
-                          <h3 className="fontStyle8 font-bold text-[var(--color6)] truncate">
-                            <Link to={`/template/${template.slug}`} className="hover:text-[var(--color4)] transition-colors duration-200">{template.title}</Link>
+                      {/* ── Body ── */}
+                      <div className="flex flex-col flex-1 p-4 sm:p-5">
+                        {/* Title + Price */}
+                        <div className="flex items-center justify-between gap-3">
+                          <h3 className="fontStyle7 font-bold text-[var(--color6)] truncate">
+                            <Link to={`/template/${template.slug}`} className="hover:text-[var(--color4)] transition-colors duration-200">
+                              {template.title}
+                            </Link>
                           </h3>
-                          <div className="flex items-center gap-1.5 shrink-0">
+
+                          <div className="flex items-center gap-2 shrink-0">
                             {template.price > 0 ? (
                               <>
                                 {template.originalPrice > template.price && (
                                   <span className="fontStyle10 text-[var(--color4)] line-through">${template.originalPrice}</span>
                                 )}
-                                <span className="fontStyle7 font-bold text-[var(--color6)]">${template.price}</span>
+                                <span className="fontStyle9 font-bold bg-color3 text-white px-3 py-1 rounded-full shadow-md shadow-indigo-500/25">
+                                  ${template.price}
+                                </span>
                               </>
                             ) : (
-                              <span className="fontStyle7 font-bold text-[var(--color6)]">Free</span>
+                              <span className="fontStyle9 font-bold bg-[var(--color6)] text-[var(--color5)] px-3 py-1 rounded-full">
+                                Free
+                              </span>
                             )}
                           </div>
                         </div>
-                        <div className="flex items-center justify-between pt-3 mt-3 border-t border-[var(--color6)]/10">
-                          <span className="fontStyle10 text-[var(--color4)] flex items-center gap-1.5">
+
+                        {/* Frameworks */}
+                        {template.frameworks.length > 0 && (
+                          <div className="flex flex-wrap gap-1.5 my-3">
+                            {template.frameworks.slice(0, 3).map((fw) => (
+                              <span
+                                key={fw}
+                                className="inline-flex items-center gap-1 fontStyle10 font-semibold uppercase tracking-wide px-2.5 py-0.5 rounded-full bg-[var(--color11)] text-[var(--color6)] border border-[var(--color6)]/25"
+                              >
+                                <i className="bx bx-code-alt text-sm"></i>
+                                {fw}
+                              </span>
+                            ))}
+                            {template.frameworks.length > 3 && (
+                              <span className="fontStyle10 font-semibold px-2.5 py-0.5 rounded-full border border-dashed border-[var(--color6)]/30 text-[var(--color4)]">
+                                +{template.frameworks.length - 3}
+                              </span>
+                            )}
+                          </div>
+                        )}
+
+                        {/* Footer */}
+                        <div className="flex items-center justify-between mt-auto pt-3 mt-4 border-t-2 border-dashed border-[var(--color6)]/15">
+                          <span className="fontStyle10 text-[var(--color4)] flex items-center gap-1.5 truncate">
                             <i className="bx bx-folder text-sm"></i>{template.category}
                           </span>
-                          <span className="fontStyle10 text-[var(--color4)] flex items-center gap-1.5">
+                          <span className="fontStyle10 font-semibold text-[var(--color6)] flex items-center gap-1.5 shrink-0 ml-2">
                             <i className="bx bx-code text-sm"></i>{template.code}
                           </span>
                         </div>
                       </div>
-                    </div>
-                  ))
+                      </div>
+                ))
                 ) : (
                   <div className="col-span-full py-20 sm:py-28 flex flex-col items-center text-center">
                     <div className="w-20 h-20 rounded-3xl mx-auto mb-6 flex items-center justify-center bg-[var(--color11)] border-2 border-dashed border-[var(--color4)] opacity-60">

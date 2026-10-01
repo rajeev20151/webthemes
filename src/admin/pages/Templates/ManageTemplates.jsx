@@ -101,9 +101,9 @@ export default function ManageTemplates() {
       }
 
       // Reordered existing images (no new uploads)
-      console.log("🔍 handleSave - imageFiles:", imageFiles?.length, "existingUrls:", existingUrls);
+      // console.log("🔍 handleSave - imageFiles:", imageFiles?.length, "existingUrls:", existingUrls);
       if ((!imageFiles || !imageFiles.length) && existingUrls && existingUrls.length) {
-        console.log("📦 Sending existingImages:", JSON.stringify(existingUrls));
+        // console.log("📦 Sending existingImages:", JSON.stringify(existingUrls));
         fd.append("existingImages", JSON.stringify(existingUrls));
       }
 

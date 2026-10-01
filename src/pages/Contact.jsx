@@ -1,6 +1,7 @@
 import {Link} from "react-router-dom";
 import { useState } from "react";
 import SEOHead from "../components/SEOHead";
+import BreadCrumb_Nav from "../components/BreadCrumb_Nav";
 import { useCreateContactMutation } from "../store/apiSlice"; 
 
 /* ── Icons ── */
@@ -145,7 +146,7 @@ export default function Contact() {
     ) : null;
 
   return (
-    <section className="relative min-h-screen py-24 overflow-hidden bg-[var(--color5)] text-[var(--color6)]">
+    <section className="relative min-h-screen py-12 sm:py-14 md:py-20 overflow-hidden bg-[var(--color5)] text-[var(--color6)]">
       <SEOHead title="Contact Us" description="Get in touch with {site}. Have questions about our templates? We're here to help." />
 
       {/* ── Decorative blobs ── */}
@@ -154,13 +155,20 @@ export default function Contact() {
 
       <div className="w-width mx-auto">
 
+        <BreadCrumb_Nav
+          items={[
+            { label: "Home", path: "/" },
+            { label: "Contact", path: "/contact" },
+          ]}
+        />
+
         {/* ── Page Heading ── */}
-        <div className="text-center mb-16">
+        <div className="text-center mb-10 sm:mb-14">
           <span className="inline-block px-4 py-1.5 rounded-full fontStyle10 font-bold tracking-widest uppercase mb-4 bg-[var(--color11)] text-[var(--color8)] border border-[var(--color11)]">
             Get In Touch
           </span>
-          <h1 className="fontStyle3 font-bold m-0 mb-4 text-[var(--color6)]">
-            We'd Love to <br />
+          <h1 className="fontStyle3 font-bold m-0 mb-4 text-[var(--color6)] leading-[1.1]">
+            We'd Love to <br className="hidden sm:block" />
             <span className="[background-image:var(--color3)] bg-clip-text [-webkit-background-clip:text] [-webkit-text-fill-color:transparent]">
               Hear From You
             </span>
@@ -172,29 +180,29 @@ export default function Contact() {
         </div>
 
         {/* ── Main Grid ── */}
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 sm:gap-8 items-start">
 
           {/* ── Left Panel ── */}
           <div className="lg:col-span-2 flex flex-col gap-5">
 
             {/* Contact info card */}
             {contactInfo.map((item, i) => (
-              <div key={i} className="flex items-start gap-4 p-5 rounded-2xl bg-[var(--color11)] border border-[rgba(0,0,0,0.05)] transition-all duration-200">
+              <div key={i} className="flex items-start gap-4 p-4 sm:p-5 rounded-2xl bg-[var(--color11)] border border-[rgba(0,0,0,0.05)] transition-all duration-200">
                 <span className="flex-shrink-0 w-11 h-11 rounded-xl flex items-center justify-center [background:var(--color3)] text-white fontStyle9">
                   {item.icon}
                 </span>
-                <div>
+                <div className="min-w-0">
                   <p className="fontStyle10 font-bold uppercase tracking-widest m-0 mb-0.5 text-[var(--color8)]">{item.label}</p>
-                  <p className="fontStyle8 font-semibold m-0 text-[var(--color6)]">{item.value}</p>
+                  <p className="fontStyle8 font-semibold m-0 text-[var(--color6)] break-words">{item.value}</p>
                   <p className="fontStyle10 m-0 mt-0.5 text-[var(--color4)]">{item.sub}</p>
                 </div>
               </div>
             ))}
 
             {/* Social links */}
-            <div className="p-5 rounded-2xl bg-[var(--color11)] border border-[rgba(0,0,0,0.05)]">
+            <div className="p-4 sm:p-5 rounded-2xl bg-[var(--color11)] border border-[rgba(0,0,0,0.05)]">
               <p className="fontStyle10 font-bold uppercase tracking-widest m-0 mb-3 text-[var(--color8)]">Follow Us</p>
-              <div className="flex items-center gap-3">
+              <div className="flex flex-wrap items-center gap-3">
                 {socials.map((s) => (
                   <a key={s.label} href="#" aria-label={s.label}
                     className="w-10 h-10 rounded-xl flex items-center justify-center [background:var(--color3)] text-white transition-all duration-200 hover:scale-110">
@@ -206,7 +214,7 @@ export default function Contact() {
           </div>
 
           {/* ── Right: Form ── */}
-          <div className="lg:col-span-3 rounded-3xl p-8 bg-[var(--color11)] border border-[rgba(0,0,0,0.06)]">
+          <div className="lg:col-span-3 rounded-3xl p-5 sm:p-7 md:p-8 bg-[var(--color11)] border border-[rgba(0,0,0,0.06)]">
 
             {sent ? (
               /* ── Success state ── */
@@ -344,7 +352,7 @@ export default function Contact() {
         </div>
 
         {/* ── Bottom FAQ strip ── */}
-        <div className="mt-12 rounded-2xl p-6 flex flex-col sm:flex-row items-center justify-between gap-4 bg-[var(--color11)] border border-[rgba(0,0,0,0.05)]">
+        <div className="mt-10 sm:mt-12 rounded-2xl p-5 sm:p-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left bg-[var(--color11)] border border-[rgba(0,0,0,0.05)]">
           <div>
             <p className="fontStyle8 font-bold m-0 text-[var(--color6)]">Looking for quick answers?</p>
             <p className="fontStyle9 m-0 mt-0.5 text-[var(--color8)]">
@@ -352,7 +360,7 @@ export default function Contact() {
             </p>
           </div>
           <Link to="/about"
-            className="flex-shrink-0 flex items-center gap-2 px-6 py-2.5 rounded-xl fontStyle9 font-bold text-white border-0 cursor-pointer hover:opacity-90 transition-opacity whitespace-nowrap [background:var(--color3)]">
+            className="w-full sm:w-auto flex-shrink-0 flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl fontStyle9 font-bold text-white border-0 cursor-pointer hover:opacity-90 transition-opacity whitespace-nowrap [background:var(--color3)]">
             Visit FAQ <IconArrow />
           </Link>
         </div>

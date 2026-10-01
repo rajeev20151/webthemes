@@ -47,25 +47,62 @@ function FaqRow({ q, a, index }) {
     }
   }, [open]);
 
+  // Window resize par khule hue answer ki height update ho
+  useEffect(() => {
+    if (!open) return;
+    const onResize = () => {
+      if (bodyRef.current) setHeight(bodyRef.current.scrollHeight);
+    };
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, [open]);
+
   return (
     <div
-      className={`rounded-2xl border border-[var(--color6)]/12 overflow-hidden bg-[var(--color5)]
-        transition-shadow duration-300 ${open ? "shadow-[4px_4px_0px_var(--color6)]" : ""}`}>
+      role="listitem"
+      className={`rounded-2xl border-2 border-[var(--color6)] overflow-hidden bg-[var(--color5)]
+        transition-all duration-300
+        ${
+          open
+            ? "shadow-[2px_2px_0px_var(--color6)] translate-x-[3px] translate-y-[3px]"
+            : "shadow-[5px_5px_0px_var(--color6)] sm:shadow-[6px_6px_0px_var(--color6)] hover:shadow-[3px_3px_0px_var(--color6)] hover:translate-x-[2px] hover:translate-y-[2px]"
+        }`}
+    >
       {/* Trigger */}
       <button
         onClick={() => setOpen((prev) => !prev)}
         aria-expanded={open}
-        className="w-full flex items-center justify-between gap-6 px-7 py-5 text-left
-          hover:bg-[var(--color6)]/3 transition-colors duration-200
-          focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color6)] focus-visible:ring-inset">
-        <div className="flex items-center gap-4">
-          <span className="fontStyle10 font-bold text-[var(--color4)] w-6 flex-shrink-0">
+        className="group w-full flex items-center justify-between gap-4 sm:gap-6 px-4 sm:px-6 py-4 sm:py-5 text-left
+          focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color6)] focus-visible:ring-inset cursor-pointer"
+      >
+        <div className="flex items-center gap-3 sm:gap-4 min-w-0">
+          {/* Number tile */}
+          <span
+            className={`fontStyle10 font-bold w-9 h-9 sm:w-10 sm:h-10 rounded-xl border-2 border-[var(--color6)] flex items-center justify-center flex-shrink-0
+              transition-all duration-300 -rotate-6 group-hover:rotate-0
+              ${
+                open
+                  ? "bg-color3 text-white rotate-0"
+                  : "bg-[var(--color11)] text-[var(--color6)]"
+              }`}
+          >
             {String(index + 1).padStart(2, "0")}
           </span>
-          <span className="fontStyle7 font-semibold text-[var(--color6)]">{q}</span>
+          <span className="fontStyle7 font-bold text-[var(--color6)]">{q}</span>
         </div>
-        <i className={`bx bx-chevron-down text-xl text-[var(--color4)] flex-shrink-0
-            transition-transform duration-300 ${open ? "rotate-180" : ""}`}></i>
+
+        {/* Chevron button */}
+        <span
+          className={`w-8 h-8 sm:w-9 sm:h-9 rounded-full border-2 border-[var(--color6)] flex items-center justify-center flex-shrink-0
+            transition-all duration-300
+            ${
+              open
+                ? "bg-[var(--color6)] text-[var(--color5)] rotate-180"
+                : "bg-[var(--color5)] text-[var(--color6)]"
+            }`}
+        >
+          <i className="bx bx-chevron-down text-xl"></i>
+        </span>
       </button>
 
       {/* Animated body */}
@@ -76,9 +113,12 @@ function FaqRow({ q, a, index }) {
           transition: "height 0.32s cubic-bezier(0.4,0,0.2,1)",
         }}
       >
-        <div ref={bodyRef} className="px-7 pb-6 pt-1">
-          <div className="pl-10">
-            <p className="fontStyle8 text-[var(--color4)] leading-relaxed">{a}</p>
+        <div ref={bodyRef} className="px-4 sm:px-6 pb-5 sm:pb-6">
+          <div className="pt-4 border-t-2 border-dashed border-[var(--color6)]/15">
+            <div className="flex gap-3 sm:gap-4">
+              <span className="w-1 rounded-full bg-color3 flex-shrink-0"></span>
+              <p className="fontStyle8 text-[var(--color4)] leading-relaxed">{a}</p>
+            </div>
           </div>
         </div>
       </div>
@@ -93,14 +133,18 @@ function FaqRow({ q, a, index }) {
 export default function FAQ() {
   return (
     <section
-      className="py-20"
+      className="py-16 sm:py-20"
       style={{ background: "var(--color11)" }}
       aria-labelledby="faq-heading"
     >
       <div className="w-width">
 
         {/* Header */}
-        <header className="text-center mb-14">
+        <header className="text-center mb-12 sm:mb-14">
+          <span className="inline-flex items-center gap-2 fontStyle10 font-bold uppercase tracking-widest text-[var(--color6)] bg-[var(--color5)] border-2 border-[var(--color6)] shadow-[3px_3px_0px_var(--color6)] px-4 py-1.5 rounded-full mb-5 -rotate-2">
+            <span className="w-2 h-2 rounded-full bg-[#fde047] border border-[var(--color6)] animate-pulse"></span>
+            FAQ
+          </span>
           <h2
             id="faq-heading"
             className="fontStyle4 text-[var(--color6)] font-bold leading-tight mb-4"
@@ -113,7 +157,7 @@ export default function FAQ() {
         </header>
 
         {/* Accordion */}
-        <div className="max-w-3xl mx-auto flex flex-col gap-4" role="list">
+        <div className="max-w-3xl mx-auto flex flex-col gap-5 sm:gap-6 pb-2" role="list">
           {FAQS.map((item, i) => (
             <FaqRow key={i} q={item.q} a={item.a} index={i} />
           ))}

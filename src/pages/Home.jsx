@@ -29,7 +29,6 @@ export default function Home(){
      />
      <Hero />
       <Features />
-     
       <TechScroll />
       <PopularTemplates />
       <TemplateSlider />

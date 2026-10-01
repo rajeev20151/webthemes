@@ -17,6 +17,18 @@ const request = async (endpoint, options = {}) => {
   };
 
   const res  = await fetch(`${API_BASE}${endpoint}`, config);
+
+  // 401 = token dead (expired / wrong secret). Use token ko rok do,
+  // warna app usi kharab token ke saath baar baar retry karta rehta hai.
+  if (res.status === 401 && !endpoint.startsWith("/admin/login")) {
+    sessionStorage.removeItem("adminToken");
+    sessionStorage.removeItem("admin");
+    if (!window.location.pathname.includes("/batman/login")) {
+      window.location.href = "/batman/login";
+    }
+    return { success: false, message: "Session expired. Please login again." };
+  }
+
   const data = await res.json();
   return data;
 };
