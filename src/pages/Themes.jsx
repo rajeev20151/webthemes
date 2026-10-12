@@ -1,5 +1,5 @@
 import { Link, useParams } from "react-router-dom";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo,useRef} from "react";
 
 import BreadCrumb_Nav from "../components/BreadCrumb_Nav";
 import SEOHead from "../components/SEOHead";
@@ -23,13 +23,21 @@ export default function Themes() {
   const { data: templateData, isLoading: themeLoading } = useGetTemplateQuery(slug, { skip: !slug });
   const theme = templateData?.template || null;
 
-  const [activeImage, setActiveImage] = useState(0);
+  const [activeImage, setActiveImage] = useState(1);
   const [showPopup, setShowPopup] = useState(false);
   const [activeTab, setActiveTab] = useState("description");
   const [email, setEmail] = useState("");
   const [reviewCount, setReviewCount] = useState(0);
 
   const [incrementViews] = useIncrementViewsMutation();
+
+const imageScrollRef = useRef(null);
+
+useEffect(() => {
+  if (imageScrollRef.current) {
+    imageScrollRef.current.scrollTop = 0;
+  }
+}, [activeImage]);
 
   useEffect(() => {
     if (theme?._id) {
@@ -176,6 +184,7 @@ export default function Themes() {
                   isFree={isFree}
                   price={theme.price}
                   downloads={theme.downloads}
+                  imageScrollRef={imageScrollRef}
                 />
               </div>
 

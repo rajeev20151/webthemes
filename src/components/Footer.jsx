@@ -110,10 +110,10 @@ export default function Footer(){
                 <Link to="about" className="fontStyle8 hover:text-[var(--color5)] hover:pl-2 
                 transition-all duration-300 inline-block">About Us</Link>
               </li>
-              {/* <li className="text-gray-400">
-                <Link to="PricingPage" className="fontStyle8 hover:text-[var(--color5)] hover:pl-2 
+              <li className="text-gray-400">
+                <Link to="pricing" className="fontStyle8 hover:text-[var(--color5)] hover:pl-2 
                 transition-all duration-300 inline-block">Pricing Plans</Link>
-              </li> */}
+              </li> 
               <li className="text-gray-400">
                 <Link to="demo" className="fontStyle8 hover:text-[var(--color5)] hover:pl-2 
                 transition-all duration-300 inline-block">Reviews</Link>

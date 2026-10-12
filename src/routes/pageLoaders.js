@@ -11,6 +11,7 @@ export const pageLoaders = {
   "/template/:slug": () => import("../pages/Themes"),
   "/demo": () => import("../pages/DemoPage"),
   "/contact": () => import("../pages/Contact"),
+  "/pricing": () => import("../pages/PricingPage"),
   "/privacy-policy": () => import("../pages/PrivacyPolicy"),
   "/login": () => import("../pages/Login"),
   "/signup": () => import("../pages/Signup"),

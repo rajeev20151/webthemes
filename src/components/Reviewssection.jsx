@@ -77,6 +77,7 @@ export default function ReviewsSection({ templateId,onCountChange }) {
     if (!rating)         return setError("Please select a star rating.");
     if (!title.trim())   return setError("Please add a review title.");
     if (!comment.trim()) return setError("Please write a comment.");
+    if (comment.trim().length > 1000) return setError("Comment must be under 1000 characters");
 
     setError("");
     try {

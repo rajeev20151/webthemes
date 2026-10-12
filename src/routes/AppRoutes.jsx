@@ -19,6 +19,7 @@ const PrivacyPolicy = lazy(pageLoaders["/privacy-policy"]);
 const Cart = lazy(pageLoaders["/cart"]);
 const Checkout = lazy(pageLoaders["/check-out"]);
 const Profile = lazy(pageLoaders["/profile"]);
+const PricingPage = lazy(pageLoaders["/pricing"]);
 const ProtectedRoute = lazy(() => import("../components/ProtectedRoute"));
 const AdminRoutes = lazy(() => import("../admin/routes/AdminRoutes"));
 
@@ -35,6 +36,7 @@ export default function AppRoutes() {
         <Route path="template/:slug" element={<Themes />} />
         <Route path="contact" element={<Contact />} />
         <Route path="login" element={<Login />} />
+        <Route path="pricing" element={<PricingPage />} />
         <Route path="signup" element={<Signup />} />
         <Route path="demo" element={<DemoPage />} />
         <Route path="privacy-policy" element={<PrivacyPolicy />} />

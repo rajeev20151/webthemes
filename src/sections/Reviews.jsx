@@ -1,4 +1,5 @@
 import { useState, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import { useGetAllReviewsQuery } from "../store/apiSlice";
 
 const INITIAL_COUNT = 6;
@@ -9,6 +10,7 @@ export default function Reviews() {
   const reviews = reviewsData?.success ? reviewsData.reviews : [];
   const [visibleCount, setVisibleCount] = useState(INITIAL_COUNT);
   const sectionRef = useRef(null);
+  const navigate = useNavigate();
 
   if (reviews.length === 0) return null;
 
@@ -71,6 +73,13 @@ export default function Reviews() {
               const rating = Math.min(r.rating || 5, 5);
               const isAccent = index % 4 === 0;
               const isOffset = index % 3 === 1;
+              const fullComment = r.comment || r.text || "";
+              const templateSlug = r.templateId?.slug;
+              const COMMENT_LIMIT = 200;
+              const isLong = fullComment.length > COMMENT_LIMIT && !!templateSlug;
+              const shownComment = isLong
+                ? `${fullComment.slice(0, COMMENT_LIMIT).trimEnd()}…`
+                : fullComment;
 
               return (
                 <div key={r._id} className={isOffset ? "lg:mt-10" : ""}>
@@ -116,7 +125,18 @@ export default function Reviews() {
                         isAccent ? "text-white/90" : "text-[var(--color8)]"
                       }`}
                     >
-                      {r.comment || r.text || ""}
+                      {shownComment}
+                      {isLong && (
+                        <button
+                          type="button"
+                          onClick={() => navigate(`/template/${templateSlug}`)}
+                          className={`fontStyle8 font-bold ml-1.5 p-0 bg-transparent border-none cursor-pointer underline underline-offset-4 transition-opacity duration-200 hover:opacity-70 ${
+                            isAccent ? "text-white" : "text-[var(--color6)]"
+                          }`}
+                        >
+                          Read More
+                        </button>
+                      )}
                     </p>
 
                     {/* Author */}

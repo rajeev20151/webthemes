@@ -218,24 +218,6 @@ export default function Login() {
                   </button>
                 </div>
 
-                <div className={`flex items-center gap-3 ${fadeUp("delay-[330ms]")}`}>
-                  <div className="flex-1 h-px bg-[var(--color6)]/8" />
-                  <span className="fontStyle10 text-[var(--color4)]">or</span>
-                  <div className="flex-1 h-px bg-[var(--color6)]/8" />
-                </div>
-
-                <div className={`flex gap-3 ${fadeUp("delay-[360ms]")}`}>
-                  {[{ icon: "bxl-google", label: "Google" }, { icon: "bxl-github", label: "GitHub" }].map(({ icon, label }) => (
-                    <button key={label} type="button"
-                      className="flex-1 py-2.5 sm:py-3 rounded-xl border-[1.5px] border-[var(--color6)]/12 bg-[var(--color5)]
-                        fontStyle9 font-semibold text-[var(--color6)]
-                        !flex !items-center justify-center gap-2
-                        hover:border-[var(--color6)] hover:shadow-[3px_3px_0_var(--color6)]
-                        hover:-translate-x-px hover:-translate-y-px transition-all duration-200">
-                      <i className={`bx ${icon} text-base`} /> {label}
-                    </button>
-                  ))}
-                </div>
               </form>
             </div>
           </div>

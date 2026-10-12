@@ -209,7 +209,7 @@ export default function Signup() {
                     </Link>
                   </div>
                   <p className="fontStyle10 font-bold tracking-[0.12em] uppercase text-[var(--color4)] mb-1">Get started</p>
-                  <h1 className="fontStyle2 font-black text-[var(--color6)] leading-[1.15] mb-1.5">Create your account</h1>
+                  <h1 className="fontStyle3 font-black text-[var(--color6)] leading-[1.15] mb-1.5">Create your account</h1>
                   <p className="fontStyle9 text-[var(--color4)] mb-7 md:mb-8">
                     Already registered?{" "}
                     <Link to="/login" className="text-[var(--color6)] font-bold underline underline-offset-4 hover:opacity-70 transition-opacity">Log in</Link>
@@ -330,20 +330,6 @@ export default function Signup() {
                     </button>
                   </div>
 
-                  <div className={`flex items-center gap-3 ${fadeUp("delay-[380ms]")}`}>
-                    <div className="flex-1 h-px bg-[var(--color6)]/10" />
-                    <span className="fontStyle10 text-[var(--color4)]">or sign up with</span>
-                    <div className="flex-1 h-px bg-[var(--color6)]/10" />
-                  </div>
-
-                  <div className={`flex gap-3 ${fadeUp("delay-[400ms]")}`}>
-                    {[{ icon: "bxl-google", label: "Google" }, { icon: "bxl-github", label: "GitHub" }].map(({ icon, label }) => (
-                      <button key={label} type="button"
-                        className="flex-1 py-2.5 sm:py-3 rounded-xl border border-[var(--color6)]/10 bg-transparent fontStyle9 font-semibold text-[var(--color6)] flex items-center justify-center gap-2 cursor-pointer hover:bg-[var(--color6)]/5 transition-all duration-200">
-                        <i className={`bx ${icon} text-base`} /> {label}
-                      </button>
-                    ))}
-                  </div>
                 </form>
               </>
             )}

@@ -9,7 +9,7 @@ const CATEGORIES = [
 ];
 const TYPES = ["All Types", "Landing Page", "Multi Page", "One Page"];
 const SORT_OPTIONS = ["Latest", "Oldest", "Most Popular"];
-const ITEMS_PER_PAGE = 12;
+const ITEMS_PER_PAGE = 9;
 
 /* ── Skeleton Card ── */
 function SkeletonCard() {

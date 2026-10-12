@@ -9,7 +9,7 @@ const emptyForm = {
   scheduledAt: "",
 };
 
-const ITEMS_PER_PAGE = 9;
+const ITEMS_PER_PAGE = 8;
 
 export default function ManageTemplates() {
   const [templates, setTemplates]     = useState([]);

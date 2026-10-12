@@ -4,14 +4,14 @@ import { API_BASE } from "../../services/api";
 
 export const desktopNav = [
   { to: "/",            label: "Home",    icon: "bx-home"         },
-  // { to: "/PricingPage", label: "Pricing", icon: "bx-purchase-tag" },
+  { to: "/pricing",     label: "Pricing", icon: "bx-purchase-tag" },
   { to: "/demo",        label: "Demos",   icon: "bx-play-circle"  },
   { to: "/blog",        label: "Blog",    icon: "bx-news"         },
 ];
 
 export const mobileNav = [
   { to: "/",            label: "Home",    icon: "bx-home"         },
-  // { to: "/PricingPage", label: "Pricing", icon: "bx-purchase-tag" },
+  { to: "/pricing",     label: "Pricing", icon: "bx-purchase-tag" },
   { to: "/demo",       label: "Demos",   icon: "bx-play-circle"  },
   // { to: "/reviews",     label: "Reviews", icon: "bx-star"         },
   { to: "/blog",        label: "Blog",    icon: "bx-news"         },

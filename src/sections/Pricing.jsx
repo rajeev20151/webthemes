@@ -1,5 +1,4 @@
 import { Link } from "react-router-dom";
-import { useState } from "react";
 import BreadCrumb_Nav from "../components/BreadCrumb_Nav";
 
 // ─────────────────────────────────────────────
@@ -8,235 +7,233 @@ import BreadCrumb_Nav from "../components/BreadCrumb_Nav";
 
 const PLANS = [
   {
-    id: "single",
+    id: "landing",
     badge: "Starter",
-    name: "Single Template",
-    tagline: "Perfect for a one-time project launch.",
-    prices: { monthly: 499, yearly: 499 },
-    note: { monthly: "one-time", yearly: "one-time" },
+    name: "Landing Page",
+    tagline: "Perfect for a single-page launch or campaign.",
+    price: 57,
+    note: "one-time",
     highlight: false,
     popularLabel: null,
     features: [
-      { label: "1 Template File Download", included: true  },
-      { label: "Full Source Code",         included: true  },
-      { label: "Free Updates (3 Months)",  included: true  },
-      { label: "Basic Support (7 Days)",   included: true  },
-      { label: "Multiple Templates",       included: false },
-      { label: "Priority Support",         included: false },
-      { label: "Unlimited Access",         included: false },
+      { label: "1 Custom Designed Page",   included: true  },
+      { label: "Mobile Responsive Build",  included: true  },
+      { label: "Contact Form Integration", included: true  },
+      { label: "Basic On-Page SEO",        included: true  },
+      { label: "2 Revision Rounds",        included: true  },
+      { label: "Multi-page Website",       included: false },
+      { label: "Admin Panel / Backend",    included: false },
     ],
-    cta: "Buy Template",
-    ctaIcon: "bx-cart-add",
+    cta: "Get a Quote",
+    ctaIcon: "bx-message-rounded-detail",
   },
   {
-    id: "bundle",
+    id: "business",
     badge: "Most Popular",
-    name: "Bundle Pack",
-    tagline: "Best value for serious creators.",
-    prices: { monthly: 3999, yearly: 3999 },
-    note: { monthly: "one-time", yearly: "one-time" },
-    highlight: false,
+    name: "Business Website",
+    tagline: "Complete custom website built from your brief.",
+    price: 170,
+    note: "one-time",
+    highlight: true,
     popularLabel: "BEST VALUE",
+    savingNote: "50% advance · 50% on delivery",
     features: [
-      { label: "10 Premium Templates",     included: true  },
-      { label: "Full Source Code",         included: true  },
-      { label: "Instant Download",         included: true  },
-      { label: "Free Updates (1 Year)",    included: true  },
-      { label: "Priority Support",         included: true  },
-      { label: "Commercial License",       included: true  },
-      { label: "Unlimited Access",         included: false },
+      { label: "Up to 6 Custom Pages",     included: true  },
+      { label: "Design From Your Brief",   included: true  },
+      { label: "Blog / CMS Section",       included: true  },
+      { label: "Contact + Newsletter",     included: true  },
+      { label: "SEO + Speed Setup",        included: true  },
+      { label: "5 Revision Rounds",        included: true  },
+      { label: "Admin Panel / Backend",    included: false },
     ],
-    cta: "Get Bundle",
-    ctaIcon: "bx-layer",
+    cta: "Start Your Project",
+    ctaIcon: "bx-rocket",
   },
   {
-    id: "agency",
-    badge: "Pro",
-    name: "Agency Plan",
-    tagline: "Unlimited access for teams & studios.",
-    prices: { monthly: 999, yearly: 9999 },
-    note: { monthly: "/month", yearly: "/year" },
-    savingNote: "Save Rs.2,989 yearly",
+    id: "custom",
+    badge: "Custom",
+    name: "Template / Web App",
+    tagline: "Full custom build — template ya complete web app.",
+    price: 341,
+    note: "onwards",
     highlight: false,
     popularLabel: null,
+    savingNote: "Final quote after scope discussion",
     features: [
-      { label: "Unlimited Templates",      included: true  },
-      { label: "Full Source Code",         included: true  },
-      { label: "New Templates Weekly",     included: true  },
-      { label: "Lifetime Updates",         included: true  },
-      { label: "Premium Support",          included: true  },
-      { label: "Commercial License",       included: true  },
-      { label: "Team Access (5 seats)",    included: true  },
+      { label: "Unlimited Pages / Screens",  included: true  },
+      { label: "Unique Design (from scratch)", included: true },
+      { label: "Admin Panel + Database",     included: true  },
+      { label: "Login / Payment / APIs",     included: true  },
+      { label: "Full Source Code Handover",  included: true  },
+      { label: "Priority Support (3 Months)",included: true  },
+      { label: "Milestone-based Delivery",   included: true  },
     ],
-    cta: "Start Plan",
-    ctaIcon: "bx-rocket",
+    cta: "Discuss Requirement",
+    ctaIcon: "bx-chat",
   },
 ];
 
 const TRUST_ITEMS = [
-  { icon: "bx-lock-alt", text: "Secure checkout via Razorpay" },
-  { icon: "bx-download",  text: "Instant download"             },
-  { icon: "bx-support",   text: "Dedicated support"            },
+  { icon: "bx-shield-quarter", text: "100% custom build — no reused code" },
+  { icon: "bx-code-alt",       text: "Full source code handover"          },
+  { icon: "bx-support",        text: "Dedicated project support"          },
 ];
 
 // ─────────────────────────────────────────────
 // UTILITY
 // ─────────────────────────────────────────────
 
-const formatINR = (n) => n.toLocaleString("en-IN");
-
-// ─────────────────────────────────────────────
-// BILLING TOGGLE
-// ─────────────────────────────────────────────
-
-function BillingToggle({ value, onChange }) {
-  return (
-    <div
-      role="group"
-      aria-label="Billing cycle"
-      className="inline-flex items-center gap-1 p-1 mb-10 rounded-full border border-[var(--color6)]/12 bg-[var(--color6)]/4">
-      {["monthly", "yearly"].map((opt) => {
-        const active = value === opt;
-        return (
-          <button
-            key={opt}
-            onClick={() => onChange(opt)}
-            aria-pressed={active}
-            className={`flex items-center gap-2 px-4 sm:px-5 py-2 rounded-full fontStyle9 font-semibold capitalize
-              select-none transition-all duration-250
-              ${active
-                ? "bg-[var(--color6)] text-[var(--color5)] shadow-sm"
-                : "text-[var(--color4)] hover:text-[var(--color6)]"
-              }`}
-          >
-            {opt}
-            {opt === "yearly" && (
-              <span
-                className={`fontStyle10 font-bold px-2 py-0.5 rounded-full transition-all duration-250
-                  ${active ? "bg-[var(--color5)] text-[var(--color6)]" : "bg-[var(--color6)] text-[var(--color5)]"}`}
-              >
-                -17%
-              </span>
-            )}
-          </button>
-        );
-      })}
-    </div>
-  );
-}
+const formatUSD = (n) => n.toLocaleString("en-US");
 
 // ─────────────────────────────────────────────
 // PLAN CARD
 // ─────────────────────────────────────────────
 
-function PlanCard({ plan, billing }) {
-  const price    = plan.prices[billing];
-  const note     = plan.note[billing];
-  const isAgency = plan.id === "agency";
+function PlanCard({ plan }) {
+  const hl = plan.highlight;
 
   return (
-    <article
-      className={`relative flex flex-col rounded-2xl border-[2px] transition-all duration-300
-        ${plan.highlight
-          ? "border-[var(--color6)] bg-[var(--color6)] shadow-[8px_8px_0px_var(--color4)]"
-          : "border-[var(--color6)]/18 bg-[var(--color5)] hover:border-[var(--color6)] hover:shadow-[6px_6px_0px_var(--color6)]"
-        }`}
-    >
-      {/* Ribbon */}
-      {plan.popularLabel && (
-        <div className="absolute -top-[17px] left-1/2 -translate-x-1/2 z-10">
-          <span
-            className="fontStyle10 font-bold uppercase tracking-widest px-5 py-1.5 rounded-full"
-            style={{ background: "var(--color3)", color: "var(--color5)" }}>
-            {plan.popularLabel}
-          </span>
-        </div>
+    <div className={`relative h-full ${hl ? "lg:-translate-y-4" : ""}`}>
+      {/* Gradient offset shadow for the highlighted plan */}
+      {hl && (
+        <span
+          aria-hidden="true"
+          className="absolute inset-0 translate-x-2 translate-y-2 rounded-[18px] bg-color3 sm:translate-x-3 sm:translate-y-3"
+        />
       )}
 
-      <div className="flex flex-col flex-1 p-6 sm:p-8">
-
-        {/* Badge */}
-        <span
-          className={`self-start fontStyle10 font-bold uppercase tracking-widest px-3 py-1 rounded-full border mb-4 sm:mb-5
-            ${plan.highlight
-              ? "border-white/25 text-white/60"
-              : "border-[var(--color6)]/18 text-[var(--color4)]"
-            }`}>
-          {plan.badge}
-        </span>
-
-        {/* Title + tagline */}
-        <h3 className={`fontStyle5 font-bold mb-1.5 ${plan.highlight ? "text-white" : "text-[var(--color6)]"}`}>
-          {plan.name}
-        </h3>
-        <p className={`fontStyle9 mb-5 sm:mb-7 ${plan.highlight ? "text-white/55" : "text-[var(--color4)]"}`}>
-          {plan.tagline}
-        </p>
-
-        {/* Price */}
-        <div className="mb-5 sm:mb-7 pb-5 sm:pb-7 border-b border-dashed border-[var(--color6)]/12">
-          <div className="flex items-end gap-1.5">
-            <span className={`fontStyle6 font-semibold self-start mt-1.5 ${plan.highlight ? "text-white/55" : "text-[var(--color4)]"}`}>
-              Rs.
-            </span>
-            <span
-              className={`font-extrabold leading-none tracking-tight ${plan.highlight ? "text-white" : "text-[var(--color6)]"}`}
-              style={{ font: "2.4rem/1 'Google Sans', sans-serif" }}
-            >
-              {formatINR(price)}
-            </span>
-            <span className={`fontStyle9 mb-0.5 ${plan.highlight ? "text-white/55" : "text-[var(--color4)]"}`}>
-              {note}
+      <article
+        className={`group relative z-10 flex h-full flex-col rounded-[18px] border-2 border-[var(--color6)] transition-all duration-300
+          ${hl
+            ? "bg-[var(--color6)] hover:-translate-y-1"
+            : "bg-[var(--color5)] shadow-[6px_6px_0px_var(--color6)] sm:shadow-[8px_8px_0px_var(--color6)] hover:shadow-[2px_2px_0px_var(--color6)] hover:translate-x-1 hover:translate-y-1 sm:hover:translate-x-1.5 sm:hover:translate-y-1.5"
+          }`}
+      >
+        {/* Ribbon */}
+        {plan.popularLabel && (
+          <div className="absolute -top-[15px] left-1/2 z-20 -translate-x-1/2">
+            <span className="whitespace-nowrap fontStyle10 font-bold uppercase tracking-widest text-white bg-color3 border-2 border-[var(--color6)] rounded-full px-5 py-1.5 shadow-[3px_3px_0px_var(--color6)]">
+              {plan.popularLabel}
             </span>
           </div>
+        )}
 
-          {isAgency && billing === "yearly" && (
-            <p className={`fontStyle10 mt-2 font-semibold ${plan.highlight ? "text-white/50" : "text-[var(--color4)]"}`}>
-              approx. Rs.833/month &nbsp;&middot;&nbsp; {plan.savingNote}
-            </p>
-          )}
+        <div className="flex flex-col flex-1 p-6 sm:p-7">
+
+          {/* Badge */}
+          <span
+            className={`self-start fontStyle10 font-bold uppercase tracking-widest px-3 py-1 rounded-full border-2 mb-4 sm:mb-5 transition-transform duration-300
+              ${hl
+                ? "border-[var(--color5)] bg-color3 text-white rotate-2"
+                : "border-[var(--color6)] bg-[var(--color5)] text-[var(--color6)] shadow-[3px_3px_0px_var(--color6)] -rotate-2 group-hover:rotate-0"
+              }`}>
+            {plan.badge}
+          </span>
+
+          {/* Title + tagline */}
+          <h3 className={`fontStyle5 font-bold mb-1.5 ${hl ? "text-[var(--color5)]" : "text-[var(--color6)]"}`}>
+            {plan.name}
+          </h3>
+          <p className={`fontStyle9 mb-5 sm:mb-6 ${hl ? "text-[var(--color5)]/65" : "text-[var(--color4)]"}`}>
+            {plan.tagline}
+          </p>
+
+          {/* Price */}
+          <div
+            className={`mb-5 sm:mb-6 rounded-xl border-2 border-dashed p-4 transition-colors duration-300
+              ${hl
+                ? "border-[var(--color5)]/40 bg-[var(--color5)]/10"
+                : "border-[var(--color6)]/25 bg-[var(--color11)]"
+              }`}>
+            <div className="flex items-end gap-1.5 flex-wrap">
+              <span className={`fontStyle6 font-semibold self-start mt-1.5 ${hl ? "text-[var(--color5)]/70" : "text-[var(--color4)]"}`}>
+                $
+              </span>
+              <span
+                className={`font-extrabold leading-none tracking-tight ${hl ? "text-[var(--color5)]" : "text-[var(--color6)]"}`}
+                style={{ font: "2.5rem/1 'Google Sans', sans-serif" }}
+              >
+                {formatUSD(plan.price)}
+              </span>
+              <span className={`fontStyle9 mb-0.5 ${hl ? "text-[var(--color5)]/70" : "text-[var(--color4)]"}`}>
+                {plan.note}
+              </span>
+            </div>
+
+            {plan.savingNote &&
+              (hl ? (
+                <span className="inline-block fontStyle10 font-bold text-white bg-color3 border border-white/25 rounded-full px-3 py-1 mt-3">
+                  {plan.savingNote}
+                </span>
+              ) : (
+                <p className="flex items-center gap-1.5 fontStyle10 mt-3 font-semibold text-[var(--color4)]">
+                  <i className="bx bx-info-circle text-base"></i>
+                  {plan.savingNote}
+                </p>
+              ))}
+          </div>
+
+          {/* Features */}
+          <ul className="flex flex-col gap-2.5 sm:gap-3 flex-1 mb-6 sm:mb-7" role="list">
+            {plan.features.map((f) => (
+              <li key={f.label} className="flex items-center gap-3">
+                <span
+                  className={`w-[26px] h-[26px] flex-shrink-0 rounded-lg border-2 flex items-center justify-center transition-all duration-300
+                    ${f.included
+                      ? hl
+                        ? "bg-color3 border-[var(--color5)] text-white shadow-[2px_2px_0px_var(--color5)]"
+                        : "bg-[var(--color5)] border-[var(--color6)] text-[var(--color6)] shadow-[2px_2px_0px_var(--color6)]"
+                      : hl
+                        ? "border-dashed border-[var(--color5)]/40 text-[var(--color5)]/50"
+                        : "border-dashed border-[var(--color6)]/30 text-[var(--color4)]"
+                    }`}>
+                  <i className={`bx ${f.included ? "bx-check" : "bx-x"} text-sm`}></i>
+                </span>
+                <span
+                  className={`fontStyle9 ${
+                    f.included
+                      ? hl ? "text-[var(--color5)] font-medium" : "text-[var(--color6)]"
+                      : hl ? "line-through text-[var(--color5)]/45" : "line-through text-[var(--color4)]"
+                  }`}>
+                  {f.label}
+                </span>
+              </li>
+            ))}
+          </ul>
+
+          {/* CTA */}
+          <Link
+            to="/contact"
+            aria-label={`${plan.cta} — ${plan.name}`}
+            className={`group/btn fontStyle8 font-semibold w-full flex items-center justify-center gap-2.5
+              px-6 py-3.5 rounded-xl border-2 transition-all duration-300 bg-color3 text-white
+              ${hl
+                ? "border-[var(--color5)] shadow-[4px_4px_0px_var(--color5)]"
+                : "border-[var(--color6)] shadow-[4px_4px_0px_var(--color6)]"
+              }
+              hover:-translate-x-0.5 hover:-translate-y-0.5
+              ${hl
+                ? "hover:shadow-[7px_7px_0px_var(--color5)]"
+                : "hover:shadow-[7px_7px_0px_var(--color6)]"
+              }
+              active:translate-x-1 active:translate-y-1
+              ${hl
+                ? "active:shadow-[1px_1px_0px_var(--color5)]"
+                : "active:shadow-[1px_1px_0px_var(--color6)]"
+              }`}>
+            <i className={`bx ${plan.ctaIcon} text-lg`}></i>
+            {plan.cta}
+            <i className="bx bx-right-arrow-alt text-lg ml-auto transition-transform duration-300 group-hover/btn:translate-x-1"></i>
+          </Link>
         </div>
 
-        {/* Features */}
-        <ul className="flex flex-col gap-2.5 sm:gap-3 flex-1 mb-6 sm:mb-8" role="list">
-          {plan.features.map((f) => (
-            <li key={f.label} className="flex items-center gap-3">
-              <span
-                className={`w-[22px] h-[22px] flex-shrink-0 rounded-full flex items-center justify-center
-                  ${f.included
-                    ? plan.highlight ? "bg-white/18 text-white" : "bg-[var(--color6)]/8 text-[var(--color6)]"
-                    : "bg-[var(--color4)]/10 text-[var(--color4)]"
-                  }`}>
-                <i className={`bx ${f.included ? "bx-check" : "bx-x"} text-sm`}></i>
-              </span>
-              <span
-                className={`fontStyle9 ${
-                  f.included
-                    ? plan.highlight ? "text-white" : "text-[var(--color6)]"
-                    : "line-through text-[var(--color4)]"
-                }`}>
-                {f.label}
-              </span>
-            </li>
-          ))}
-        </ul>
-
-        {/* CTA */}
-        <Link
-          to="#"
-          aria-label={`${plan.cta} — ${plan.name}`}
-          className={`group/btn fontStyle8 font-semibold w-full flex items-center justify-center gap-2.5
-            px-6 py-3 sm:py-3.5 rounded-xl border-[2px] transition-all duration-300
-            ${plan.highlight
-              ? "bg-white text-[var(--color6)] border-white hover:bg-transparent hover:text-white"
-              : "bg-[var(--color6)] text-[var(--color5)] border-[var(--color6)] hover:bg-transparent hover:text-[var(--color6)]"
-            }`}>
-          <i className={`bx ${plan.ctaIcon} text-lg`}></i>
-          {plan.cta}
-          <i className="bx bx-right-arrow-alt text-lg ml-auto transition-transform duration-300 group-hover/btn:translate-x-1"></i>
-        </Link>
-      </div>
-    </article>
+        {/* Bottom accent bar */}
+        <span
+          className={`absolute bottom-0 left-0 h-1.5 w-0 rounded-b-[16px] group-hover:w-full transition-all duration-500 ease-out
+            ${hl ? "bg-[var(--color5)]" : "bg-color3"}`}
+        />
+      </article>
+    </div>
   );
 }
 
@@ -245,11 +242,13 @@ function PlanCard({ plan, billing }) {
 // ─────────────────────────────────────────────
 
 export default function Pricing() {
-  const [billing, setBilling] = useState("monthly");
-
   return (
-    <section className="py-12 sm:py-20 md:py-20 overflow-hidden" aria-labelledby="pricing-heading">
-      <div className="w-width">
+    <section className="relative py-14 sm:py-20 overflow-hidden" aria-labelledby="pricing-heading">
+      {/* Decorative glows */}
+      <span aria-hidden="true" className="absolute -top-6 -left-16 w-64 h-64 rounded-full glow-orange opacity-20 pointer-events-none" />
+      <span aria-hidden="true" className="absolute -bottom-10 -right-16 w-64 h-64 rounded-full glow-gold opacity-20 pointer-events-none" />
+
+      <div className="w-width relative z-10">
         <BreadCrumb_Nav
           items={[
             { label: "Home", path: "/" },
@@ -258,36 +257,46 @@ export default function Pricing() {
         />
 
         {/* Header */}
-        <div className="text-center">
-          <span className="inline-block fontStyle10 font-bold uppercase tracking-widest text-[var(--color4)] border border-[var(--color6)]/18 px-4 py-1.5 rounded-full mb-4 sm:mb-5">
-            Pricing Plans
+        <div className="text-center max-w-2xl mx-auto">
+          <span className="inline-flex items-center gap-2 fontStyle10 font-bold uppercase tracking-widest text-[var(--color6)]
+            bg-[var(--color5)] border-2 border-[var(--color6)] shadow-[3px_3px_0px_var(--color6)]
+            px-4 py-1.5 rounded-full mb-4 sm:mb-5 -rotate-2">
+            <span className="w-2 h-2 rounded-full bg-color3 animate-pulse"></span>
+            Custom Development Pricing
           </span>
           <h2
             id="pricing-heading"
             className="fontStyle4 text-[var(--color6)] font-bold leading-tight mb-3 sm:mb-4"
           >
-            Simple, Transparent Pricing
+            Get Your Website Built Right
           </h2>
-          <p className="fontStyle8 text-[var(--color4)] max-w-lg mx-auto mb-6 sm:mb-8 px-2">
-            Choose the plan that fits your workflow — no hidden charges, no surprises.
-            Upgrade or downgrade at any time.
+          <p className="fontStyle8 text-[var(--color4)] max-w-lg mx-auto mb-8 sm:mb-20 px-2">
+            Pricing depends on what you need — a landing page, a business site, or a
+            full custom template/app. Pick a starting point, we'll finalize the quote
+            after discussing your requirement.
           </p>
-          <BillingToggle value={billing} onChange={setBilling} />
         </div>
 
         {/* Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-7 lg:gap-8 items-stretch">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 sm:gap-7 lg:gap-8 items-stretch pt-2">
           {PLANS.map((plan) => (
-            <PlanCard key={plan.id} plan={plan} billing={billing} />
+            <PlanCard key={plan.id} plan={plan} />
           ))}
         </div>
 
         {/* Trust bar */}
-        <div className="mt-8 sm:mt-10 flex flex-wrap items-center justify-center gap-x-5 sm:gap-x-7 gap-y-3">
+        <div className="mt-10 sm:mt-14 flex flex-wrap items-center justify-center gap-3 sm:gap-4">
           {TRUST_ITEMS.map((item) => (
-            <div key={item.text} className="flex items-center gap-1.5 text-[var(--color4)]">
-              <i className={`bx ${item.icon} text-base`}></i>
-              <span className="fontStyle10 text-sm sm:text-base">{item.text}</span>
+            <div
+              key={item.text}
+              className="flex items-center gap-2.5 bg-[var(--color5)] border-2 border-[var(--color6)]
+                shadow-[3px_3px_0px_var(--color6)] rounded-full px-4 py-2
+                transition-all duration-300 hover:shadow-[1px_1px_0px_var(--color6)] hover:translate-x-0.5 hover:translate-y-0.5"
+            >
+              <span className="w-8 h-8 flex-shrink-0 rounded-full bg-color3 border border-[var(--color6)] flex items-center justify-center text-white">
+                <i className={`bx ${item.icon} text-base`}></i>
+              </span>
+              <span className="fontStyle10 font-semibold text-[var(--color6)]">{item.text}</span>
             </div>
           ))}
         </div>

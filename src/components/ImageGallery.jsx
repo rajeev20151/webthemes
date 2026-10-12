@@ -1,9 +1,11 @@
-export default function ImageGallery({ resolvedImages, activeImage, setActiveImage, setShowPopup, isFree, price, downloads }) {
+export default function ImageGallery({ resolvedImages, activeImage, setActiveImage, setShowPopup, isFree, price, downloads,imageScrollRef }) {
+
+ 
   return (
     <div className="mb-6 sm:mb-8 rounded-2xl overflow-hidden border-2 border-[var(--color6)]/10 bg-[var(--color11)] shadow-lg shadow-black/5">
       <div className="relative overflow-hidden aspect-video">
   {resolvedImages[activeImage] ? (
-    <div className="w-full h-full overflow-y-auto">
+    <div className="w-full h-full overflow-y-auto" ref={imageScrollRef}>
       <img
         src={resolvedImages[activeImage]}
         alt={`Preview ${activeImage + 1}`}

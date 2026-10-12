@@ -293,69 +293,99 @@ export default function AdminContacts() {
       {/* ── Detail Modal ── */}
       {selected && (
         <div
-          className="fixed inset-0 z-[9998] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
+          className="fixed inset-0 z-[9998] flex items-center justify-center p-4 bg-black/60 backdrop-blur-md"
           onClick={() => setSelected(null)}
         >
+          <style>{`
+            @keyframes adminModalIn { from { opacity: 0; transform: translateY(14px) scale(.97); } to { opacity: 1; transform: none; } }
+            @keyframes adminOverlayIn { from { opacity: 0; } to { opacity: 1; } }
+          `}</style>
           <div
             onClick={(e) => e.stopPropagation()}
-            className="admin-card w-full max-w-lg p-6 relative z-[9999]"
+            className="admin-card w-full max-w-xl p-0 relative z-[9999] max-h-[90vh] overflow-y-auto"
+            style={{ animation: "adminModalIn .28s cubic-bezier(.16,1,.3,1)", boxShadow: "0 24px 60px -12px rgba(0,0,0,.35)" }}
           >
-            <button
-              onClick={() => setSelected(null)}
-              className="absolute top-4 right-4 text-[var(--admin-muted)] hover:text-[var(--admin-text)] p-1.5 rounded-lg cursor-pointer transition-colors duration-200 hover:bg-[var(--admin-hover)]"
+            {/* Header */}
+            <div
+              className="flex items-start gap-3.5 p-6 pb-4 m-0"
+              style={{ borderBottom: "1px solid var(--admin-border)" }}
             >
-              <IconX />
-            </button>
-
-            <div className="flex items-center gap-3 mb-5">
-              <span className="w-11 h-11 rounded-xl flex items-center justify-center text-white admin-grad-indigo">
-                <IconMail />
+              <span className="w-12 h-12 rounded-2xl flex items-center justify-center text-white fontStyle8 font-bold text-lg flex-shrink-0 admin-grad-indigo">
+                {(selected.name || "U").charAt(0).toUpperCase()}
               </span>
-              <div>
-                <p className="fontStyle7 font-bold text-[var(--admin-text)] m-0">{selected.name}</p>
-                <p className="fontStyle9 text-[var(--admin-muted)] m-0">{selected.email}</p>
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <p className="fontStyle7 font-bold text-[var(--admin-text)] m-0 truncate">{selected.name}</p>
+                  <span className={`fontStyle10 font-bold uppercase px-2 py-0.5 rounded-full ${statusBadgeClass(selected.status)}`}>
+                    {selected.status}
+                  </span>
+                </div>
+                <p className="fontStyle9 text-[var(--admin-muted)] m-0 mt-0.5 flex items-center gap-1.5 break-all">
+                  <IconMail /> {selected.email}
+                </p>
               </div>
+              <button
+                onClick={() => setSelected(null)}
+                className="text-[var(--admin-muted)] hover:text-[var(--admin-text)] p-2 rounded-xl cursor-pointer transition-all duration-200 hover:bg-[var(--admin-hover)] flex-shrink-0 -mt-1 -mr-1"
+              >
+                <IconX />
+              </button>
             </div>
 
-            <div className="flex items-center gap-2 mb-5">
-              <span className="fontStyle9 text-[var(--admin-muted)]">Status:</span>
+            {/* Meta row */}
+            <div className="flex items-center justify-between gap-3 px-6 pt-4 flex-wrap">
+              <span className="fontStyle9 font-medium text-[var(--admin-subtext)] bg-[var(--admin-hover)] px-3 py-1 rounded-lg">
+                {selected.topic}
+              </span>
+              <span className="fontStyle10 text-[var(--admin-muted)]">Received {formatDate(selected.createdAt)}</span>
+            </div>
+
+            {/* Status switch */}
+            <div className="flex items-center gap-2 px-6 pt-4">
+              <span className="fontStyle10 font-bold uppercase tracking-widest text-[var(--admin-muted)] mr-1">Status</span>
               {["new", "read", "replied"].map((s) => (
                 <button
                   key={s}
                   onClick={() => handleStatusChange(selected._id, s)}
-                  className={`fontStyle9 font-bold uppercase px-2.5 py-1 rounded-full cursor-pointer transition-all duration-200 ${statusBadgeClass(s)}`}
-                  style={{ opacity: selected.status === s ? 1 : 0.4 }}
+                  className={`fontStyle9 font-bold uppercase px-3 py-1 rounded-full cursor-pointer transition-all duration-200 ${statusBadgeClass(s)}`}
+                  style={{
+                    opacity: selected.status === s ? 1 : 0.4,
+                    boxShadow: selected.status === s ? "0 0 0 3px var(--admin-accent-soft)" : "none",
+                  }}
                 >
                   {s}
                 </button>
               ))}
             </div>
 
-            <div className="mb-4 p-3 rounded-xl bg-[var(--admin-hover)]">
-              <p className="fontStyle9 font-bold uppercase tracking-widest text-[var(--admin-muted)] m-0 mb-1">Topic</p>
-              <p className="fontStyle9 text-[var(--admin-text)] m-0">{selected.topic}</p>
+            {/* Message */}
+            <div className="px-6 pt-4">
+              <p className="fontStyle10 font-bold uppercase tracking-widest text-[var(--admin-muted)] m-0 mb-1.5">Message</p>
+              <div
+                className="p-4 rounded-xl bg-[var(--admin-hover)] max-h-52 overflow-y-auto"
+                style={{ borderLeft: "3px solid var(--admin-accent)" }}
+              >
+                <p className="fontStyle9 text-[var(--admin-subtext)] m-0 whitespace-pre-wrap leading-relaxed">{selected.message}</p>
+              </div>
             </div>
 
-            <div className="mb-4 p-3 rounded-xl bg-[var(--admin-hover)]">
-              <p className="fontStyle9 font-bold uppercase tracking-widest text-[var(--admin-muted)] m-0 mb-1">Message</p>
-              <p className="fontStyle9 text-[var(--admin-subtext)] m-0 whitespace-pre-wrap leading-relaxed">{selected.message}</p>
-            </div>
-
-            <p className="fontStyle9 text-[var(--admin-muted)] m-0">Received {formatDate(selected.createdAt)}</p>
-
+            {/* Reply history */}
             {selected.reply && (
-              <div className="mt-4 p-3 rounded-xl border border-green-300/30 bg-green-50/50 dark:bg-green-900/10">
-                <div className="flex items-center gap-1.5 mb-1.5">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-green-600"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4z" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                  <span className="fontStyle9 font-bold text-green-700 m-0">Your Reply</span>
+              <div className="px-6 pt-4">
+                <div className="p-4 rounded-xl border border-green-300/30 bg-green-50/50 dark:bg-green-900/10">
+                  <div className="flex items-center gap-1.5 mb-1.5">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-green-600"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4z" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                    <span className="fontStyle9 font-bold text-green-700 m-0">Your Reply</span>
+                    {selected.repliedAt && <span className="fontStyle10 text-[var(--admin-muted)] m-0 ml-auto">Sent {formatDate(selected.repliedAt)}</span>}
+                  </div>
+                  <p className="fontStyle9 text-[var(--admin-subtext)] m-0 whitespace-pre-wrap leading-relaxed">{selected.reply}</p>
                 </div>
-                <p className="fontStyle9 text-[var(--admin-subtext)] m-0 whitespace-pre-wrap leading-relaxed">{selected.reply}</p>
-                {selected.repliedAt && <p className="fontStyle10 text-[var(--admin-muted)] m-0 mt-1.5">Sent {formatDate(selected.repliedAt)}</p>}
               </div>
             )}
 
-            <div className="mt-4">
-              <label className="block fontStyle9 font-bold uppercase tracking-widest text-[var(--admin-muted)] mb-1.5">Reply Message</label>
+            {/* Reply box */}
+            <div className="px-6 pt-4 pb-6">
+              <label className="block fontStyle10 font-bold uppercase tracking-widest text-[var(--admin-muted)] mb-1.5">Reply Message</label>
               <textarea
                 value={replyText}
                 onChange={(e) => setReplyText(e.target.value)}
@@ -363,25 +393,25 @@ export default function AdminContacts() {
                 rows={4}
                 className="admin-input resize-none"
               />
-            </div>
 
-            <div className="flex gap-3 mt-4">
-              <button
-                onClick={handleReply}
-                disabled={!replyText.trim() || sending}
-                className="flex-1 text-center fontStyle9 font-bold py-2.5 rounded-xl text-white cursor-pointer admin-grad-indigo transition-opacity duration-200 hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {sending ? "Sending..." : replySent ? "Sent!" : "Send Reply"}
-              </button>
-              <button
-                onClick={() => {
-                  setSelected(null);
-                  setConfirmDelete(selected);
-                }}
-                className="fontStyle9 font-bold py-2.5 px-4 rounded-xl cursor-pointer text-[var(--admin-danger)] border border-[var(--admin-danger)]/20 bg-[var(--admin-danger-soft)] hover:bg-[var(--admin-danger)] hover:text-white transition-all duration-200"
-              >
-                Delete
-              </button>
+              <div className="flex gap-3 mt-4">
+                <button
+                  onClick={handleReply}
+                  disabled={!replyText.trim() || sending}
+                  className="flex-1 text-center fontStyle9 font-bold py-2.5 rounded-xl text-white cursor-pointer admin-grad-indigo transition-all duration-200 hover:opacity-90 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {sending ? "Sending..." : replySent ? "✓ Sent!" : "Send Reply"}
+                </button>
+                <button
+                  onClick={() => {
+                    setSelected(null);
+                    setConfirmDelete(selected);
+                  }}
+                  className="fontStyle9 font-bold py-2.5 px-4 rounded-xl cursor-pointer text-[var(--admin-danger)] border border-[var(--admin-danger)]/20 bg-[var(--admin-danger-soft)] hover:bg-[var(--admin-danger)] hover:text-white transition-all duration-200"
+                >
+                  Delete
+                </button>
+              </div>
             </div>
           </div>
         </div>
