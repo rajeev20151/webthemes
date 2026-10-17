@@ -1,13 +1,11 @@
 import { Link, useSearchParams } from "react-router-dom";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useRef } from "react";
 import BreadCrumb_Nav from "../components/BreadCrumb_Nav";
 import SEOHead from "../components/SEOHead";
 import { useGetTemplatesQuery, API_URL } from "../store/apiSlice";
 
-const CATEGORIES = [
-  "All Industries", "Agency", "Portfolio", "E-Commerce", "SaaS", "Restaurant", "Fashion",
-];
-const TYPES = ["All Types", "Landing Page", "Multi Page", "One Page"];
+const ALL_CATEGORIES = "All Industries";
+const ALL_TYPES = "All Types";
 const SORT_OPTIONS = ["Latest", "Oldest", "Most Popular"];
 const ITEMS_PER_PAGE = 9;
 
@@ -146,6 +144,7 @@ export default function Templates() {
   const [sortBy, setSortBy] = useState("Latest");
   const [currentPage, setCurrentPage] = useState(1);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const resultsRef = useRef(null);
 
   // Debounced search
   const [debouncedSearch, setDebouncedSearch] = useState(search);
@@ -170,6 +169,12 @@ export default function Templates() {
   const pagination = responseData?.pagination ?? { page: 1, totalPages: 1, total: 0 };
   const templates = rawTemplates.map(mapTemplate);
 
+  // Filter dropdown options derived from the real template data
+  const { data: optionsData } = useGetTemplatesQuery({ limit: 1000 });
+  const allTemplates = optionsData?.templates ?? [];
+  const categoryOptions = [ALL_CATEGORIES, ...new Set(allTemplates.map((t) => t.category).filter(Boolean))];
+  const typeOptions = [ALL_TYPES, ...new Set(allTemplates.map((t) => t.tag).filter(Boolean))];
+
   useEffect(() => {
     const q = searchParams.get("q") || "";
     setSearch(q);
@@ -177,6 +182,11 @@ export default function Templates() {
   }, [searchParams]);
 
   const pageNumbers = getPageNumbers(pagination.page, pagination.totalPages);
+
+  function goToPage(page) {
+    setCurrentPage(page);
+    resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
 
   function clearAll() {
     setSearch("");
@@ -283,8 +293,8 @@ export default function Templates() {
               </div>
             </div>
 
-            <SelectField label="Category" options={CATEGORIES} selected={selectedCategory} onSelect={(v) => { setSelectedCategory(v); setCurrentPage(1); }} />
-            <SelectField label="Theme Type" options={TYPES} selected={selectedType} onSelect={(v) => { setSelectedType(v); setCurrentPage(1); }} />
+            <SelectField label="Category" options={categoryOptions} selected={selectedCategory} onSelect={(v) => { setSelectedCategory(v); setCurrentPage(1); }} />
+            <SelectField label="Theme Type" options={typeOptions} selected={selectedType} onSelect={(v) => { setSelectedType(v); setCurrentPage(1); }} />
             <SelectField label="Sort By" options={SORT_OPTIONS} selected={sortBy} onSelect={(v) => { setSortBy(v); setCurrentPage(1); }} />
 
             <button onClick={clearAll} className="w-full py-3 rounded-xl fontStyle9 font-semibold text-[var(--color5)] bg-[var(--color6)] border border-[var(--color6)]/15 hover:text-[var(--color5)] hover:border-[var(--color6)]/30 transition-all duration-200">
@@ -293,7 +303,7 @@ export default function Templates() {
           </div>
 
           {/* ── RIGHT CONTENT ── */}
-          <div className="flex-1 min-w-0 self-start">
+          <div ref={resultsRef} className="flex-1 min-w-0 self-start scroll-mt-24 lg:scroll-mt-28">
             <div className="hidden lg:flex items-center justify-between mb-5 sm:mb-7">
               <div className="flex items-center gap-2 sm:gap-3">
                 <h2 className="fontStyle5 font-bold text-[var(--color6)]">Results</h2>
@@ -436,7 +446,7 @@ export default function Templates() {
               <div className="flex flex-col items-center gap-3 sm:gap-4">
                 <div className="flex items-center gap-1 sm:gap-1.5 flex-wrap justify-center">
                   <button
-                    onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                    onClick={() => goToPage(Math.max(1, currentPage - 1))}
                     disabled={currentPage === 1}
                     className={`w-8 h-8 sm:w-9 sm:h-9 rounded-full border border-[var(--color6)]/15 bg-[var(--color11)] flex items-center justify-center transition-all duration-200 ${currentPage === 1 ? "text-[var(--color4)] opacity-40 cursor-not-allowed" : "text-[var(--color4)] hover:border-[var(--color6)]/40 hover:text-[var(--color6)] cursor-pointer"}`}
                   >
@@ -449,7 +459,7 @@ export default function Templates() {
                     ) : (
                       <button
                         key={p}
-                        onClick={() => setCurrentPage(p)}
+                        onClick={() => goToPage(p)}
                         className={`w-8 h-8 sm:w-9 sm:h-9 rounded-full fontStyle9 font-semibold flex items-center justify-center transition-all duration-200 text-sm ${currentPage === p ? "bg-[var(--color6)] text-[var(--color5)]" : "border border-[var(--color6)]/15 bg-[var(--color11)] text-[var(--color4)] hover:border-[var(--color6)]/40 hover:text-[var(--color6)]"}`}
                       >
                         {p}
@@ -458,7 +468,7 @@ export default function Templates() {
                   )}
 
                   <button
-                    onClick={() => setCurrentPage((p) => Math.min(pagination.totalPages, p + 1))}
+                    onClick={() => goToPage(Math.min(pagination.totalPages, currentPage + 1))}
                     disabled={currentPage === pagination.totalPages}
                     className={`w-8 h-8 sm:w-9 sm:h-9 rounded-full border border-[var(--color6)]/15 bg-[var(--color11)] flex items-center justify-center transition-all duration-200 ${currentPage === pagination.totalPages ? "text-[var(--color4)] opacity-40 cursor-not-allowed" : "text-[var(--color4)] hover:border-[var(--color6)]/40 hover:text-[var(--color6)] cursor-pointer"}`}
                   >

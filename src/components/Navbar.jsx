@@ -126,7 +126,7 @@ export default function Navbar() {
 
   useEffect(() => {
     if (searchOpen) {
-      if (!allTemplates.length) fetchTemplates();
+      if (!allTemplates.length) fetchTemplates({ limit: 1000 });
       if (desktopSearchRef.current) desktopSearchRef.current.focus();
     }
     if (!searchOpen) clearDesktopQuery();
@@ -142,7 +142,7 @@ export default function Navbar() {
 
   // ── templates are only fetched the first time they are needed ──
   const ensureTemplates = useCallback(() => {
-    if (!allTemplates.length) fetchTemplates();
+    if (!allTemplates.length) fetchTemplates({ limit: 1000 });
   }, [allTemplates.length, fetchTemplates]);
 
   const toggleTheme = () => {

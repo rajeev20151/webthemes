@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
 const OFFERS = [
-  { text: "Flat 50% OFF on all premium templates", short: "Flat 50% OFF on premium templates", cta: "Shop Now",  to: "/templates" },
+  { text: "All premium templates", short: "Flat 50% OFF on premium templates", cta: "Shop Now",  to: "/templates" },
   { text: "Free lifetime updates on every purchase",     short: "Free lifetime updates",                cta: "Explore",  to: "/templates" },
   { text: "Launch weekend — free downloads on select templates", short: "Free downloads this weekend", cta: "View Demos", to: "/demo" },
 ];

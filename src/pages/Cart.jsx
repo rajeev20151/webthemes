@@ -97,7 +97,7 @@ export default function Cart() {
         title="Shopping Cart"
         description="Review your selected templates and proceed to checkout."
       />
-      <section className="min-h-screen bg-[var(--color5)] py-8 md:py-12">
+      <section className="min-h-screen bg-[var(--color5)] pt-12 pb-8 sm:pt-14 md:pt-20 md:pb-12">
         <div className="w-width">
           <BreadCrumb_Nav
             items={[

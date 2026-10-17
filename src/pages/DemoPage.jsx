@@ -14,7 +14,7 @@ import EmptyState from "../components/EmptyState";
 
 export default function DemoPage() {
   const [searchParams, setSearchParams] = useSearchParams();
-  const { data: templatesData } = useGetTemplatesQuery();
+  const { data: templatesData } = useGetTemplatesQuery({ limit: 1000 });
 
   const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
   const origin = API_BASE.replace(/\/api$/, "");
@@ -86,6 +86,12 @@ export default function DemoPage() {
   const ALL_TECH = ["All", ...new Set(demos.map((d) => d.tech).filter(Boolean))];
   const ALL_TAGS = ["All", ...new Set(demos.map((d) => d.tag).filter(Boolean))];
 
+  const stats = {
+    templates: demos.length,
+    categories: ALL_CATEGORIES.length - 1,
+    free: demos.length ? Math.round((demos.filter((d) => d.tag === "FREE").length / demos.length) * 100) : 0,
+  };
+
   return (
     <section className="py-12 sm:py-12 md:py-20 bg-[var(--color5)] min-h-screen">
       <SEOHead
@@ -99,7 +105,7 @@ export default function DemoPage() {
       <div className="w-width">
         <BreadCrumb_Nav items={[{ label: "Home", path: "/" }, { label: "Demos", path: "/demos" }]} />
 
-        <HeroHeader search={search} />
+        <HeroHeader search={search} stats={stats} />
 
         <FilterBar
           search={search} setSearch={setSearch}

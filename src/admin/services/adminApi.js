@@ -82,7 +82,7 @@ export const deleteUserAPI = (id) =>
  // ─── Template APIs (Admin) ────────────────────────────────────
 
 export const adminGetTemplatesAPI = () =>
-  request("/templates", { method: "GET" });
+  request("/templates?limit=1000", { method: "GET" });
 
 export const adminCreateTemplateAPI = (formData) =>
   request("/templates", { method: "POST", body: formData });

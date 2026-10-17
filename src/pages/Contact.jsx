@@ -25,7 +25,21 @@ const socials = [
   { icon: <IconLinkedin />, label: "LinkedIn" },
 ];
 
-const topics = ["General Inquiry", "Template Support", "License Question", "Refund Request", "Partnership", "Other"];
+// const topics = ["General Inquiry", "Template Support", "License Question", "Refund Request", "Partnership", "Other"];
+
+const topics = [
+  "General Inquiry",
+  "Template Support",
+  // "License Question",
+  // "Refund Request",
+  // "Partnership",
+  "Landing Page - $59",
+  "Business Website - $179",
+  "Custom Web Application - $349+",
+  "Pricing Inquiry",
+  "Website Redesign",
+  "Other",
+];
 
 /* ── Validation rules ── */
 const validators = {

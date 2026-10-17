@@ -89,7 +89,7 @@ export default function Blog() {
       />
 
       {/* ─── HEADER ─── */}
-      <section className="pt-16 pb-12 sm:pt-20 sm:pb-14 md:pt-24 md:pb-18 overflow-hidden relative">
+      <section className="pt-12 pb-12 sm:pt-14 sm:pb-14 md:pt-20 md:pb-18 overflow-hidden relative">
         <div
           aria-hidden="true"
           className="absolute inset-0 pointer-events-none"

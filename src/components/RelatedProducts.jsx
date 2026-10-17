@@ -22,17 +22,17 @@ export default function RelatedProducts({ relatedProducts }) {
             <Link
               key={product.id}
               to={`/template/${product.slug}`}
-              className="group border-2 border-[var(--color6)]/10 rounded-2xl overflow-hidden bg-[var(--color11)] shadow-sm hover:shadow-xl hover:border-[var(--color6)]/30 hover:-translate-y-1.5 transition-all duration-300"
+              className="group border border-[var(--color6)]/10 rounded-2xl overflow-hidden bg-[var(--color11)] shadow-sm hover:shadow-lg hover:border-[var(--color6)]/25 hover:-translate-y-1 transition-all duration-300"
             >
-              <div className="relative overflow-hidden aspect-[13/9]">
-                <img src={product.image} alt={product.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                <span className={`absolute top-2.5 left-2.5 fontStyle10 font-bold uppercase px-2.5 py-1 rounded-full text-white text-xs shadow-md ${product.price === "Free" ? "bg-green-500" : "bg-[var(--color3)]"}`}>
+              <div className="relative overflow-hidden aspect-[13/9] bg-[var(--color6)]/5">
+                <img src={product.image} alt={product.title} className="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-105" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/35 via-transparent to-transparent"></div>
+                <span className={`absolute top-3 left-3 fontStyle10 font-bold uppercase px-3 py-1.5 rounded-full text-white text-xs shadow-md backdrop-blur-sm ${product.price === "Free" ? "bg-green-600/95" : "bg-[var(--color3)]/95"}`}>
                   {product.price}
                 </span>
               </div>
-              <div className="p-3.5">
-                <h3 className="fontStyle9 font-semibold text-[var(--color6)] mb-2 line-clamp-2 leading-snug group-hover:text-[var(--color3)] transition-colors duration-200">{product.title}</h3>
+              <div className="p-4">
+                <h3 className="fontStyle9 font-semibold text-[var(--color6)] mb-3 line-clamp-2 leading-snug group-hover:text-[var(--color3)] transition-colors duration-200">{product.title}</h3>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-1.5 fontStyle10 text-[var(--color4)]">
                     <i className="bx bx-download text-xs"></i>

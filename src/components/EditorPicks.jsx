@@ -5,8 +5,8 @@ function EditorPickCard({ pick }) {
   return (
     <Link key={pick.id} to={`/template/${pick.slug}`}
       className="group flex flex-col border border-[var(--color6)]/10 rounded-xl overflow-hidden bg-[var(--color11)] shadow-sm hover:shadow-lg hover:border-[var(--color6)]/25 hover:-translate-y-0.5 transition-all duration-300">
-      <div className="relative overflow-hidden aspect-video">
-        <img src={pick.image} alt={pick.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+      <div className="relative overflow-hidden aspect-[16/10]">
+        <img src={pick.image} alt={pick.title} className="w-full h-full object-cover object-top group-hover:scale-110 transition-transform duration-500" />
         {pick.originalPrice && (
           <div className="absolute top-2 right-2 bg-yellow-400 text-black rounded-full px-2.5 py-1 text-center shadow-md">
             <p className="fontStyle10 font-semibold line-through opacity-60 leading-none">{pick.originalPrice}</p>
@@ -18,7 +18,7 @@ function EditorPickCard({ pick }) {
         </span>
       </div>
       <div className="p-3">
-        <p className="fontStyle9 font-semibold text-[var(--color6)] mb-1.5 line-clamp-1 group-hover:text-[var(--color3)] transition-colors duration-200">{pick.title}</p>
+        <p className="fontStyle9 font-semibold text-[var(--color6)] mb-1.5 line-clamp-2 group-hover:text-[var(--color3)] transition-colors duration-200">{pick.title || pick.name || pick.slug || "Untitled"}</p>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-1.5 fontStyle10 text-[var(--color4)]">
             <i className="bx bx-cart text-xs"></i>

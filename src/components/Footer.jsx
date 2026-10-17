@@ -159,12 +159,12 @@ export default function Footer(){
             <div className="mt-5 sm:mt-6">
               <h5 className="fontStyle7 text-[var(--color5)] font-semibold mb-2 sm:mb-3">Support</h5>
               <ul className="space-y-1.5 sm:space-y-2">
-                <li className="text-gray-400">
+                {/* <li className="text-gray-400">
                   <Link to="#" className="fontStyle8 hover:text-[var(--color5)] 
                   transition-colors duration-300">Documentation</Link>
-                </li>
+                </li> */}
                 <li className="text-gray-400">
-                  <Link to="#" className="fontStyle8 hover:text-[var(--color5)] 
+                  <Link to="terms" className="fontStyle8 hover:text-[var(--color5)] 
                   transition-colors duration-300">Terms of Service</Link>
                 </li>
                 <li className="text-gray-400">
@@ -183,12 +183,10 @@ export default function Footer(){
               {contents?.copyrightText}
             </p>
             <div className="flex gap-4 sm:gap-6">
-              <Link to="#" className="fontStyle8 text-gray-400 hover:text-[var(--color5)] 
+              <Link to="privacy-policy" className="fontStyle8 text-gray-400 hover:text-[var(--color5)] 
                 transition-colors duration-300 text-sm sm:text-base">Privacy</Link>
-              <Link to="#" className="fontStyle8 text-gray-400 hover:text-[var(--color5)] 
+              <Link to="terms" className="fontStyle8 text-gray-400 hover:text-[var(--color5)] 
               transition-colors duration-300 text-sm sm:text-base">Terms</Link>
-              <Link to="#" className="fontStyle8 text-gray-400 hover:text-[var(--color5)] 
-              transition-colors duration-300 text-sm sm:text-base">Cookies</Link>
             </div>
           </div>
         </div>

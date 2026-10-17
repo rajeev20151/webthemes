@@ -104,43 +104,51 @@ export default function Hero() {
     </div>
    {/* ------ hero-content ------  */}
   {/* hero content */}
+{/* hero content */}
+<div className="absolute inset-0 flex items-center justify-center px-4">
 
-      <div className="absolute inset-0 flex items-center justify-center px-4">
+  <div
+    className="hero-content w-full sm:px-6 md:px-8
+    max-w-[19rem] min-[400px]:max-w-sm sm:max-w-md md:max-w-xl lg:max-w-2xl xl:max-w-6xl
+    rounded-2xl sm:rounded-3xl border-2 sm:border-3 border-[var(--color5)]
+    text-center bg-blur p-5 sm:p-8 bg-[var(--color10)]"
+  >
 
-        <div className="hero-content w-full sm:px-6 md:px-8 max-w-sm sm:max-w-md md:max-w-xl lg:max-w-2xl xl:max-w-6xl 
-        rounded-3xl border border-3 border-[var(--color5)] text-center bg-blur p-6 sm:p-8 bg-[var(--color10)]">
+    {isLoading ? (
+      <div
+        aria-hidden="true"
+        className="h-8 sm:h-[46px] md:h-[58px] w-3/4 sm:w-1/2 mx-auto rounded-xl bg-[var(--color6)]/10 animate-pulse mb-5 sm:mb-10"
+      />
+    ) : (
+      <h1 className="text-2xl sm:text-3xl md:text-4xl
+  max-sm:text-[26px]! max-sm:font-bold! max-sm:leading-[1.2]! max-sm:tracking-tight!
+  text-balance text-[var(--color6)] font-bold fontStyle3 mb-5 sm:mb-10">
+  {contents?.title}
+</h1>
+    )}
 
-          {isLoading ? (
-            <div
-              aria-hidden="true"
-              className="h-[38px] sm:h-[46px] md:h-[58px] w-2/3 sm:w-1/2 mx-auto rounded-xl bg-[var(--color6)]/10 animate-pulse mb-8 sm:mb-10"
-            />
-          ) : (
-            <h1 className="text-2xl sm:text-3xl md:text-4xl text-[var(--color6)] font-bold fontStyle3 mb-8 sm:mb-10">
-              {contents?.title}
-            </h1>
-          )}
-  
-          <Link
-            to="/demo"
-            className="group fontStyle7 inline-flex items-center gap-3 pl-6 sm:pl-8 pr-3 py-3
-            bg-[var(--color5)] text-[var(--color6)] rounded-full shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-xl"
-          >
+    <Link
+      to="/demo"
+      className="group fontStyle7 inline-flex items-center gap-2 sm:gap-3
+      pl-5 sm:pl-8 pr-2 sm:pr-3 py-2 sm:py-3 text-sm sm:text-base
+      bg-[var(--color5)] text-[var(--color6)] rounded-full shadow-lg
+      transition-all duration-300 hover:scale-105 hover:shadow-xl"
+    >
+    <span className="font-bold whitespace-nowrap max-sm:text-[15px]! max-sm:font-bold! max-sm:tracking-normal!">
+    Explore Demos
+    </span>
 
-            <span className="font-bold">Explore Demos</span>
+      <span
+        className="flex items-center justify-center shrink-0
+        w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-[var(--color6)]
+        transition-all duration-300 group-hover:rotate-90"
+      >
+        <i className="bx bx-up-arrow-alt text-lg sm:text-xl text-[var(--color5)]"></i>
+      </span>
+    </Link>
 
-            <span className="flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-[var(--color6)]
-            transition-all duration-300 group-hover:rotate-90">
-
-              <i className="bx bx-up-arrow-alt text-xl text-[var(--color5)]"></i>
-
-            </span>
-
-          </Link>
-
-        </div>
-
-      </div>
+  </div>
+</div>
 
     </section>
   );

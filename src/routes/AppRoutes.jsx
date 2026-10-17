@@ -16,6 +16,7 @@ const Themes = lazy(pageLoaders["/template/:slug"]);
 const DemoPage = lazy(pageLoaders["/demo"]);
 const Contact = lazy(pageLoaders["/contact"]);
 const PrivacyPolicy = lazy(pageLoaders["/privacy-policy"]);
+const TermsOfService = lazy(pageLoaders["/terms"]);
 const Cart = lazy(pageLoaders["/cart"]);
 const Checkout = lazy(pageLoaders["/check-out"]);
 const Profile = lazy(pageLoaders["/profile"]);
@@ -40,6 +41,8 @@ export default function AppRoutes() {
         <Route path="signup" element={<Signup />} />
         <Route path="demo" element={<DemoPage />} />
         <Route path="privacy-policy" element={<PrivacyPolicy />} />
+        <Route path="privacy" element={<PrivacyPolicy />} />
+        <Route path="terms" element={<TermsOfService />} />
         <Route path="forgotPassword" element={<ForgotPassword />} />
         <Route path="cart" element={<ProtectedRoute><Cart /></ProtectedRoute>} />
         <Route path="check-out" element={<ProtectedRoute><Checkout /></ProtectedRoute>} />

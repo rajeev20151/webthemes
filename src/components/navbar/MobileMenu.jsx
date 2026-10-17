@@ -3,7 +3,7 @@ import logo from "../../assets/icons/logo.png";
 import SuggestionList from "./SuggestionList";
 import { mobileNav } from "./navbarData";
 
-const FOOTER_LINKS = ["Terms", "Privacy", "Refund"];
+const FOOTER_LINKS = ["Terms", "Privacy"];
 
 // Full-screen slide-in menu for < lg. All state/handlers come from Navbar.
 export default function MobileMenu({

@@ -18,13 +18,13 @@ const FAQS = [
     q: "What payment methods do you accept?",
     a: "We accept UPI, all major Credit / Debit Cards, Net Banking, and popular wallets through our secure Razorpay-powered checkout.",
   },
+  // {
+  //   q: "Can I upgrade my plan at any time?",
+  //   a: "Absolutely. Upgrade from Single to Bundle, or from Bundle to Agency at any time. We will credit your previous purchase towards the new plan.",
+  // },
   {
-    q: "Can I upgrade my plan at any time?",
-    a: "Absolutely. Upgrade from Single to Bundle, or from Bundle to Agency at any time. We will credit your previous purchase towards the new plan.",
-  },
-  {
-    q: "What is your refund policy?",
-    a: "Single Template purchases are eligible for a full refund within 7 days. Bundle and Agency plans carry a 3-day refund window, provided no more than 2 templates have been downloaded.",
+    q: "Do you offer refunds?",
+    a: "Refunds are available only for high-price premium templates. All other templates and plans are final and non-refundable. Please review the template details carefully before purchasing.",
   },
   {
     q: "Are updates included?",

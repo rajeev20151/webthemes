@@ -1,4 +1,10 @@
-export default function HeroHeader({ search }) {
+export default function HeroHeader({ search, stats }) {
+  const items = [
+    { icon: "bx-layer", val: `${stats?.templates ?? 0}+`, lbl: "Templates" },
+    { icon: "bx-category", val: `${stats?.categories ?? 0}+`, lbl: "Categories" },
+    { icon: "bx-gift", val: `${stats?.free ?? 0}%`, lbl: "Free Access" },
+  ];
+
   return (
     <div className="mt-6 sm:mt-8 mb-8 sm:mb-10">
       <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
@@ -19,11 +25,7 @@ export default function HeroHeader({ search }) {
         </div>
 
         <div className="flex items-center gap-3 sm:gap-4 flex-wrap lg:flex-nowrap">
-          {[
-            { icon: "bx-layer", val: "1045+", lbl: "Templates" },
-            { icon: "bx-category", val: "20+", lbl: "Categories" },
-            { icon: "bx-gift", val: "100%", lbl: "Free Access" },
-          ].map((s, i) => (
+          {items.map((s, i) => (
             <div
               key={i}
               className="flex items-center gap-3 px-4 py-3 rounded-2xl border border-[var(--color6)]/10 bg-[var(--color11)]"

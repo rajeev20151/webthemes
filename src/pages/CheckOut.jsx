@@ -40,7 +40,7 @@ export default function Checkout() {
 
   /* ══════════════ CHECKOUT ══════════════ */
   return (
-    <section className="min-h-screen bg-[var(--color5)] py-12 md:py-20">
+    <section className="min-h-screen bg-[var(--color5)] pt-12 pb-12 sm:pt-14 md:pt-20 md:pb-20">
       <SEOHead
         title="Checkout"
         description="Complete your purchase securely."

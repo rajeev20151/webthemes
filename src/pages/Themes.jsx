@@ -65,7 +65,7 @@ useEffect(() => {
     return list.map((t) => ({
       id: t._id,
       slug: t.slug,
-      title: t.name,
+      title: t.name || t.title || "Untitled",
       price: t.price === 0 ? "Free" : `$${t.price}`,
       purchases: t.downloads || 0,
       downloads: t.downloads || 0,
@@ -83,7 +83,6 @@ useEffect(() => {
       ...t,
       badge: "TEMPLATE",
       badgeCls: t.price === "Free" ? "bg-green-500" : "bg-violet-700",
-      originalPrice: null,
     }));
   }, [relatedProducts]);
 
@@ -104,11 +103,36 @@ useEffect(() => {
       <p className="fontStyle9 text-[var(--color4)]">Loading...</p>
     </div>
   );
-  if (!theme) return (
-    <div className="min-h-screen flex items-center justify-center bg-[var(--color5)]">
-      <p className="fontStyle9 text-[var(--color4)]">Template not found.</p>
+if (!theme) return (
+  <div className="relative flex min-h-[78vh] items-center justify-center overflow-hidden bg-[var(--color5)] px-5 py-12 sm:py-16">
+    <div className="pointer-events-none absolute -left-32 -top-24 h-80 w-80 rounded-full bg-[var(--color6)]/5 blur-[100px]" />
+    <div className="pointer-events-none absolute -bottom-32 -right-24 h-96 w-96 rounded-full bg-[var(--color6)]/5 blur-[110px]" />
+    <div className="relative grid w-full max-w-4xl overflow-hidden rounded-3xl border border-[var(--color6)]/10 bg-[var(--color11)] shadow-2xl shadow-[var(--color6)]/10 md:grid-cols-[0.85fr_1.15fr]">
+      <div className="relative flex min-h-56 flex-col items-center justify-center overflow-hidden p-8 text-white sm:min-h-72 md:min-h-[28rem]" style={{ background: "var(--color3)" }}>
+        <span className="pointer-events-none absolute -right-10 -top-12 h-48 w-48 rounded-full border border-white/20" />
+        <span className="pointer-events-none absolute -bottom-20 -left-10 h-56 w-56 rounded-full border border-white/15" />
+        <div className="relative mb-4 flex h-16 w-16 items-center justify-center rounded-2xl border border-white/30 bg-white/15 shadow-lg backdrop-blur-sm">
+          <i className="bx bx-file-blank text-3xl" />
+        </div>
+        <span className="relative text-[clamp(5rem,13vw,8rem)] font-black leading-none tracking-[-0.08em]">404</span>
+        <span className="relative mt-3 rounded-full border border-white/30 bg-white/10 px-4 py-1.5 fontStyle10 font-semibold uppercase tracking-[0.2em]">Page not found</span>
+      </div>
+      <div className="flex flex-col items-center justify-center px-7 py-10 text-center sm:px-12 md:items-start md:text-left">
+        <span className="mb-4 fontStyle10 font-bold uppercase tracking-[0.18em] text-[var(--color4)]">The link may be outdated</span>
+        <h1 className="fontStyle4 mb-4 text-2xl font-bold tracking-tight text-[var(--color6)] sm:text-3xl">Template not found</h1>
+        <p className="fontStyle9 mb-8 max-w-md leading-7 text-[var(--color4)]">This template may have been removed or the link may be incorrect. Browse the collection to find another one.</p>
+        <div className="flex w-full flex-col justify-center gap-3 sm:w-auto sm:flex-row md:justify-start">
+          <Link to="/templates" style={{ background: "var(--color3)" }} className="group inline-flex min-h-12 items-center justify-center gap-3 rounded-xl px-5 py-3 fontStyle9 font-semibold text-white shadow-lg shadow-[var(--color6)]/15 transition-all hover:-translate-y-0.5 hover:shadow-xl focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[var(--color6)]/20">
+            Browse templates <i className="bx bx-right-arrow-alt text-xl transition-transform group-hover:translate-x-1" />
+          </Link>
+          <Link to="/" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-[var(--color6)]/15 px-5 py-3 fontStyle9 font-semibold text-[var(--color6)] transition-colors hover:bg-[var(--color6)]/5 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[var(--color6)]/15">
+            <i className="bx bx-home-alt text-lg" /> Go home
+          </Link>
+        </div>
+      </div>
     </div>
-  );
+  </div>
+);
 
   const resolvedImages = (theme.images || []).map(imgUrl);
   const isFree = !theme.price || theme.price === 0;

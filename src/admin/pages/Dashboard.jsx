@@ -1,7 +1,7 @@
 ﻿import { useState, useEffect, useMemo } from "react";
 import {
   PieChart, Pie, Cell,
-  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend,
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LabelList,
   AreaChart, Area,
 } from "recharts";
 import {
@@ -196,35 +196,43 @@ function StatusPie({ data }) {
 }
 
 /* ── Category Bar ── */
-function CategoryBar({ data }) {
+function TemplateCountChart({ data }) {
+  const chartWidth = Math.max(500, data.length * 120);
+
   return (
-    <div className="admin-card p-5">
+    <div className="admin-card p-5 lg:col-span-2">
       <div className="mb-4">
-        <p className="fontStyle5 font-bold text-[var(--admin-text)] m-0">Templates by Category</p>
-        <p className="fontStyle9 text-[var(--admin-muted)] mt-0.5 m-0">Distribution across categories</p>
+        <p className="fontStyle5 font-bold text-[var(--admin-text)] m-0">Website Templates</p>
+        <p className="fontStyle9 text-[var(--admin-muted)] mt-0.5 m-0">One count for each website template</p>
       </div>
-      <ResponsiveContainer width="100%" height={220}>
-        <BarChart data={data} margin={{ top: 4, right: 4, left: -20, bottom: 0 }} barSize={22}>
-          <CartesianGrid strokeDasharray="3 3" stroke="rgba(148,163,184,0.08)" vertical={false} />
-          <XAxis dataKey="name" tick={{ fontSize: 10, fill: "#94a3b8" }} axisLine={false} tickLine={false} />
-          <YAxis tick={{ fontSize: 10, fill: "#94a3b8" }} axisLine={false} tickLine={false} allowDecimals={false} />
-          <Tooltip
-            contentStyle={{
-              background: "var(--admin-surface)",
-              border: "1px solid var(--admin-border)",
-              borderRadius: 10,
-              fontSize: 12,
-              boxShadow: "0 8px 24px var(--admin-shadow)",
-            }}
-            labelStyle={{ color: "var(--admin-text)", fontWeight: 600 }}
-          />
-          <Bar dataKey="count" radius={[6, 6, 0, 0]}>
-            {data.map((_, i) => (
-              <Cell key={i} fill={Object.values(COLORS)[i % Object.values(COLORS).length]} />
-            ))}
-          </Bar>
-        </BarChart>
-      </ResponsiveContainer>
+      <div className="overflow-x-auto">
+        <div style={{ width: chartWidth, height: 220 }}>
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={data} margin={{ top: 4, right: 16, left: 0, bottom: 62 }} barSize={28}>
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(148,163,184,0.08)" vertical={false} />
+              <XAxis dataKey="name" interval={0} angle={-45} textAnchor="end" height={70} tick={{ fontSize: 10, fill: "#94a3b8" }} axisLine={false} tickLine={false} />
+              <YAxis allowDecimals={false} width={36} tick={{ fontSize: 10, fill: "#94a3b8" }} axisLine={false} tickLine={false} />
+              <Tooltip
+                formatter={(value) => [value, "Templates"]}
+                contentStyle={{
+                  background: "var(--admin-surface)",
+                  border: "1px solid var(--admin-border)",
+                  borderRadius: 10,
+                  fontSize: 12,
+                  boxShadow: "0 8px 24px var(--admin-shadow)",
+                }}
+                labelStyle={{ color: "var(--admin-text)", fontWeight: 600 }}
+              />
+              <Bar dataKey="count" radius={[6, 6, 0, 0]}>
+                {data.map((_, i) => (
+                  <Cell key={i} fill={Object.values(COLORS)[i % Object.values(COLORS).length]} />
+                ))}
+                <LabelList dataKey="count" position="top" fill="#94a3b8" fontSize={10} />
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
     </div>
   );
 }
@@ -450,14 +458,10 @@ export default function Dashboard() {
     { name: "Banned",   key: "Banned",   value: users.filter((u) => u.status === "Banned" || u.isBanned).length },
   ];
 
-  const catMap = {};
-  templates.forEach((t) => {
-    const cat = t.category || "Uncategorized";
-    catMap[cat] = (catMap[cat] || 0) + 1;
-  });
-  const categoryData = Object.entries(catMap)
-    .map(([name, count]) => ({ name, count }))
-    .sort((a, b) => b.count - a.count);
+  const templateCountData = templates.map((template) => ({
+    name: template.name || "Untitled",
+    count: template.views || template.downloads || 0,
+  }))
 
   const newContacts = contacts.filter((c) => c.status === "new" || !c.status).length;
   const unreadChats = chats.filter((c) => c.status === "unread" || !c.status).length;
@@ -577,7 +581,7 @@ export default function Dashboard() {
 
       {/* ── Charts + Activity Row ── */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        {categoryData.length > 0 && <CategoryBar data={categoryData} />}
+        <TemplateCountChart data={templateCountData} />
         <StatusPie data={userStatus} />
       </div>
 
