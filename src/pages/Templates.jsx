@@ -387,7 +387,7 @@ export default function Templates() {
                                 </span>
                               </>
                             ) : (
-                              <span className="fontStyle9 font-bold bg-[var(--color6)] text-[var(--color5)] px-3 py-1 rounded-full">
+                              <span className="fontStyle9 font-bold bg-color12 text-[var(--color5)] px-3 py-1 rounded-full">
                                 Free
                               </span>
                             )}

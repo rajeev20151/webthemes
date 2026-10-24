@@ -74,6 +74,14 @@ export const apiSlice = createApi({
       query: (id) => ({ url: `/templates/${id}/views`, method: "POST" }),
     }),
 
+    getLatestTemplates: builder.query({
+      query: (params = {}) => {
+        const qs = new URLSearchParams(params).toString();
+        return `/templates/latest${qs ? `?${qs}` : ""}`;
+      },
+      providesTags: ["Template"],
+    }),
+
     // ─── BLOGS ───────────────────────────────────────
     getBlogs: builder.query({
       query: (params = {}) => {
@@ -204,4 +212,5 @@ export const {
   useClearCartApiMutation,
   useMergeCartApiMutation,
   useSubscribeNewsletterMutation,
+  useGetLatestTemplatesQuery,
 } = apiSlice;

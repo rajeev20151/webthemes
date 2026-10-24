@@ -68,6 +68,11 @@ export const getTemplatesAPI = () =>
 export const getTemplateAPI = (id) =>
   request(`/templates/${id}`, { method: "GET" });
 
+export const getLatestTemplatesAPI = (params = {}) => {
+  const qs = new URLSearchParams(params).toString();
+  return request(`/templates/latest${qs ? `?${qs}` : ""}`, { method: "GET" });
+};
+
 // ─── Chat APIs ────────────────────────────────────────────────
 export const getTemplateChatsAPI = (templateId) =>
   request(`/chats/${templateId}`, { method: "GET" });

@@ -24,14 +24,6 @@ export default function ThemeSidebar({ theme, isFree, resolvedPreviewUrl, resolv
   return (
     <div className="hidden lg:flex flex-col gap-5 flex-shrink-0 w-[290px] xl:w-[310px] sticky top-6">
       <div className="rounded-2xl border border-[var(--color6)]/10 bg-[var(--color11)] p-5 shadow-sm hover:shadow-md transition-shadow duration-300">
-        <div className="flex items-center justify-between mb-4">
-          <span className="fontStyle7 font-bold text-[var(--color6)]">
-            {isFree ? "Free download" : `$${theme.price}`}
-          </span>
-          <Link to="#" className="fontStyle9 text-blue-500 hover:text-blue-600 hover:underline flex items-center gap-1 transition-colors duration-200">
-            License <i className="bx bx-chevron-right text-sm"></i>
-          </Link>
-        </div>
         <DownloadButtons isFree={isFree} price={theme.price} link={theme.link} previewUrl={resolvedPreviewUrl} downloadUrl={resolvedDownloadUrl} theme={theme} addToCart={handleAddToCart} />
         <div className="mt-4 space-y-2 mb-5">
           {(isFree

@@ -85,7 +85,7 @@ export default function ManageTemplates() {
         "frameworks", "compatible", "tags", "keyFeatures", "inTheBox", "libraries",
       ];
       textFields.forEach((key) => {
-        if (form[key] !== undefined && form[key] !== "") fd.append(key, form[key]);
+        if (form[key] !== undefined) fd.append(key, form[key]);
       });
 
     // / price/originalPrice hamesha bhejo (0 bhi valid hai)

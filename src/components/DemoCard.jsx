@@ -55,7 +55,7 @@ export default function DemoCard({ demo }) {
       <div className="flex flex-col flex-1 p-4 sm:p-5">
         {/* Title + Price */}
         <div className="flex items-center justify-between gap-3">
-          <h3 className="fontStyle7 font-bold text-[var(--color6)] leading-snug">
+          <h3 className="fontStyle7 font-bold text-[var(--color6)] leading-snug truncate">
             <Link
               to={`/template/${demo.slug}`}
               className="hover:text-[var(--color4)] transition-colors duration-200"
@@ -77,7 +77,7 @@ export default function DemoCard({ demo }) {
                 </span>
               </>
             ) : (
-              <span className="fontStyle9 font-bold bg-[var(--color6)] text-[var(--color5)] px-3 py-1 rounded-full">
+              <span className="fontStyle9 font-bold bg-color12 text-[var(--color5)] px-3 py-1 rounded-full">
                 Free
               </span>
             )}

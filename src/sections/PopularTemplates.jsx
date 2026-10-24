@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { useGetPopularTemplatesQuery, useGetTemplatesRatingsQuery, API_URL } from "../store/apiSlice";
+import { useGetLatestTemplatesQuery, useGetTemplatesRatingsQuery, API_URL } from "../store/apiSlice";
 
 const imgUrl = (path) => {
   if (!path) return "";
@@ -39,11 +39,9 @@ function StarRating({ rating = 0, reviews = 0 }) {
 }
 
 export default function PopularTemplates() {
-const { data: templatesData, isLoading: loading } = useGetPopularTemplatesQuery(100);
+const { data: templatesData, isLoading: loading } = useGetLatestTemplatesQuery({ limit: 9 });
 
-const templates = [...(templatesData?.templates ?? [])]
-  .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-  .slice(0, 9);
+const templates = templatesData?.templates ?? [];
 
   // Batch fetch all ratings in ONE call
   const templateIds = templates.map((t) => t._id).filter(Boolean);
@@ -127,20 +125,20 @@ const templates = [...(templatesData?.templates ?? [])]
                     {t.price > 0 ? (
                       <>
                         {t.originalPrice > 0 && t.originalPrice > t.price && (
-                          <span className="fontStyle10 text-[var(--color4)] line-through">${t.originalPrice}</span>
+                          <span className="fontStyle9 text-[var(--color4)] line-through">${t.originalPrice}</span>
                         )}
-                        <span className="fontStyle7 font-bold text-[var(--color6)]">${t.price}</span>
+                        <span className="fontStyle9 font-bold bg-color3 text-white px-3 py-1 rounded-full shadow-md shadow-indigo-500/25">${t.price}</span>
                       </>
-                    ) : (
-                      <span className="fontStyle7 font-bold text-[var(--color6)]">Free</span>
+                    ) : ( 
+                      <span className="fontStyle9 font-bold bg-color12 text-[var(--color5)] px-3 py-1 rounded-full">Free</span>
                     )}
                   </span>
                 </div>
 
                 <div className="flex items-center justify-between">
-                  <span className="fontStyle10 text-[var(--color4)] flex items-center gap-1">
+                  {/* <span className="fontStyle10 text-[var(--color4)] flex items-center gap-1">
                     <i className="bx bx-cart text-sm"></i>{t.downloads || 0} Purchases
-                  </span>
+                  </span> */}
                   <StarRating
                     rating={ratings[t._id]?.rating || 0}
                     reviews={ratings[t._id]?.total || 0}
