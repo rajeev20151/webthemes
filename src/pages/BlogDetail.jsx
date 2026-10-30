@@ -4,6 +4,7 @@ import BreadCrumb_Nav from "../components/BreadCrumb_Nav";
 import { API_BASE } from "../services/api";
 import { useGetBlogBySlugQuery } from "../store/apiSlice";
 import SEOHead from "../components/SEOHead";
+import ReactMarkdown from "react-markdown";
 
 const resolveUrl = (p) => {
   if (!p) return "";
@@ -41,8 +42,17 @@ function ReadProgress() {
 }
 
 /* ── Table of Contents ── */
+function extractHeadings(content) {
+  if (!content || typeof content !== "string") return [];
+  return content
+    .split("\n")
+    .map((line) => line.match(/^(#{1,3})\s+(.+)$/))
+    .filter(Boolean)
+    .map((m) => ({ level: m[1].length, text: m[2].trim() }));
+}
+
 function TableOfContents({ content }) {
-  const headings = content.filter((b) => b.type === "heading");
+  const headings = extractHeadings(content);
   const [active, setActive] = useState(0);
 
   useEffect(() => {
@@ -277,7 +287,7 @@ export default function BlogDetail() {
           role: b.authorRole || "",
           bio: "",
         },
-        content: Array.isArray(b.content) ? b.content : [],
+        content: typeof b.content === "string" ? b.content : "",
         tags: Array.isArray(b.tags) ? b.tags : [],
       });
       setRelated(
@@ -421,20 +431,24 @@ export default function BlogDetail() {
 
         {/* ─── HERO IMAGE ─── */}
         {post.image && (
-          <section style={fadeUp(0.22)} className="py-8 sm:py-10">
-            <div className="w-width">
-              <div className="rounded-2xl sm:rounded-3xl overflow-hidden border-2 border-[var(--color6)] shadow-[6px_6px_0px_var(--color6)] sm:shadow-[10px_10px_0px_var(--color6)]">
-                <img src={post.image} alt={post.title} className="w-full object-cover" style={{ maxHeight: 520 }} />
-              </div>
+        <section style={fadeUp(0.22)} className="py-8 sm:py-10">
+          <div className="w-width">
+            <div className="rounded-2xl sm:rounded-3xl overflow-hidden border-2 border-[var(--color6)] shadow-[6px_6px_0px_var(--color6)] sm:shadow-[10px_10px_0px_var(--color6)]">
+              <img
+                src={post.image}
+                alt={post.title}
+                className="w-full h-auto object-cover object-top block"
+              />
             </div>
-          </section>
+          </div>
+        </section>
         )}
 
         {/* ─── BODY + SIDEBAR ─── */}
         <section className="pb-16 sm:pb-24">
           <div className="w-width">
             {/* Mobile TOC toggle */}
-            {post.content.some((b) => b.type === "heading") && (
+            {extractHeadings(post.content).length > 0 && (
               <button
                 onClick={() => setShowToc(!showToc)}
                 className="lg:hidden w-full mb-6 p-4 rounded-2xl border-2 border-[var(--color6)] bg-[var(--color5)] flex items-center justify-between shadow-[4px_4px_0px_var(--color6)] cursor-pointer"
@@ -460,10 +474,19 @@ export default function BlogDetail() {
 
               {/* Article body */}
               <article style={fadeUp(0.28)}>
-                {post.content.length > 0 ? (
-                  post.content.map((block, i) => (
-                    <ContentBlock key={i} block={block} />
-                  ))
+                {post.content ? (
+                  <div className="prose max-w-none">
+                    <ReactMarkdown
+                      components={{
+                        h1: ({ children }) => <h1 className="post-heading fontStyle4 font-bold text-[var(--color6)] mt-10 mb-4">{children}</h1>,
+                        h2: ({ children }) => <h2 className="post-heading fontStyle5 font-bold text-[var(--color6)] mt-10 mb-4 flex items-center gap-3"><span className="w-2 h-7 rounded-full bg-color3 flex-shrink-0"></span>{children}</h2>,
+                        h3: ({ children }) => <h3 className="post-heading fontStyle6 font-bold text-[var(--color6)] mt-8 mb-3">{children}</h3>,
+                        p: ({ children }) => <p className="fontStyle8 text-[var(--color8)] leading-[1.85] sm:leading-[1.9] mb-5 sm:mb-6">{children}</p>,
+                      }}
+                    >
+                      {post.content}
+                    </ReactMarkdown>
+                  </div>
                 ) : (
                   <div className="py-10 text-center">
                     <p className="fontStyle9 text-[var(--color4)]">This article is coming soon.</p>

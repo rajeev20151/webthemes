@@ -12,7 +12,7 @@ const CATEGORIES = ["All", "Design", "Development", "Templates", "Tips & Tricks"
 const emptyForm = {
   title: "", slug: "", category: "Development", tag: "", excerpt: "",
   authorName: "Admin", authorRole: "", readTime: "5 min read",
-  featured: false, status: "published", tags: "",
+  featured: false, status: "published", tags: "", content: "",
 };
 
 /* ── Icons ── */
@@ -49,10 +49,11 @@ const formatDate = (d) => {
 /* ════════════════════════════════════════════
    MODAL
 ════════════════════════════════════════════ */
-function BlogModal({ mode, data, onClose, onSave, saving }) {
+function BlogModal({ mode, data, onClose, onSave, saving, categories = [] }) {
   const [form, setForm]       = useState({
     ...data,
     tags: Array.isArray(data.tags) ? data.tags.join(", ") : (data.tags || ""),
+    content: typeof data.content === "string" ? data.content : "",
   });
   const [imageFile, setImageFile] = useState(null);
   const [preview, setPreview] = useState(data.image ? resolveUrl(data.image) : "");
@@ -86,7 +87,7 @@ function BlogModal({ mode, data, onClose, onSave, saving }) {
           const tagsStr = Array.isArray(v) ? v.join(", ") : (v || "");
           fd.append("tags", JSON.stringify(tagsStr ? tagsStr.split(",").map((t) => t.trim()).filter(Boolean) : []));
         } else if (k === "content") {
-          fd.append("content", JSON.stringify(Array.isArray(v) ? v : []));
+          fd.append("content", String(v || ""));
         } else {
           fd.append(k, String(v));
         }
@@ -138,9 +139,18 @@ function BlogModal({ mode, data, onClose, onSave, saving }) {
 
             <div>
               <label className={labelCls}>Category *</label>
-              <select className="admin-select" value={form.category} onChange={(e) => set("category", e.target.value)}>
-                {CATEGORIES.filter((c) => c !== "All").map((c) => <option key={c}>{c}</option>)}
-              </select>
+              <input
+                className={inputCls}
+                list="blog-categories"
+                value={form.category}
+                onChange={(e) => set("category", e.target.value)}
+                placeholder="Type or pick a category"
+              />
+              <datalist id="blog-categories">
+                {Array.from(new Set([...CATEGORIES.filter((c) => c !== "All"), ...categories])).map((c) => (
+                  <option key={c} value={c} />
+                ))}
+              </datalist>
             </div>
 
             <div>
@@ -192,6 +202,11 @@ function BlogModal({ mode, data, onClose, onSave, saving }) {
             <div className="md:col-span-2">
               <label className={labelCls}>Excerpt *</label>
               <textarea className={inputCls + " min-h-[80px] resize-y"} value={form.excerpt} onChange={(e) => set("excerpt", e.target.value)} placeholder="Short description of the blog post" rows={3} />
+            </div>
+
+            <div className="md:col-span-2">
+              <label className={labelCls}>Content (Markdown)</label>
+              <textarea className={inputCls + " min-h-[240px] resize-y font-mono"} value={form.content || ""} onChange={(e) => set("content", e.target.value)} placeholder="# Heading\n\nParagraph text..." rows={10} />
             </div>
 
             {/* Image */}
@@ -404,7 +419,10 @@ export default function ManageBlogs() {
           value={filterCategory}
           onChange={(e) => setFilterCategory(e.target.value)}
         >
-          {CATEGORIES.map((c) => <option key={c}>{c}</option>)}
+          <option>All</option>
+          {Array.from(new Set([...CATEGORIES.filter((c) => c !== "All"), ...blogs.map((b) => b.category).filter(Boolean)])).map((c) => (
+            <option key={c}>{c}</option>
+          ))}
         </select>
       </div>
 
@@ -426,7 +444,7 @@ export default function ManageBlogs() {
       )}
 
       {/* Modal */}
-      {modal && <BlogModal mode={modal.mode} data={modal.data} onClose={() => setModal(null)} onSave={handleSave} saving={saving} />}
+      {modal && <BlogModal mode={modal.mode} data={modal.data} onClose={() => setModal(null)} onSave={handleSave} saving={saving} categories={Array.from(new Set(blogs.map((b) => b.category).filter(Boolean)))} />}
 
       {/* Delete Confirm */}
       {deleteTarget && <DeleteConfirm title={deleteTarget.title} onConfirm={handleDelete} onCancel={() => setDelete(null)} saving={saving} />}

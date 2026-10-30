@@ -34,13 +34,13 @@ export default function BlogCard({ post, index }) {
           group-hover:shadow-[2px_2px_0px_var(--color6)] group-hover:translate-x-1 group-hover:translate-y-1 sm:group-hover:translate-x-1.5 sm:group-hover:translate-y-1.5"
       >
         {/* Image */}
-        <div className="relative overflow-hidden aspect-[16/10] bg-[var(--color11)] border-b-2 border-[var(--color6)]">
+        <div className="relative overflow-hidden aspect-[16/8] bg-[var(--color11)] border-b-2 border-[var(--color6)]">
           {post.image ? (
             <img
               src={post.image}
               alt={post.title}
               loading="lazy"
-              className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+              className="w-full h-full object-contain object-top transition-transform duration-700 ease-out group-hover:scale-105"
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center">
