@@ -3,7 +3,7 @@ export default function ImageGallery({ resolvedImages, activeImage, setActiveIma
  
   return (
     <div className="mb-6 sm:mb-8 rounded-2xl overflow-hidden border-2 border-[var(--color6)]/10 bg-[var(--color11)] shadow-lg shadow-black/5">
-      <div className="relative overflow-hidden aspect-video">
+      <div className="relative overflow-hidden aspect-[4/3] sm:aspect-video">
   {resolvedImages[activeImage] ? (
     <div className="w-full h-full overflow-y-auto" ref={imageScrollRef}>
       <img

@@ -194,6 +194,11 @@ export default function Templates() {
     setSelectedType("All Types");
     setSortBy("Latest");
     setCurrentPage(1);
+    setSidebarOpen(false);
+  }
+
+  function closeMobileFilters() {
+    setSidebarOpen(false);
   }
 
   const hasActiveFilters = selectedType !== "All Types" || selectedCategory !== "All Industries" || search;
@@ -254,17 +259,17 @@ export default function Templates() {
               hasActiveFilters ? "bg-[var(--color6)] text-[var(--color5)] border-transparent" : "border-[var(--color6)]/12 bg-[var(--color11)] text-[var(--color6)]"
             }`}
           >
-            <i className="bx bx-filter-alt text-base"></i> Filters
+            <i className="bx bx-slider-alt text-lg"></i> Filters
           </button>
         </div>
 
         <div className="flex gap-6 lg:gap-8 mt-2 sm:mt-4">
           {/* ── LEFT SIDEBAR ── */}
           {sidebarOpen && (
-            <div className="fixed inset-0 bg-black/60 z-[998] lg:hidden" onClick={() => setSidebarOpen(false)} />
+            <div className="fixed inset-0 bg-black/60 z-[10000] lg:hidden" onClick={closeMobileFilters} />
           )}
           <div className={`
-            fixed top-0 right-0 h-screen z-[999] overflow-y-auto w-[280px] bg-[var(--color5)] border-l border-[var(--color6)]/15 p-6 transition-transform duration-300 ease-in-out
+            fixed top-0 right-0 h-screen z-[10001] overflow-y-auto w-[280px] bg-[var(--color5)] border-l border-[var(--color6)]/15 p-6 transition-transform duration-300 ease-in-out
             ${sidebarOpen ? "translate-x-0" : "translate-x-full"}
             lg:translate-x-0 lg:h-auto lg:overflow-y-auto lg:max-h-[calc(73vh)] lg:right-auto lg:flex-shrink-0 lg:w-72 lg:bg-[var(--color11)] lg:rounded-2xl lg:border lg:border-[var(--color6)]/10 lg:p-7 lg:sticky lg:top-6
           `}>
@@ -293,9 +298,9 @@ export default function Templates() {
               </div>
             </div>
 
-            <SelectField label="Category" options={categoryOptions} selected={selectedCategory} onSelect={(v) => { setSelectedCategory(v); setCurrentPage(1); }} />
-            <SelectField label="Theme Type" options={typeOptions} selected={selectedType} onSelect={(v) => { setSelectedType(v); setCurrentPage(1); }} />
-            <SelectField label="Sort By" options={SORT_OPTIONS} selected={sortBy} onSelect={(v) => { setSortBy(v); setCurrentPage(1); }} />
+            <SelectField label="Category" options={categoryOptions} selected={selectedCategory} onSelect={(v) => { setSelectedCategory(v); setCurrentPage(1); closeMobileFilters(); }} />
+            <SelectField label="Theme Type" options={typeOptions} selected={selectedType} onSelect={(v) => { setSelectedType(v); setCurrentPage(1); closeMobileFilters(); }} />
+            <SelectField label="Sort By" options={SORT_OPTIONS} selected={sortBy} onSelect={(v) => { setSortBy(v); setCurrentPage(1); closeMobileFilters(); }} />
 
             <button onClick={clearAll} className="w-full py-3 rounded-xl fontStyle9 font-semibold text-[var(--color5)] bg-[var(--color6)] border border-[var(--color6)]/15 hover:text-[var(--color5)] hover:border-[var(--color6)]/30 transition-all duration-200">
               Clear All

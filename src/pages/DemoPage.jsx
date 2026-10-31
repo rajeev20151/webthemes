@@ -31,7 +31,7 @@ export default function DemoPage() {
       category: t.category || t.subtitle || "General",
       type: t.tag || "Multi Page",
       tag: t.price === 0 ? "FREE" : "PRO",
-      tech: framework.includes("WORDPRESS") ? "WORDPRESS" : "HTML/CSS",
+      tech: framework.includes("WORDPRESS") ? "WORDPRESS" : "Templates",
       image,
       frameworks: Array.isArray(t.frameworks) && t.frameworks.length > 0 ? t.frameworks.join(", ") : "",
       views: t.views ?? t.downloads ?? 0,

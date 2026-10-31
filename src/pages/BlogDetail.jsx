@@ -359,7 +359,7 @@ export default function BlogDetail() {
               items={[
                 { label: "Home", path: "/" },
                 { label: "Blog", path: "/blog" },
-                { label: post.title, path: `/blog/${post.slug}` },
+                { label: post.title, path: `/blog/${post.slug}`, compact: true },
               ]}
             />
 

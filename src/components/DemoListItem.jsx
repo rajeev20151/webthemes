@@ -9,18 +9,18 @@ export default function DemoListItem({ demo }) {
         hover:border-[var(--color6)]/30 hover:bg-[var(--color11)] hover:shadow-[3px_3px_0px_rgba(0,0,0,0.06)]
         transition-all duration-200"
     >
-      <Link to={`/template/${demo.slug}`} className="flex-shrink-0 rounded-xl overflow-hidden bg-[var(--color1)] block w-[clamp(80px,18vw,130px)] aspect-[13/9]">
+      <Link to={`/template/${demo.slug}`} className="flex-shrink-0 rounded-xl overflow-hidden bg-[var(--color1)] block w-[clamp(100px,26vw,130px)] aspect-[5/8] sm:w-[clamp(80px,18vw,130px)] sm:aspect-[13/9]">
         {demo.image && (
         <img
         src={demo.image}
         alt={demo.title}
-        className="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-105"
+        className="w-full h-full object-contain object-top sm:object-cover sm:object-top sm:transition-transform sm:duration-500 sm:group-hover:scale-105"
         />
         )}
       </Link>
 
       <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2 mb-1.5 flex-wrap">
+        <div className="flex min-w-0 items-center gap-2 mb-1.5 flex-wrap">
           <TagBadge tag={demo.tag} />
           {demo.tech && <TechBadge tech={demo.frameworks} />}
           <span className="flex items-center gap-1.5">
@@ -41,16 +41,16 @@ export default function DemoListItem({ demo }) {
             {demo.title}
           </Link>
         </h3>
-        <div className="flex items-center gap-3 flex-wrap">
-          <span className="fontStyle10 text-[var(--color4)] flex items-center gap-1">
+        <div className="flex min-w-0 items-center gap-3 flex-wrap">
+          <span className="fontStyle10 text-[var(--color4)] flex min-w-0 items-center gap-1 truncate">
             <i className="bx bx-folder-open text-xs"></i>
             {demo.category}
           </span>
-          <span className="fontStyle10 text-[var(--color4)] flex items-center gap-1 hidden xs:flex">
+          <span className="fontStyle10 text-[var(--color4)] flex items-center gap-1 hidden sm:flex">
             <i className="bx bx-layer text-xs"></i>
             {demo.type}
           </span>
-          <span className="fontStyle10 text-[var(--color4)] flex items-center gap-1">
+          <span className="fontStyle10 text-[var(--color4)] flex shrink-0 items-center gap-1 whitespace-nowrap">
             <i className="bx bx-show text-xs"></i>
             {demo.views} views
           </span>

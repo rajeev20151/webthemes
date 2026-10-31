@@ -55,11 +55,9 @@ const SECTIONS = [
   {
     id: "payments",
     icon: "bx-credit-card",
-    title: "Payments & Refunds",
+    title: "Payments",
     body: [
       "All prices are listed in US Dollars unless stated otherwise. Payments are processed securely through third-party payment providers.",
-      "Refunds are available only for high-price premium templates. All other purchases, including regular templates and plans, are final and non-refundable once the order is completed.",
-      `To request a refund for an eligible premium template, review the template details and requirements carefully, then contact us at ${CONTACT_EMAIL}.`,
     ],
   },
   {

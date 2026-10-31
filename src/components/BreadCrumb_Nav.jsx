@@ -29,11 +29,15 @@ export default function BreadCrumbNav({ items = [] }) {
                   <i className="bx bx-chevron-right text-[var(--color6)]/40 text-lg" />
                 </>
               ) : (
-                <span className="inline-flex items-center px-3 py-1.5 rounded-full
+                <span
+                  title={item.compact ? item.label : undefined}
+                  className={`inline-flex items-center px-3 py-1.5 rounded-full
                   fontStyle10 font-bold uppercase tracking-widest
                   text-[var(--color5)] border-2 border-[var(--color6)]
-                  bg-[var(--color6)] shadow-[2px_2px_0_var(--color4)]">
-                  {item.label}
+                  bg-[var(--color6)] shadow-[2px_2px_0_var(--color4)]
+                  ${item.compact ? "min-w-0 max-w-[60vw] sm:max-w-[32rem]" : ""}`}
+                >
+                  <span className={item.compact ? "truncate" : ""}>{item.label}</span>
                 </span>
               )}
             </li>
