@@ -106,6 +106,9 @@ export const deleteTemplateReviewAPI = (reviewId) =>
 export const getContentsAPI = () =>
   request("/contents", { method: "GET" });
 
+export const getContentBySectionAPI = (section) =>
+  request(`/contents/section/${encodeURIComponent(section)}`, { method: "GET" });
+
 // ─── Contact API (Public) ──────────────────────────────────────
 export const createContactAPI = (data) =>
   request("/contacts", {

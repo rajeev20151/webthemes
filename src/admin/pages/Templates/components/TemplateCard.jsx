@@ -98,10 +98,10 @@ export default function TemplateCard({ item, onEdit, onDelete }) {
         </div>
 
         {/* Actions */}
-        <div className="flex gap-2 mt-1">
+        <div className="grid grid-cols-2 gap-2 mt-1">
           <button
             onClick={() => onEdit(item)}
-            className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl fontStyle9 font-semibold cursor-pointer border transition-all duration-200"
+            className="min-w-0 flex items-center justify-center gap-1.5 px-1.5 py-2 rounded-xl fontStyle9 font-semibold cursor-pointer border transition-all duration-200"
             style={{ borderColor: "var(--admin-border)", background: "var(--admin-bg)", color: "var(--admin-subtext)" }}
             onMouseEnter={(e) => { e.currentTarget.style.borderColor = "var(--admin-accent)"; e.currentTarget.style.color = "var(--admin-accent)"; }}
             onMouseLeave={(e) => { e.currentTarget.style.borderColor = "var(--admin-border)"; e.currentTarget.style.color = "var(--admin-subtext)"; }}
@@ -109,12 +109,23 @@ export default function TemplateCard({ item, onEdit, onDelete }) {
             <IconEdit /> Edit
           </button>
 
+          {item.zipFile && (
+            <a
+              href={imgUrl(item.zipFile)}
+              download={item.zipFile.split("/").pop()}
+              className="min-w-0 flex items-center justify-center gap-1.5 px-1.5 py-2 rounded-xl fontStyle9 font-semibold transition-all duration-200 no-underline"
+              style={{ background: "var(--admin-success-soft)", color: "var(--admin-success)" }}
+            >
+              <IconDownload /> Download ZIP
+            </a>
+          )}
+
           {previewLink && !scheduled && (
             <a
               href={previewLink}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl fontStyle9 font-semibold transition-all duration-200 no-underline"
+              className="min-w-0 flex items-center justify-center gap-1.5 px-1.5 py-2 rounded-xl fontStyle9 font-semibold transition-all duration-200 no-underline"
               style={{ background: "var(--admin-accent-soft)", color: "var(--admin-accent)" }}
               onMouseEnter={(e) => e.currentTarget.style.background = "rgba(99,102,241,0.18)"}
               onMouseLeave={(e) => e.currentTarget.style.background = "var(--admin-accent-soft)"}
@@ -124,7 +135,7 @@ export default function TemplateCard({ item, onEdit, onDelete }) {
           )}
           {previewLink && scheduled && (
             <span
-              className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl fontStyle9 font-semibold"
+              className="min-w-0 flex items-center justify-center gap-1.5 px-1.5 py-2 rounded-xl fontStyle9 font-semibold"
               style={{ background: "var(--admin-hover)", color: "var(--admin-muted)" }}
             >
               <IconClock /> Not live yet
@@ -133,7 +144,7 @@ export default function TemplateCard({ item, onEdit, onDelete }) {
 
           <button
             onClick={() => onDelete(item)}
-            className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl fontStyle9 font-semibold cursor-pointer border-0 transition-all duration-200"
+            className="min-w-0 flex items-center justify-center gap-1.5 px-1.5 py-2 rounded-xl fontStyle9 font-semibold cursor-pointer border-0 transition-all duration-200"
             style={{ background: "var(--admin-danger-soft)", color: "var(--admin-danger)" }}
             onMouseEnter={(e) => e.currentTarget.style.background = "rgba(248,113,113,0.2)"}
             onMouseLeave={(e) => e.currentTarget.style.background = "var(--admin-danger-soft)"}

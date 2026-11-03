@@ -1,6 +1,32 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAdminAuth } from "../context/AdminAuthContext";
+import {
+  adminGetNotificationsAPI,
+  adminMarkAllNotificationsReadAPI,
+  adminMarkNotificationReadAPI,
+} from "../services/adminApi";
+
+const notificationTime = (date) => {
+  const minutes = Math.floor((Date.now() - new Date(date).getTime()) / 60000);
+  if (minutes < 1) return "Just now";
+  if (minutes < 60) return `${minutes}m ago`;
+  if (minutes < 1440) return `${Math.floor(minutes / 60)}h ago`;
+  return new Date(date).toLocaleDateString();
+};
+
+const IconSun = () => (
+  <svg aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="12" cy="12" r="4" />
+    <path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42" />
+  </svg>
+);
+
+const IconMoon = () => (
+  <svg aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M20.9 13A9 9 0 0 1 11 3.1 9 9 0 1 0 20.9 13Z" />
+  </svg>
+);
 
 export default function Header({ onMenuClick }) {
   const { logout } = useAdminAuth();
@@ -9,6 +35,23 @@ export default function Header({ onMenuClick }) {
     return localStorage.getItem("admin-theme") === "dark";
   });
   const [mobileSearch, setMobileSearch] = useState(false);
+  const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const [notifications, setNotifications] = useState([]);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const [notificationsError, setNotificationsError] = useState("");
+
+  const loadNotifications = useCallback(async () => {
+    try {
+      const res = await adminGetNotificationsAPI();
+      if (!res.success) throw new Error(res.message || "Failed to load notifications");
+      setNotifications(res.notifications || []);
+      setUnreadCount(res.unreadCount || 0);
+      setNotificationsError("");
+    } catch (err) {
+      console.error("Failed to load admin notifications", err);
+      setNotificationsError(err.message || "Failed to load notifications");
+    }
+  }, []);
 
   useEffect(() => {
     const html = document.documentElement;
@@ -21,14 +64,53 @@ export default function Header({ onMenuClick }) {
     }
   }, [dark]);
 
+  useEffect(() => {
+    loadNotifications();
+    const intervalId = window.setInterval(loadNotifications, 30000);
+    return () => window.clearInterval(intervalId);
+  }, [loadNotifications]);
+
   const handleLogout = () => {
     logout();
     navigate("/batman/login");
   };
 
+  const handleNotificationClick = async (notification) => {
+    if (!notification.readAt) {
+      try {
+        const res = await adminMarkNotificationReadAPI(notification._id);
+        if (!res.success) throw new Error(res.message || "Failed to mark notification as read");
+        setNotifications((current) => current.map((item) =>
+          item._id === notification._id ? res.notification : item
+        ));
+        setUnreadCount((count) => Math.max(0, count - 1));
+      } catch (err) {
+        console.error("Failed to mark notification as read", err);
+        setNotificationsError(err.message || "Failed to mark notification as read");
+        return;
+      }
+    }
+    setNotificationsOpen(false);
+    navigate(notification.link);
+  };
+
+  const handleMarkAllRead = async () => {
+    try {
+      const res = await adminMarkAllNotificationsReadAPI();
+      if (!res.success) throw new Error(res.message || "Failed to mark notifications as read");
+      const readAt = new Date().toISOString();
+      setNotifications((current) => current.map((item) => ({ ...item, readAt: item.readAt || readAt })));
+      setUnreadCount(0);
+      setNotificationsError("");
+    } catch (err) {
+      console.error("Failed to mark all notifications as read", err);
+      setNotificationsError(err.message || "Failed to mark notifications as read");
+    }
+  };
+
   return (
-    <header className="admin-header sticky top-0 z-50 w-full backdrop-blur-xl bg-[var(--admin-bg)]/80 border-b border-[var(--admin-border)]">
-      <div className="flex items-center justify-between w-full px-4 py-[11px] sm:px-6 xl:py-[11px]">
+    <header className="admin-header sticky top-0 z-50 w-full border-b border-[var(--admin-border)] bg-[var(--admin-surface)]/90 shadow-sm backdrop-blur-xl transition-colors duration-300">
+      <div className="flex min-h-[64px] items-center justify-between gap-3 px-4 py-2.5 sm:px-6">
 
         {/* Left — Hamburger + Mobile Search Toggle */}
         <div className="flex items-center gap-2">
@@ -74,37 +156,111 @@ export default function Header({ onMenuClick }) {
         <div className="flex items-center justify-center gap-1.5 sm:gap-2">
 
           {/* Dark/Light Toggle */}
-          <div className="hidden sm:flex items-center h-9 px-1 gap-0.5 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)]">
-            <span className={`w-7 h-7 flex items-center justify-center rounded-lg text-xs transition-all duration-200 ${!dark ? 'text-amber-500 bg-amber-500/10' : 'text-[var(--admin-muted)]'}`}>☀</span>
-            <button
-              className="relative w-8 h-[18px] rounded-full bg-[var(--admin-border)] transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-[var(--admin-accent)]/20 shrink-0"
-              onClick={() => setDark(!dark)}
-              aria-label="Toggle dark mode"
-            >
-              <span className={`absolute top-[2px] left-[2px] w-[14px] h-[14px] rounded-full bg-white shadow-sm transition-all duration-300 ${dark ? 'translate-x-[16px]' : 'translate-x-0'}`} />
-            </button>
-            <span className={`w-7 h-7 flex items-center justify-center rounded-lg text-xs transition-all duration-200 ${dark ? 'text-indigo-400 bg-indigo-500/10' : 'text-[var(--admin-muted)]'}`}>🌙</span>
+          <div className="hidden sm:flex items-center">
+            <div className="flex items-center gap-1 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-bg)] p-1" role="group" aria-label="Color theme">
+              <button
+                type="button"
+                onClick={() => setDark(false)}
+                aria-label="Use light mode"
+                aria-pressed={!dark}
+                className={`flex h-8 w-8 items-center justify-center rounded-lg border-0 transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--admin-accent)]/30 ${
+                  !dark
+                    ? "bg-[var(--admin-surface)] text-amber-500 shadow-sm"
+                    : "bg-transparent text-[var(--admin-muted)] hover:text-[var(--admin-text)]"
+                }`}
+              >
+                <IconSun />
+              </button>
+              <button
+                type="button"
+                onClick={() => setDark(true)}
+                aria-label="Use dark mode"
+                aria-pressed={dark}
+                className={`flex h-8 w-8 items-center justify-center rounded-lg border-0 transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--admin-accent)]/30 ${
+                  dark
+                    ? "bg-[var(--admin-surface)] text-indigo-400 shadow-sm"
+                    : "bg-transparent text-[var(--admin-muted)] hover:text-[var(--admin-text)]"
+                }`}
+              >
+                <IconMoon />
+              </button>
+            </div>
           </div>
 
           {/* Mobile Dark Toggle */}
           <button
             className="sm:hidden flex items-center justify-center w-9 h-9 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] hover:bg-[var(--admin-hover)] text-[var(--admin-muted)] hover:text-[var(--admin-accent)] hover:border-[var(--admin-accent)]/20 transition-all duration-200 active:scale-90"
             onClick={() => setDark(!dark)}
-            aria-label="Toggle dark mode"
+            aria-label={dark ? "Switch to light mode" : "Switch to dark mode"}
           >
-            <span className="text-sm">{dark ? '☀' : '🌙'}</span>
+            {dark ? <IconSun /> : <IconMoon />}
           </button>
 
           {/* Notification Bell */}
           <div className="relative">
-            <button className="relative flex items-center justify-center w-9 h-9 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] text-[var(--admin-muted)] transition-all duration-200 hover:bg-[var(--admin-hover)] hover:text-[var(--admin-accent)] hover:border-[var(--admin-border-hover)] active:scale-90">
-              <span className="absolute -right-0.5 -top-0.5 z-10 w-2.5 h-2.5 rounded-full bg-orange-500 ring-[2.5px] ring-[var(--admin-surface)]">
-                <span className="absolute inset-0 rounded-full bg-orange-500 animate-ping" />
-              </span>
+            <button
+              type="button"
+              aria-label={`Notifications${unreadCount ? `, ${unreadCount} unread` : ""}`}
+              aria-expanded={notificationsOpen}
+              onClick={() => {
+                setNotificationsOpen((open) => !open);
+                loadNotifications();
+              }}
+              className="relative flex items-center justify-center w-9 h-9 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] text-[var(--admin-muted)] transition-all duration-200 hover:bg-[var(--admin-hover)] hover:text-[var(--admin-accent)] hover:border-[var(--admin-border-hover)] active:scale-90"
+            >
+              {unreadCount > 0 && (
+                <span className="absolute -right-1 -top-1 z-10 flex min-w-4 h-4 items-center justify-center rounded-full bg-orange-500 px-1 text-[9px] font-bold text-white ring-2 ring-[var(--admin-surface)]">
+                  {unreadCount > 9 ? "9+" : unreadCount}
+                </span>
+              )}
               <svg className="fill-current" width="16" height="16" viewBox="0 0 20 20">
                 <path d="M10.75 2.29248C10.75 1.87827 10.4143 1.54248 10 1.54248C9.58583 1.54248 9.25004 1.87827 9.25004 2.29248V2.83613C6.08266 3.20733 3.62504 5.9004 3.62504 9.16748V14.4591H3.33337C2.91916 14.4591 2.58337 14.7949 2.58337 15.2091C2.58337 15.6234 2.91916 15.9591 3.33337 15.9591H4.37504H15.625H16.6667C17.0809 15.9591 17.4167 15.6234 17.4167 15.2091C17.4167 14.7949 17.0809 14.4591 16.6667 14.4591H16.375V9.16748C16.375 5.9004 13.9174 3.20733 10.75 2.83613V2.29248ZM14.875 14.4591V9.16748C14.875 6.47509 12.6924 4.29248 10 4.29248C7.30765 4.29248 5.12504 6.47509 5.12504 9.16748V14.4591H14.875ZM8.00004 17.7085C8.00004 18.1228 8.33583 18.4585 8.75004 18.4585H11.25C11.6643 18.4585 12 18.1228 12 17.7085C12 17.2943 11.6643 16.9585 11.25 16.9585H8.75004C8.33583 16.9585 8.00004 17.2943 8.00004 17.7085Z" fill="currentColor"/>
               </svg>
             </button>
+            {notificationsOpen && (
+              <div className="absolute right-0 top-12 z-[100] w-[min(22rem,calc(100vw-2rem))] overflow-hidden rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-surface)] shadow-xl">
+                <div className="flex items-center justify-between border-b border-[var(--admin-border)] px-4 py-3">
+                  <div>
+                    <p className="m-0 fontStyle9 font-bold text-[var(--admin-text)]">Notifications</p>
+                    <p className="m-0 mt-0.5 fontStyle9 text-[var(--admin-muted)]">{unreadCount} unread</p>
+                  </div>
+                  <button
+                    type="button"
+                    disabled={!unreadCount}
+                    onClick={handleMarkAllRead}
+                    className="border-0 bg-transparent p-1 fontStyle9 font-semibold text-[var(--admin-accent)] disabled:cursor-default disabled:opacity-50"
+                  >
+                    Mark all read
+                  </button>
+                </div>
+                {notificationsError && (
+                  <p role="alert" className="m-0 px-4 py-3 fontStyle9 text-[var(--admin-danger)]">{notificationsError}</p>
+                )}
+                <div className="max-h-96 overflow-y-auto">
+                  {notifications.length === 0 && !notificationsError ? (
+                    <p className="m-0 px-4 py-8 text-center fontStyle9 text-[var(--admin-muted)]">No notifications yet.</p>
+                  ) : notifications.map((notification) => (
+                    <button
+                      type="button"
+                      key={notification._id}
+                      onClick={() => handleNotificationClick(notification)}
+                      className={`flex w-full gap-3 border-0 border-b border-[var(--admin-border)] px-4 py-3 text-left transition-colors hover:bg-[var(--admin-hover)] ${
+                        notification.readAt ? "bg-transparent" : "bg-[var(--admin-accent-soft)]/40"
+                      }`}
+                    >
+                      <span className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${
+                        notification.readAt ? "bg-transparent" : "bg-[var(--admin-accent)]"
+                      }`} />
+                      <span className="min-w-0 flex-1">
+                        <span className="block fontStyle9 font-semibold text-[var(--admin-text)]">{notification.title}</span>
+                        <span className="mt-0.5 block truncate fontStyle9 text-[var(--admin-muted)]">{notification.message}</span>
+                        <span className="mt-1 block fontStyle9 text-[var(--admin-muted)]">{notificationTime(notification.createdAt)}</span>
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Profile Avatar */}

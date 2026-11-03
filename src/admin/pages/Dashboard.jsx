@@ -207,7 +207,7 @@ function TemplateCountChart({ data }) {
       </div>
       <div className="overflow-x-auto">
         <div style={{ width: chartWidth, height: 220 }}>
-          <ResponsiveContainer width="100%" height="100%">
+          <ResponsiveContainer width="100%" height={220}>
             <BarChart data={data} margin={{ top: 4, right: 16, left: 0, bottom: 62 }} barSize={28}>
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(148,163,184,0.08)" vertical={false} />
               <XAxis dataKey="name" interval={0} angle={-45} textAnchor="end" height={70} tick={{ fontSize: 10, fill: "#94a3b8" }} axisLine={false} tickLine={false} />

@@ -60,6 +60,30 @@ export const adminResendOTPAPI = (email) =>
 export const getAdminMeAPI = () =>
   request("/admin/me", { method: "GET" });
 
+export const adminChangePasswordAPI = (currentPassword, newPassword) =>
+  request("/admin/change-password", {
+    method: "PATCH",
+    body: JSON.stringify({ currentPassword, newPassword }),
+  });
+
+export const adminGetNotificationsAPI = () =>
+  request("/admin/notifications", { method: "GET" });
+
+export const adminMarkNotificationReadAPI = (id) =>
+  request(`/admin/notifications/${id}/read`, { method: "PATCH" });
+
+export const adminMarkAllNotificationsReadAPI = () =>
+  request("/admin/notifications/read-all", { method: "PATCH" });
+
+export const adminGetNotificationPreferencesAPI = () =>
+  request("/admin/notification-preferences", { method: "GET" });
+
+export const adminUpdateNotificationPreferencesAPI = (preferences) =>
+  request("/admin/notification-preferences", {
+    method: "PATCH",
+    body: JSON.stringify(preferences),
+  });
+
 // Get user (data)
 export const getUsersAPI = () =>
   request("/admin/users", {

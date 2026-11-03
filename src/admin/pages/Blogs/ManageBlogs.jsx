@@ -80,7 +80,7 @@ function BlogModal({ mode, data, onClose, onSave, saving, categories = [] }) {
 
     try {
       const fd = new FormData();
-      const ALLOW = ["title","slug","category","tag","excerpt","authorName","authorRole","readTime","featured","status","content"];
+      const ALLOW = ["title","slug","category","tag","excerpt","authorName","authorRole","readTime","featured","status","tags","content"];
       Object.entries(form).forEach(([k, v]) => {
         if (!ALLOW.includes(k)) return;
         if (k === "tags") {

@@ -13,6 +13,7 @@ import StickyMobileBar from "../components/StickyMobileBar";
 import MobileThemeInfo from "../components/MobileThemeInfo";
 import RelatedProducts from "../components/RelatedProducts";
 import ThemeSidebar from "../components/ThemeSidebar";
+import { getContentBySectionAPI } from "../services/api";
 
 import { useGetTemplateQuery, useGetTemplateReviewsQuery, useGetRelatedTemplatesQuery, useIncrementViewsMutation, API_URL as API_BASE } from "../store/apiSlice";
 import { imgUrl } from "../utils/themeHelpers";
@@ -28,8 +29,27 @@ export default function Themes() {
   const [activeTab, setActiveTab] = useState("description");
   const [email, setEmail] = useState("");
   const [reviewCount, setReviewCount] = useState(0);
+  const [discussionEnabled, setDiscussionEnabled] = useState(true);
+  const [discussionSettingsLoaded, setDiscussionSettingsLoaded] = useState(false);
 
   const [incrementViews] = useIncrementViewsMutation();
+
+  useEffect(() => {
+    let active = true;
+    getContentBySectionAPI("site-settings")
+      .then((res) => {
+        if (active) setDiscussionEnabled(res.success ? res.content.discussionEnabled !== false : true);
+      })
+      .catch((err) => {
+        console.error("Failed to load discussion setting", err);
+        if (active) setDiscussionEnabled(true);
+      })
+      .finally(() => {
+        if (active) setDiscussionSettingsLoaded(true);
+      });
+
+    return () => { active = false; };
+  }, []);
 
 const imageScrollRef = useRef(null);
 
@@ -231,7 +251,7 @@ if (!theme) return (
               </div>
 
               <div className="order-5 mt-6 lg:mt-0 border-b border-[var(--color6)]/10 mb-6 flex gap-4 sm:gap-6">
-                {["description", "reviews", "discussion"].map((tab) => (
+                {["description", "reviews", ...(discussionSettingsLoaded && discussionEnabled ? ["discussion"] : [])].map((tab) => (
                   <button
                     key={tab}
                     onClick={() => setActiveTab(tab)}

@@ -8,10 +8,6 @@ import { API_BASE } from "../services/api";
 import { useGetBlogsQuery } from "../store/apiSlice";
 import SEOHead from "../components/SEOHead";
 
-const CATEGORIES = [
-  "All", "Design", "Development", "Templates", "Tips & Tricks", "Case Studies",
-];
-
 const TAG_COLORS = {
   Featured: "bg-[var(--color6)] text-[var(--color5)]",
   Popular: "text-white",
@@ -48,6 +44,8 @@ const mapBlog = (b) => ({
   featured: b.featured,
 });
 
+const normalizeCategory = (category) => (typeof category === "string" ? category.trim() : "");
+
 export default function Blog() {
   const [activeCategory, setActiveCategory] = useState("All");
   const [search, setSearch] = useState("");
@@ -60,6 +58,20 @@ export default function Blog() {
     return [];
   }, [blogsData]);
 
+  const categories = useMemo(
+    () => [
+      "All",
+      ...new Set(
+        posts
+          .filter((post) => !post.featured)
+          .map((post) => normalizeCategory(post.category))
+          .filter(Boolean)
+          .sort((a, b) => a.localeCompare(b))
+      ),
+    ],
+    [posts]
+  );
+
   useEffect(() => {
     const t = setTimeout(() => setMounted(true), 60);
     return () => clearTimeout(t);
@@ -69,9 +81,13 @@ export default function Blog() {
   const nonFeatured = posts.filter((p) => !p.featured);
 
   const filtered = nonFeatured.filter((p) => {
-    const matchCat = activeCategory === "All" || p.category === activeCategory;
+    const category = normalizeCategory(p.category);
+    const matchCat =
+      activeCategory === "All" ||
+      category.toLowerCase() === activeCategory.toLowerCase();
     const q = search.toLowerCase();
-    const matchQ = p.title.toLowerCase().includes(q) || p.category.toLowerCase().includes(q);
+    const matchQ =
+      p.title.toLowerCase().includes(q) || category.toLowerCase().includes(q);
     return matchCat && matchQ;
   });
 
@@ -142,7 +158,7 @@ export default function Blog() {
           <div className="pb-5 sm:pb-6 border-b-2 border-dashed border-[var(--color6)]/15 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 sm:gap-5">
             {/* Category tabs */}
             <div className="flex items-center gap-2.5 overflow-x-auto py-2 px-1 -mx-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-              {CATEGORIES.map((cat) => {
+              {categories.map((cat) => {
                 const active = activeCategory === cat;
                 return (
                   <button
@@ -262,7 +278,12 @@ export default function Blog() {
 
             {/* Sidebar */}
             <div className="lg:sticky lg:top-36">
-              <Sidebar posts={posts} CATEGORIES={CATEGORIES} />
+              <Sidebar
+                posts={posts}
+                categories={categories}
+                activeCategory={activeCategory}
+                onCategorySelect={setActiveCategory}
+              />
             </div>
           </div>
         </div>

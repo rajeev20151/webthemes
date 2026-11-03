@@ -1,4 +1,12 @@
-﻿import { useState } from "react";
+import { useEffect, useState } from "react";
+import {
+  adminGetContentsAPI,
+  adminCreateContentAPI,
+  adminUpdateContentAPI,
+  adminChangePasswordAPI,
+  adminGetNotificationPreferencesAPI,
+  adminUpdateNotificationPreferencesAPI,
+} from "../services/adminApi";
 
 /* ── Icons ── */
 const IconUser     = () => <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>;
@@ -6,6 +14,7 @@ const IconLock     = () => <svg className="w-4 h-4" viewBox="0 0 24 24" fill="no
 const IconBell     = () => <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>;
 const IconPalette  = () => <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 0 1 10 10c0 2-2 3-4 2l-2-1a2 2 0 0 0-2 2v1a2 2 0 0 1-2 2 10 10 0 0 1 0-20z"/></svg>;
 const IconShield   = () => <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>;
+const IconFeatures = () => <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 21v-7m0-4V3m8 18v-9m0-4V3m8 18v-5m0-4V3M1 14h6m2-6h6m2 8h6"/></svg>;
 const IconCheck    = () => <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><polyline points="20 6 9 17 4 12"/></svg>;
 const IconCamera   = () => <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>;
 
@@ -16,6 +25,7 @@ const TABS = [
   { id: "notifications", label: "Notifications", icon: <IconBell />     },
   { id: "appearance",    label: "Appearance",    icon: <IconPalette />  },
   { id: "privacy",       label: "Privacy",       icon: <IconShield />   },
+  { id: "features",      label: "Discussion",    icon: <IconFeatures /> },
 ];
 
 /* ── Reusable field components ── */
@@ -41,19 +51,33 @@ function SectionTitle({ title, desc }) {
 }
 
 /* ── Toggle Switch ── */
-function Toggle({ checked, onChange }) {
+function Toggle({ checked, onChange, label }) {
   return (
     <button
+      type="button"
+      role="switch"
+      aria-checked={checked}
+      aria-label={label}
       onClick={() => onChange(!checked)}
-      className={`relative w-11 h-6 rounded-full border transition-all duration-300 cursor-pointer shrink-0 outline-none
-        ${checked
-          ? "bg-[var(--admin-accent)] border-[var(--admin-accent)]"
-          : "bg-[var(--admin-border)] border-[var(--admin-border)]"
-        }`}
+      className={`group relative inline-flex h-7 w-12 shrink-0 cursor-pointer items-center rounded-full border p-0.5 outline-none transition-all duration-300 focus-visible:ring-4 focus-visible:ring-[var(--admin-accent-soft)] ${
+        checked
+          ? "border-[var(--admin-accent)] bg-[var(--admin-accent)] shadow-[0_3px_10px_var(--admin-accent-soft)]"
+          : "border-[var(--admin-border)] bg-[var(--admin-bg)] hover:border-[var(--admin-muted)]"
+      }`}
     >
-      <span className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform duration-300
-        ${checked ? "translate-x-5" : "translate-x-0.5"}`}
-      />
+      <span
+        className={`flex h-5 w-5 items-center justify-center rounded-full bg-white text-[var(--admin-accent)] shadow-[0_2px_5px_rgba(15,23,42,0.22)] transition-transform duration-300 ease-out ${
+          checked ? "translate-x-5" : "translate-x-0"
+        }`}
+      >
+        {checked ? (
+          <svg className="h-3 w-3" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+            <path d="m3.5 8 3 3 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        ) : (
+          <span className="h-1 w-1 rounded-full bg-slate-400" />
+        )}
+      </span>
     </button>
   );
 }
@@ -66,7 +90,7 @@ function NotifRow({ label, desc, checked, onChange }) {
         <p className="fontStyle9 font-semibold text-[var(--admin-text)] m-0">{label}</p>
         <p className="fontStyle9 text-[var(--admin-muted)] mt-0.5 m-0">{desc}</p>
       </div>
-      <Toggle checked={checked} onChange={onChange} />
+      <Toggle checked={checked} onChange={onChange} label={label} />
     </div>
   );
 }
@@ -152,9 +176,41 @@ function ProfilePanel() {
 function SecurityPanel() {
   const [show, setShow] = useState({ cur: false, new: false, con: false });
   const [saving, setSaving] = useState(false);
-  const save = () => { setSaving(true); setTimeout(() => setSaving(false), 1200); };
+  const [passwords, setPasswords] = useState({ current: "", next: "", confirm: "" });
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  const save = async (event) => {
+    event.preventDefault();
+    setError("");
+    setSuccess("");
+
+    if (passwords.next !== passwords.confirm) {
+      setError("New password and confirmation do not match.");
+      return;
+    }
+    if (passwords.next.length < 8) {
+      setError("New password must be at least 8 characters.");
+      return;
+    }
+
+    setSaving(true);
+    try {
+      const res = await adminChangePasswordAPI(passwords.current, passwords.next);
+      if (!res.success) {
+        setError(res.message || "Failed to change password.");
+        return;
+      }
+      setPasswords({ current: "", next: "", confirm: "" });
+      setSuccess(res.message || "Password changed successfully.");
+    } catch (err) {
+      console.error("Failed to change admin password", err);
+      setError(err.message || "Failed to change password.");
+    } finally {
+      setSaving(false);
+    }
+  };
   const EyeBtn = ({ k }) => (
-    <button onClick={() => setShow(s => ({ ...s, [k]: !s[k] }))}
+    <button type="button" aria-label={`${show[k] ? "Hide" : "Show"} password`} onClick={() => setShow(s => ({ ...s, [k]: !s[k] }))}
       className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--admin-muted)] hover:text-[var(--admin-text)] transition-colors bg-transparent border-none cursor-pointer p-0">
       <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
         {show[k]
@@ -165,23 +221,25 @@ function SecurityPanel() {
     </button>
   );
   return (
-    <div className="flex flex-col gap-6">
+    <form onSubmit={save} className="flex flex-col gap-6">
       <SectionTitle title="Change Password" desc="Choose a strong password to keep your account secure." />
+      {error && <p role="alert" className="fontStyle9 text-[var(--admin-danger)] m-0">{error}</p>}
+      {success && <p role="status" className="fontStyle9 text-[var(--admin-success)] m-0">{success}</p>}
       <Field label="Current Password">
         <div className="relative">
-          <input className={`${inputCls} pr-11`} type={show.cur ? "text" : "password"} placeholder="••••••••" />
+          <input required autoComplete="current-password" className={`${inputCls} pr-11`} type={show.cur ? "text" : "password"} value={passwords.current} onChange={(e) => setPasswords((p) => ({ ...p, current: e.target.value }))} placeholder="Current password" />
           <EyeBtn k="cur" />
         </div>
       </Field>
       <Field label="New Password">
         <div className="relative">
-          <input className={`${inputCls} pr-11`} type={show.new ? "text" : "password"} placeholder="••••••••" />
+          <input required minLength={8} autoComplete="new-password" className={`${inputCls} pr-11`} type={show.new ? "text" : "password"} value={passwords.next} onChange={(e) => setPasswords((p) => ({ ...p, next: e.target.value }))} placeholder="At least 8 characters" />
           <EyeBtn k="new" />
         </div>
       </Field>
       <Field label="Confirm New Password">
         <div className="relative">
-          <input className={`${inputCls} pr-11`} type={show.con ? "text" : "password"} placeholder="••••••••" />
+          <input required minLength={8} autoComplete="new-password" className={`${inputCls} pr-11`} type={show.con ? "text" : "password"} value={passwords.confirm} onChange={(e) => setPasswords((p) => ({ ...p, confirm: e.target.value }))} placeholder="Confirm new password" />
           <EyeBtn k="con" />
         </div>
       </Field>
@@ -201,40 +259,102 @@ function SecurityPanel() {
       </div>
 
       <div className="flex sm:justify-end pt-2">
-        <SaveBtn loading={saving} onClick={save} className="w-full sm:w-auto" />
+        <button
+          type="submit"
+          disabled={saving}
+          className="flex w-full sm:w-auto items-center justify-center gap-2 px-6 py-2.5 rounded-xl fontStyle9 font-bold text-white border-none cursor-pointer transition-opacity duration-200 hover:opacity-90 disabled:opacity-60 shadow-[0_4px_14px_rgba(99,102,241,0.3)]"
+          style={{ background: "var(--admin-accent-grad)" }}
+        >
+          {saving ? "Saving..." : <><IconCheck /> Change Password</>}
+        </button>
       </div>
-    </div>
+    </form>
   );
 }
 
 /* Notifications */
 function NotificationsPanel() {
   const [notifs, setNotifs] = useState({
-    email_orders:   true,
-    email_updates:  false,
-    email_security: true,
-    push_orders:    true,
-    push_messages:  false,
-    push_reports:   true,
+    discussion: true,
+    contactInApp: true,
+    contactEmail: true,
   });
-  const toggle = (k) => setNotifs(n => ({ ...n, [k]: !n[k] }));
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
+  const [saved, setSaved] = useState(false);
+
+  useEffect(() => {
+    const loadPreferences = async () => {
+      try {
+        const res = await adminGetNotificationPreferencesAPI();
+        if (!res.success) throw new Error(res.message || "Failed to load notification preferences");
+        setNotifs(res.preferences);
+      } catch (err) {
+        console.error("Failed to load notification preferences", err);
+        setError(err.message || "Failed to load notification preferences");
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadPreferences();
+  }, []);
+
+  const toggle = (key) => {
+    setNotifs((current) => ({ ...current, [key]: !current[key] }));
+    setSaved(false);
+  };
+
+  const savePreferences = async () => {
+    setSaving(true);
+    setError("");
+    setSaved(false);
+    try {
+      const res = await adminUpdateNotificationPreferencesAPI(notifs);
+      if (!res.success) throw new Error(res.message || "Failed to save notification preferences");
+      setNotifs(res.preferences);
+      setSaved(true);
+    } catch (err) {
+      console.error("Failed to save notification preferences", err);
+      setError(err.message || "Failed to save notification preferences");
+    } finally {
+      setSaving(false);
+    }
+  };
+
   return (
     <div className="flex flex-col gap-6">
       <SectionTitle title="Notification Preferences" desc="Choose what you want to be notified about." />
 
+      {error && <p role="alert" className="fontStyle9 text-[var(--admin-danger)] m-0">{error}</p>}
+      {loading ? (
+        <p className="fontStyle9 text-[var(--admin-muted)]">Loading notification preferences...</p>
+      ) : (
+      <>
       <div className="admin-card px-5">
         <p className="fontStyle9 font-bold uppercase tracking-wider text-[var(--admin-muted)] pt-4 pb-2 m-0">Email Notifications</p>
-        <NotifRow label="New Orders"        desc="Get notified when a new order is placed"      checked={notifs.email_orders}   onChange={() => toggle("email_orders")}   />
-        <NotifRow label="Product Updates"   desc="Receive emails about product changes"         checked={notifs.email_updates}  onChange={() => toggle("email_updates")}  />
-        <NotifRow label="Security Alerts"   desc="Important security notifications"             checked={notifs.email_security} onChange={() => toggle("email_security")} />
+        <NotifRow label="New Contact Messages" desc="Receive an email when a user submits the contact form" checked={notifs.contactEmail} onChange={() => toggle("contactEmail")} />
       </div>
 
       <div className="admin-card px-5">
-        <p className="fontStyle9 font-bold uppercase tracking-wider text-[var(--admin-muted)] pt-4 pb-2 m-0">Push Notifications</p>
-        <NotifRow label="Order Updates"     desc="Real-time order status changes"               checked={notifs.push_orders}    onChange={() => toggle("push_orders")}    />
-        <NotifRow label="New Messages"      desc="When someone sends you a message"             checked={notifs.push_messages}  onChange={() => toggle("push_messages")}  />
-        <NotifRow label="Weekly Reports"    desc="Summary of your weekly performance"           checked={notifs.push_reports}   onChange={() => toggle("push_reports")}   />
+        <p className="fontStyle9 font-bold uppercase tracking-wider text-[var(--admin-muted)] pt-4 pb-2 m-0">In-App Notifications</p>
+        <NotifRow label="New Discussions" desc="Show an alert in the admin notification bell" checked={notifs.discussion} onChange={() => toggle("discussion")} />
+        <NotifRow label="New Contact Messages" desc="Show an alert in the admin notification bell" checked={notifs.contactInApp} onChange={() => toggle("contactInApp")} />
       </div>
+      <div className="flex items-center justify-between gap-4">
+        {saved && <p role="status" className="fontStyle9 text-[var(--admin-success)] m-0">Notification preferences saved.</p>}
+        <button
+          type="button"
+          onClick={savePreferences}
+          disabled={saving}
+          className="ml-auto flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl fontStyle9 font-bold text-white border-none cursor-pointer transition-opacity duration-200 hover:opacity-90 disabled:opacity-60"
+          style={{ background: "var(--admin-accent-grad)" }}
+        >
+          {saving ? "Saving..." : <><IconCheck /> Save Preferences</>}
+        </button>
+      </div>
+      </>
+      )}
     </div>
   );
 }
@@ -338,10 +458,97 @@ function PrivacyPanel() {
   );
 }
 
+/* Website Features */
+function FeaturesPanel() {
+  const [settingsId, setSettingsId] = useState(null);
+  const [discussionEnabled, setDiscussionEnabled] = useState(true);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
+  const [saved, setSaved] = useState(false);
+
+  useEffect(() => {
+    const loadSettings = async () => {
+      try {
+        const res = await adminGetContentsAPI();
+        if (!res.success) throw new Error(res.message || "Failed to load settings");
+        const settings = res.contents.find((item) => item.section === "site-settings");
+        if (settings) {
+          setSettingsId(settings._id);
+          setDiscussionEnabled(settings.discussionEnabled !== false);
+        }
+      } catch (err) {
+        console.error("Failed to load website settings", err);
+        setError(err.message || "Failed to load settings");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadSettings();
+  }, []);
+
+  const saveSettings = async () => {
+    setSaving(true);
+    setError("");
+    setSaved(false);
+    try {
+      const payload = {
+        section: "site-settings",
+        title: "Site Settings",
+        discussionEnabled,
+      };
+      const res = settingsId
+        ? await adminUpdateContentAPI(settingsId, payload)
+        : await adminCreateContentAPI(payload);
+      if (!res.success) throw new Error(res.message || "Failed to save settings");
+      setSettingsId(res.content._id);
+      setSaved(true);
+    } catch (err) {
+      console.error("Failed to save website settings", err);
+      setError(err.message || "Failed to save settings");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <div className="flex flex-col gap-6">
+      <SectionTitle title="Discussion" desc="Control whether users can see the Discussion option on template details." />
+      {error && <p role="alert" className="fontStyle9 text-[var(--admin-danger)] m-0">{error}</p>}
+      {loading ? (
+        <p className="fontStyle9 text-[var(--admin-muted)]">Loading settings...</p>
+      ) : (
+        <>
+          <div className="admin-card px-5">
+            <NotifRow
+              label="Template Discussion"
+              desc="Show the Discussion tab on template details for users"
+              checked={discussionEnabled}
+              onChange={setDiscussionEnabled}
+            />
+          </div>
+          <div className="flex items-center justify-between gap-4">
+            {saved && <p role="status" className="fontStyle9 text-[var(--admin-success)] m-0">Settings saved.</p>}
+            <button
+              onClick={saveSettings}
+              disabled={saving}
+              className="ml-auto flex items-center gap-2 px-6 py-2.5 rounded-xl fontStyle9 font-bold text-white border-none cursor-pointer transition-opacity duration-200 hover:opacity-90 disabled:opacity-60"
+              style={{ background: "var(--admin-accent-grad)" }}
+            >
+              {saving ? "Saving..." : "Save Changes"}
+            </button>
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
 /* ════════════════════════════════════
    MAIN
 ════════════════════════════════════ */
-const PANELS = { profile: <ProfilePanel />, security: <SecurityPanel />, notifications: <NotificationsPanel />, appearance: <AppearancePanel />, privacy: <PrivacyPanel /> };
+const PANELS = { profile: <ProfilePanel />, security: <SecurityPanel />, notifications: <NotificationsPanel />, appearance: <AppearancePanel />, privacy: <PrivacyPanel />, features: <FeaturesPanel /> };
 
 export default function Setting() {
   const [active, setActive] = useState("profile");
@@ -353,7 +560,7 @@ export default function Setting() {
       <div className="flex flex-col sm:flex-row sm:items-center">
         <div>
           <h1 className="fontStyle7 font-bold text-[var(--admin-text)] m-0">Settings</h1>
-          <p className="fontStyle9 text-[var(--admin-muted)] mt-1 m-0">Manage your account preferences</p>
+          <p className="fontStyle9 text-[var(--admin-muted)] mt-1 m-0">Manage your account preferences and website features</p>
         </div>
       </div>
 

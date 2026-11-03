@@ -477,7 +477,8 @@ export default function ManageContent() {
   useEffect(() => { fetchContents(); }, []);
 
   /* ── Filter ── */
-  const filtered = items.filter((item) => {
+  const managedItems = items.filter((item) => item.section !== "site-settings");
+  const filtered = managedItems.filter((item) => {
     const q = search.toLowerCase();
     return (
       item.section.toLowerCase().includes(q) ||
@@ -537,7 +538,7 @@ export default function ManageContent() {
         <div>
           <h1 className="fontStyle7 font-bold m-0 text-(--admin-text)">Manage Content</h1>
           <p className="fontStyle9 mt-1 m-0 text-(--admin-muted)">
-            {items.length} sections · website content manage karo
+            {managedItems.length} sections · website content manage karo
           </p>
         </div>
         <button
