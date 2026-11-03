@@ -8,14 +8,14 @@ import ThemeMetaCard from "./ThemeMetaCard";
 import NewsletterCard from "./NewsletterCard";
 import TagPill from "./TagPill";
 
-export default function ThemeSidebar({ theme, isFree, resolvedPreviewUrl, resolvedDownloadUrl, editorPicks, editorPicksLoading, email, setEmail }) {
+export default function ThemeSidebar({ theme, isFree, resolvedPreviewUrl, resolvedDownloadUrl, editorPicks, editorPicksLoading, email, setEmail, showPreview = true, recordType = "template" }) {
   const dispatch = useDispatch();
   const isAuth = useSelector((state) => state.cart.isAuth);
   const [addToCartApi] = useAddToCartApiMutation();
 
   const handleAddToCart = (item) => {
     if (isAuth) {
-      addToCartApi({ templateId: item._id }).unwrap().then((res) => dispatch(setDbCart(res?.cart?.items || []))).catch(() => {});
+      addToCartApi(recordType === "software" ? { softwareId: item._id } : { templateId: item._id }).unwrap().then((res) => dispatch(setDbCart(res?.cart?.items || []))).catch(() => {});
     } else {
       dispatch(addToCart(item));
     }
@@ -24,7 +24,7 @@ export default function ThemeSidebar({ theme, isFree, resolvedPreviewUrl, resolv
   return (
     <div className="hidden lg:flex flex-col gap-5 flex-shrink-0 w-[290px] xl:w-[310px] sticky top-6">
       <div className="rounded-2xl border border-[var(--color6)]/10 bg-[var(--color11)] p-5 shadow-sm hover:shadow-md transition-shadow duration-300">
-        <DownloadButtons isFree={isFree} price={theme.price} link={theme.link} previewUrl={resolvedPreviewUrl} downloadUrl={resolvedDownloadUrl} theme={theme} addToCart={handleAddToCart} />
+        <DownloadButtons isFree={isFree} price={theme.price} link={theme.link} previewUrl={resolvedPreviewUrl} downloadUrl={resolvedDownloadUrl} theme={theme} addToCart={handleAddToCart} showPreview={showPreview} recordType={recordType} />
         <div className="mt-4 space-y-2 mb-5">
           {(isFree
             ? ["Open source", "Use in commercial projects", "Life time free updates"]

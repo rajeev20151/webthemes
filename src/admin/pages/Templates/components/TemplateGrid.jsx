@@ -4,7 +4,7 @@ export default function TemplateGrid({ loading, paginated, filteredLength, onEdi
   if (loading) {
     return (
       <div className="text-center py-16 fontStyle9" style={{ color: "var(--admin-muted)" }}>
-        Loading templates...
+        Loading uploads...
       </div>
     );
   }
@@ -12,7 +12,7 @@ export default function TemplateGrid({ loading, paginated, filteredLength, onEdi
   if (filteredLength === 0) {
     return (
       <div className="text-center py-16 fontStyle9" style={{ color: "var(--admin-muted)" }}>
-        No templates found.
+        No templates or software found.
       </div>
     );
   }

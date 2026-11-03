@@ -13,6 +13,7 @@ const Login = lazy(pageLoaders["/login"]);
 const Signup = lazy(pageLoaders["/signup"]);
 const ForgotPassword = lazy(pageLoaders["/forgotPassword"]);
 const Themes = lazy(pageLoaders["/template/:slug"]);
+const SoftwareDetails = Themes;
 const DemoPage = lazy(pageLoaders["/demo"]);
 const Contact = lazy(pageLoaders["/contact"]);
 const PrivacyPolicy = lazy(pageLoaders["/privacy-policy"]);
@@ -35,6 +36,7 @@ export default function AppRoutes() {
         <Route path="blog" element={<Blog />} />
         <Route path="blog/:slug" element={<BlogDetail />} />
         <Route path="template/:slug" element={<Themes />} />
+        <Route path="software/:slug" element={<SoftwareDetails />} />
         <Route path="contact" element={<Contact />} />
         <Route path="login" element={<Login />} />
         <Route path="pricing" element={<PricingPage />} />

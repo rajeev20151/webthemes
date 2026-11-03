@@ -13,7 +13,7 @@ import EmptyCart from "../components/checkout/EmptyCart";
 
 /* ── Normalize item structure — DB items have templateId nested, guest items are flat ── */
 const norm = (item) => {
-  const t = item.templateId || item;
+  const t = item.softwareId || item.templateId || item;
   return {
     id: t._id || item._id,
     name: t.name || item.name || "Untitled",

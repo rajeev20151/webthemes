@@ -1,4 +1,4 @@
-import { Link, useParams } from "react-router-dom";
+import { Link, useLocation, useParams } from "react-router-dom";
 import { useState, useEffect, useMemo,useRef} from "react";
 
 import BreadCrumb_Nav from "../components/BreadCrumb_Nav";
@@ -15,14 +15,18 @@ import RelatedProducts from "../components/RelatedProducts";
 import ThemeSidebar from "../components/ThemeSidebar";
 import { getContentBySectionAPI } from "../services/api";
 
-import { useGetTemplateQuery, useGetTemplateReviewsQuery, useGetRelatedTemplatesQuery, useIncrementViewsMutation, API_URL as API_BASE } from "../store/apiSlice";
+import { useGetTemplateQuery, useGetSoftwareQuery, useGetTemplateReviewsQuery, useGetRelatedTemplatesQuery, useIncrementViewsMutation, API_URL as API_BASE } from "../store/apiSlice";
 import { imgUrl } from "../utils/themeHelpers";
 
 export default function Themes() {
   const { slug } = useParams();
+  const { pathname } = useLocation();
+  const isSoftware = pathname.startsWith("/software/");
 
-  const { data: templateData, isLoading: themeLoading } = useGetTemplateQuery(slug, { skip: !slug });
-  const theme = templateData?.template || null;
+  const { data: templateData, isLoading: templateLoading } = useGetTemplateQuery(slug, { skip: !slug || isSoftware });
+  const { data: softwareData, isLoading: softwareLoading } = useGetSoftwareQuery(slug, { skip: !slug || !isSoftware });
+  const theme = isSoftware ? softwareData?.software || null : templateData?.template || null;
+  const themeLoading = isSoftware ? softwareLoading : templateLoading;
 
   const [activeImage, setActiveImage] = useState(1);
   const [showPopup, setShowPopup] = useState(false);
@@ -33,6 +37,8 @@ export default function Themes() {
   const [discussionSettingsLoaded, setDiscussionSettingsLoaded] = useState(false);
 
   const [incrementViews] = useIncrementViewsMutation();
+
+  const activeDetailTab = isSoftware ? "description" : activeTab;
 
   useEffect(() => {
     let active = true;
@@ -60,25 +66,23 @@ useEffect(() => {
 }, [activeImage]);
 
   useEffect(() => {
-    if (theme?._id) {
+    if (theme?._id && !isSoftware) {
       const viewed = JSON.parse(localStorage.getItem("viewedTemplates") || "[]");
       if (!viewed.includes(theme._id)) {
         incrementViews(theme._id);
         localStorage.setItem("viewedTemplates", JSON.stringify([...viewed, theme._id]));
       }
     }
-  }, [theme?._id]);
+  }, [theme?._id, isSoftware, incrementViews]);
 
-  const { data: reviewsData } = useGetTemplateReviewsQuery(theme?._id, { skip: !theme?._id });
+  const { data: reviewsData } = useGetTemplateReviewsQuery(theme?._id, { skip: !theme?._id || isSoftware });
 
-  useEffect(() => {
-    if (reviewsData?.stats?.total !== undefined) setReviewCount(reviewsData.stats.total);
-  }, [reviewsData]);
+  const displayedReviewCount = isSoftware ? 0 : reviewsData?.stats?.total ?? reviewCount;
 
   // Fetch related templates by category (max 6) — NOT all templates
   const { data: relatedData, isLoading: relatedLoading } = useGetRelatedTemplatesQuery(
     { category: theme?.category || "", excludeId: theme?._id, limit: 6 },
-    { skip: !theme?.category || !theme?._id }
+    { skip: !theme?.category || !theme?._id || isSoftware }
   );
   const relatedProducts = useMemo(() => {
     const list = relatedData?.templates ?? [];
@@ -202,14 +206,16 @@ if (!theme) return (
           isFree={isFree}
           resolvedDownloadUrl={resolvedDownloadUrl}
           resolvedPreviewUrl={resolvedPreviewUrl}
+          showPreview={!isSoftware}
+          recordType={isSoftware ? "software" : "template"}
         />
 
         <div className="w-width py-10 sm:py-12 md:py-20">
           <BreadCrumb_Nav
             items={[
               { label: "Home", path: "/" },
-              { label: "Templates", path: "/templates" },
-              { label: "Templates-Details", path: `/template/${slug}` },
+              { label: isSoftware ? "Software" : "Templates", path: isSoftware ? "/" : "/templates" },
+              { label: isSoftware ? "Software-Details" : "Templates-Details", path: `${isSoftware ? "/software" : "/template"}/${slug}` },
             ]}
           />
 
@@ -232,12 +238,12 @@ if (!theme) return (
                 />
               </div>
 
-              <div className="flex items-center gap-3 mb-5 order-3">
+              {!isSoftware && <div className="flex items-center gap-3 mb-5 order-3">
                 <StarRating rating={theme.rating || 0} />
                 <Link to="#reviews" className="fontStyle9 text-[var(--color4)] hover:text-[var(--color6)] transition-colors duration-200 underline-offset-2 hover:underline">
-                  {reviewCount} customers reviews
+                  {displayedReviewCount} customers reviews
                 </Link>
-              </div>
+              </div>}
 
               <div className="order-4">
                 <MobileThemeInfo
@@ -247,22 +253,24 @@ if (!theme) return (
                   resolvedDownloadUrl={resolvedDownloadUrl}
                   email={email}
                   setEmail={setEmail}
+                  showPreview={!isSoftware}
+                  recordType={isSoftware ? "software" : "template"}
                 />
               </div>
 
               <div className="order-5 mt-6 lg:mt-0 border-b border-[var(--color6)]/10 mb-6 flex gap-4 sm:gap-6">
-                {["description", "reviews", ...(discussionSettingsLoaded && discussionEnabled ? ["discussion"] : [])].map((tab) => (
+                {["description", ...(!isSoftware ? ["reviews", ...(discussionSettingsLoaded && discussionEnabled ? ["discussion"] : [])] : [])].map((tab) => (
                   <button
                     key={tab}
                     onClick={() => setActiveTab(tab)}
-                    className={`pb-3 fontStyle8 font-semibold capitalize transition-all duration-200 border-b-2 -mb-px ${activeTab === tab ? "border-[var(--color6)] text-[var(--color6)]" : "border-transparent text-[var(--color4)] hover:text-[var(--color6)] hover:border-[var(--color6)]/30"}`}
+                    className={`pb-3 fontStyle8 font-semibold capitalize transition-all duration-200 border-b-2 -mb-px ${activeDetailTab === tab ? "border-[var(--color6)] text-[var(--color6)]" : "border-transparent text-[var(--color4)] hover:text-[var(--color6)] hover:border-[var(--color6)]/30"}`}
                   >
                     {tab === "reviews" ? `Reviews (${reviewCount})` : tab === "discussion" ? "Discussion" : "Description"}
                   </button>
                 ))}
               </div>
 
-              {activeTab === "description" && (
+              {activeDetailTab === "description" && (
                 <div className="space-y-6 sm:space-y-8 order-6">
                   <p className="fontStyle6 text-[var(--color6)] font-bold leading-relaxed">
                     {theme.subtitle || theme.name}
@@ -321,21 +329,23 @@ if (!theme) return (
                 </div>
               )}
 
-              {activeTab === "reviews" && (
+              {!isSoftware && activeDetailTab === "reviews" && (
                 <div className="order-6">
                   <ReviewsSection onCountChange={setReviewCount} templateId={theme?._id} />
                 </div>
               )}
 
-              {activeTab === "discussion" && (
+              {!isSoftware && activeDetailTab === "discussion" && (
                 <div className="order-6">
                   <ChatSection templateId={theme?._id} />
                 </div>
               )}
 
-              <div className="order-7">
-                <RelatedProducts relatedProducts={relatedProducts} />
-              </div>
+              {!isSoftware && (
+                <div className="order-7">
+                  <RelatedProducts relatedProducts={relatedProducts} />
+                </div>
+              )}
             </div>
 
             <ThemeSidebar
@@ -347,6 +357,8 @@ if (!theme) return (
               editorPicksLoading={relatedLoading}
               email={email}
               setEmail={setEmail}
+              showPreview={!isSoftware}
+              recordType={isSoftware ? "software" : "template"}
             />
           </div>
         </div>

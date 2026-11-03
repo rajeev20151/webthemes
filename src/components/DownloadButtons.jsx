@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 
-export default function DownloadButtons({ compact = false, isFree = true, price = 0, link = "", previewUrl = "", downloadUrl = "", theme = {}, addToCart = () => {} }) {
+export default function DownloadButtons({ compact = false, isFree = true, price = 0, link = "", previewUrl = "", downloadUrl = "", theme = {}, addToCart = () => {}, showPreview = true, recordType = "template" }) {
   const navigate = useNavigate();
   const { token } = useSelector((state) => state.auth);
 
@@ -34,6 +34,7 @@ export default function DownloadButtons({ compact = false, isFree = true, price 
       originalPrice: theme.originalPrice,
       image: theme.images?.[0] || "",
       tag: theme.tag,
+      recordType,
     });
     navigate("/cart");
   };
@@ -53,12 +54,14 @@ export default function DownloadButtons({ compact = false, isFree = true, price 
           Add to Cart - ${price}
         </button>
       )}
-      <button
-        onClick={handlePreview}
-        className={`${compact ? "flex-1" : "w-full"} py-3.5 cursor-pointer rounded-xl fontStyle8 font-semibold text-green-500 border-2 border-green-500/30 flex items-center justify-center gap-2 hover:bg-green-500/8 hover:border-green-500/50 transition-all duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-500`}
-      >
-        Live Preview <i className="bx bx-link-external text-base"></i>
-      </button>
+      {showPreview && (
+        <button
+          onClick={handlePreview}
+          className={`${compact ? "flex-1" : "w-full"} py-3.5 cursor-pointer rounded-xl fontStyle8 font-semibold text-green-500 border-2 border-green-500/30 flex items-center justify-center gap-2 hover:bg-green-500/8 hover:border-green-500/50 transition-all duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-500`}
+        >
+          Live Preview <i className="bx bx-link-external text-base"></i>
+        </button>
+      )}
     </div>
   );
 }

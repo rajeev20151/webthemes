@@ -3,13 +3,14 @@ import TagBadge from "./TagBadge";
 import TechBadge from "./TechBadge";
 
 export default function DemoListItem({ demo }) {
+  const detailsUrl = `/${demo.recordType === "software" ? "software" : "template"}/${demo.slug}`;
   return (
     <div
       className="group flex items-center gap-3 sm:gap-4 border border-[var(--color6)]/12 rounded-2xl bg-[var(--color11)] p-3 sm:p-4
         hover:border-[var(--color6)]/30 hover:bg-[var(--color11)] hover:shadow-[3px_3px_0px_rgba(0,0,0,0.06)]
         transition-all duration-200"
     >
-      <Link to={`/template/${demo.slug}`} className="flex-shrink-0 rounded-xl overflow-hidden bg-[var(--color1)] block w-[clamp(100px,26vw,130px)] aspect-[5/8] sm:w-[clamp(80px,18vw,130px)] sm:aspect-[13/9]">
+      <Link to={detailsUrl} className="flex-shrink-0 rounded-xl overflow-hidden bg-[var(--color1)] block w-[clamp(100px,26vw,130px)] aspect-[5/8] sm:w-[clamp(80px,18vw,130px)] sm:aspect-[13/9]">
         {demo.image && (
         <img
         src={demo.image}
@@ -37,7 +38,7 @@ export default function DemoListItem({ demo }) {
           </span>
         </div>
         <h3 className="fontStyle7 font-bold text-[var(--color6)] truncate mb-1">
-          <Link to={`/template/${demo.slug}`} className="hover:text-[var(--color4)] transition-colors duration-200">
+          <Link to={detailsUrl} className="hover:text-[var(--color4)] transition-colors duration-200">
             {demo.title}
           </Link>
         </h3>
@@ -58,7 +59,7 @@ export default function DemoListItem({ demo }) {
       </div>
 
       <div className="flex-shrink-0 flex items-center gap-2">
-        <Link to={`/template/${demo.slug}`} className="hidden sm:flex items-center gap-2 px-4 py-2.5 rounded-xl fontStyle9 font-bold bg-[var(--color6)] text-[var(--color5)] hover:opacity-80 transition-opacity duration-200">
+        <Link to={detailsUrl} className="hidden sm:flex items-center gap-2 px-4 py-2.5 rounded-xl fontStyle9 font-bold bg-[var(--color6)] text-[var(--color5)] hover:opacity-80 transition-opacity duration-200">
           <i className="bx bx-info-circle text-sm"></i>
           View Details
         </Link>
@@ -68,7 +69,7 @@ export default function DemoListItem({ demo }) {
             Preview
           </a>
         )}
-        <Link to={`/template/${demo.slug}`} className="sm:hidden w-9 h-9 rounded-xl flex items-center justify-center bg-[var(--color6)] text-[var(--color5)] hover:opacity-80 transition-opacity duration-200">
+        <Link to={detailsUrl} className="sm:hidden w-9 h-9 rounded-xl flex items-center justify-center bg-[var(--color6)] text-[var(--color5)] hover:opacity-80 transition-opacity duration-200">
           <i className="bx bx-info-circle text-base"></i>
         </Link>
         {demo.previewUrl && (

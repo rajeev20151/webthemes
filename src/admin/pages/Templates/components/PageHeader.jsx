@@ -5,10 +5,10 @@ export default function PageHeader({ total, filtered, hasActiveFilters, onAdd })
     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
       <div>
         <h1 className="fontStyle7 font-bold m-0" style={{ color: "var(--admin-text)" }}>
-          Manage Templates
+          Manage Templates &amp; Software
         </h1>
         <p className="fontStyle9 mt-1 m-0" style={{ color: "var(--admin-muted)" }}>
-          {total} templates total{hasActiveFilters ? ` · ${filtered} matching` : ""}
+          {total} items total{hasActiveFilters ? ` · ${filtered} matching` : ""}
         </p>
       </div>
       <button
@@ -18,7 +18,7 @@ export default function PageHeader({ total, filtered, hasActiveFilters, onAdd })
         onMouseEnter={(e) => e.currentTarget.style.opacity = "0.88"}
         onMouseLeave={(e) => e.currentTarget.style.opacity = "1"}
       >
-        <IconPlus /> Add Template
+        <IconPlus /> Add Template / Software
       </button>
     </div>
   );

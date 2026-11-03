@@ -111,6 +111,18 @@ export const adminGetTemplatesAPI = () =>
 export const adminCreateTemplateAPI = (formData) =>
   request("/templates", { method: "POST", body: formData });
 
+export const adminCreateSoftwareAPI = (formData) =>
+  request("/software", { method: "POST", body: formData });
+
+export const adminGetSoftwaresAPI = () =>
+  request("/software?limit=1000", { method: "GET" });
+
+export const adminUpdateSoftwareAPI = (id, formData) =>
+  request(`/software/${id}`, { method: "PUT", body: formData });
+
+export const adminDeleteSoftwareAPI = (id) =>
+  request(`/software/${id}`, { method: "DELETE" });
+
 export const adminUpdateTemplateAPI = (id, formData) =>
   request(`/templates/${id}`, { method: "PUT", body: formData });
 

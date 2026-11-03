@@ -40,7 +40,7 @@ export default function Cart() {
 
   // Normalize item structure — DB items have templateId nested, guest items are flat
   const norm = (item) => {
-    const t = item.templateId || item;
+    const t = item.softwareId || item.templateId || item;
     return {
       id: t._id || item._id,
       name: t.title || t.name || "Untitled",
@@ -61,7 +61,7 @@ export default function Cart() {
 
   const handleRemove = (item) => {
     if (isAuth) {
-      removeFromCartApi(item.templateId?._id || item.templateId)
+      removeFromCartApi(item.softwareId?._id || item.softwareId || item.templateId?._id || item.templateId)
         .unwrap()
         .then((res) => {
           dispatch(setDbCart(res?.cart?.items || []));

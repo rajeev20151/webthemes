@@ -2,27 +2,19 @@ import {Link} from "react-router-dom";
 import { useState } from "react";
 import SEOHead from "../components/SEOHead";
 import BreadCrumb_Nav from "../components/BreadCrumb_Nav";
-import { useCreateContactMutation } from "../store/apiSlice"; 
+import { useCreateContactMutation, useGetContentsQuery } from "../store/apiSlice";
+
 
 /* ── Icons ── */
 const IconMail     = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><rect x="2" y="4" width="20" height="16" rx="3" stroke="currentColor" strokeWidth="1.8"/><path d="M2 8l10 7 10-7" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/></svg>;
 const IconSend     = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>;
 const IconArrow    = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>;
-const IconTwitter  = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.737-8.835L2.25 2.25h6.988l4.26 5.631zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>;
-const IconInsta    = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><rect x="2" y="2" width="20" height="20" rx="5" stroke="currentColor" strokeWidth="1.8"/><circle cx="12" cy="12" r="4" stroke="currentColor" strokeWidth="1.8"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor"/></svg>;
-const IconLinkedin = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z"/><circle cx="4" cy="4" r="2" fill="currentColor"/></svg>;
 const IconCheck    = () => <svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg>;
 const IconValid    = () => <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg>;
 const IconError    = () => <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"/></svg>;
 
 const contactInfo = [
   { icon: <IconMail />, label: "Email Us", value: "hello@themewagen.com", sub: "Reply within 24 hours" },
-];
-
-const socials = [
-  { icon: <IconTwitter />,  label: "Twitter" },
-  { icon: <IconInsta />,    label: "Instagram" },
-  { icon: <IconLinkedin />, label: "LinkedIn" },
 ];
 
 // const topics = ["General Inquiry", "Template Support", "License Question", "Refund Request", "Partnership", "Other"];
@@ -77,6 +69,14 @@ const fieldClass = (error, touched, value) => {
 };
 
 export default function Contact() {
+  const { data: contentsData } = useGetContentsQuery();
+  const contentItems = contentsData?.success ? contentsData.contents : [];
+  const socialContent = contentItems.find((item) =>
+    item.section?.toLowerCase() === "footer" &&
+    item.socialLinks?.some((social) => social.platform?.trim())
+  ) || contentItems.find((item) =>
+    item.socialLinks?.some((social) => social.platform?.trim())
+  );
   const [form,    setForm]    = useState({ name: "", email: "", topic: "", message: "" });
   const [errors,  setErrors]  = useState({ name: "", email: "", topic: "", message: "" });
   const [touched, setTouched] = useState({ name: false, email: false, topic: false, message: false });
@@ -217,12 +217,27 @@ export default function Contact() {
             <div className="p-4 sm:p-5 rounded-2xl bg-[var(--color11)] border border-[rgba(0,0,0,0.05)]">
               <p className="fontStyle10 font-bold uppercase tracking-widest m-0 mb-3 text-[var(--color8)]">Follow Us</p>
               <div className="flex flex-wrap items-center gap-3">
-                {socials.map((s) => (
-                  <a key={s.label} href="#" aria-label={s.label}
-                    className="w-10 h-10 rounded-xl flex items-center justify-center [background:var(--color3)] text-white transition-all duration-200 hover:scale-110">
-                    {s.icon}
-                  </a>
-                ))}
+                {socialContent?.socialLinks?.filter((social) => social.platform?.trim()).map((social, index) => {
+                  const className = "w-10 h-10 rounded-xl flex items-center justify-center [background:var(--color3)] text-white transition-all duration-200 hover:scale-110";
+                  const icon = <i className={`bx bxl-${social.platform.trim().toLowerCase()} text-base`} />;
+
+                  return social.url?.trim() ? (
+                    <a
+                      key={social._id || `${social.platform}-${index}`}
+                      href={social.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={social.platform}
+                      className={className}
+                    >
+                      {icon}
+                    </a>
+                  ) : (
+                    <span key={social._id || `${social.platform}-${index}`} aria-label={social.platform} className={className}>
+                      {icon}
+                    </span>
+                  );
+                })}
               </div>
             </div>
           </div>

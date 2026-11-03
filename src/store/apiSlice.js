@@ -56,6 +56,9 @@ export const apiSlice = createApi({
       query: (slugOrId) => `/templates/${slugOrId}`,
       providesTags: (result, error, slugOrId) => [{ type: "Template", id: slugOrId }],
     }),
+    getSoftware: builder.query({
+      query: (slugOrId) => `/software/${slugOrId}`,
+    }),
     getPopularTemplates: builder.query({
       query: (limit = 9) => `/templates/popular?limit=${limit}`,
       providesTags: ["Template"],
@@ -80,6 +83,13 @@ export const apiSlice = createApi({
         return `/templates/latest${qs ? `?${qs}` : ""}`;
       },
       providesTags: ["Template"],
+    }),
+
+    getLatestSoftwares: builder.query({
+      query: (params = {}) => {
+        const qs = new URLSearchParams({ ...params, sort: "latest" }).toString();
+        return `/software${qs ? `?${qs}` : ""}`;
+      },
     }),
 
     // ─── BLOGS ───────────────────────────────────────
@@ -191,6 +201,7 @@ export const {
   useGetTemplatesQuery,
   useLazyGetTemplatesQuery,
   useGetTemplateQuery,
+  useGetSoftwareQuery,
   useGetPopularTemplatesQuery,
   useGetRelatedTemplatesQuery,
   useGetTemplatesRatingsQuery,
@@ -213,4 +224,5 @@ export const {
   useMergeCartApiMutation,
   useSubscribeNewsletterMutation,
   useGetLatestTemplatesQuery,
+  useGetLatestSoftwaresQuery,
 } = apiSlice;

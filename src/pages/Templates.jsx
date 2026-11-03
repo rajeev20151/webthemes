@@ -2,7 +2,7 @@ import { Link, useSearchParams } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
 import BreadCrumb_Nav from "../components/BreadCrumb_Nav";
 import SEOHead from "../components/SEOHead";
-import { useGetTemplatesQuery, API_URL } from "../store/apiSlice";
+import { useGetTemplatesQuery, useGetLatestSoftwaresQuery, API_URL } from "../store/apiSlice";
 
 const ALL_CATEGORIES = "All Industries";
 const ALL_TYPES = "All Types";
@@ -81,7 +81,7 @@ function SelectField({ label, options, selected, onSelect }) {
 }
 
 /* ── Map API template → UI shape ── */
-function mapTemplate(t) {
+function mapTemplate(t, recordType = "template") {
   const origin = API_URL.replace(/\/api$/, "");
   const rawImage = Array.isArray(t.images) && t.images.length > 0 ? t.images[0] : null;
   const image = rawImage
@@ -95,7 +95,9 @@ function mapTemplate(t) {
   return {
     id: t._id,
     slug: t.slug,
+    recordType,
     title: t.name || "Untitled",
+    createdAt: t.createdAt,
     category: t.category || t.subtitle || "General",
     type: t.tag || "Multi Page",
     tag: t.price === 0 ? "FREE" : "PRO",
@@ -137,7 +139,7 @@ function getPageNumbers(current, total) {
 export default function Templates() {
   const [searchParams] = useSearchParams();
 
-  // Server-side filters
+  // Listing filters
   const [search, setSearch] = useState(() => searchParams.get("q") || "");
   const [selectedCategory, setSelectedCategory] = useState("All Industries");
   const [selectedType, setSelectedType] = useState("All Types");
@@ -153,27 +155,36 @@ export default function Templates() {
     return () => clearTimeout(timer);
   }, [search]);
 
-  // Build query params
-  const queryParams = {
-    page: currentPage,
-    limit: ITEMS_PER_PAGE,
-    ...(debouncedSearch && { search: debouncedSearch }),
-    ...(selectedCategory !== "All Industries" && { category: selectedCategory }),
-    ...(selectedType !== "All Types" && { tag: selectedType }),
-    ...(sortBy === "Oldest" && { sort: "oldest" }),
-    ...(sortBy === "Most Popular" && { sort: "popular" }),
-  };
+  const { data: templatesData, isLoading: templatesLoading } = useGetTemplatesQuery({ limit: 1000 });
+  const { data: softwaresData, isLoading: softwaresLoading } = useGetLatestSoftwaresQuery({ limit: 1000 });
+  const loading = templatesLoading || softwaresLoading;
+  const allTemplates = templatesData?.templates ?? [];
+  const allSoftwares = softwaresData?.softwares ?? [];
+  const allItems = [
+    ...allTemplates.map((item) => mapTemplate(item, "template")),
+    ...allSoftwares.map((item) => mapTemplate(item, "software")),
+  ];
+  const filteredItems = allItems.filter((item) =>
+    (!debouncedSearch ||
+      item.title.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
+      item.category.toLowerCase().includes(debouncedSearch.toLowerCase())) &&
+    (selectedCategory === ALL_CATEGORIES || item.category === selectedCategory) &&
+    (selectedType === ALL_TYPES || item.type === selectedType)
+  );
 
-  const { data: responseData, isLoading: loading } = useGetTemplatesQuery(queryParams);
-  const rawTemplates = responseData?.templates ?? [];
-  const pagination = responseData?.pagination ?? { page: 1, totalPages: 1, total: 0 };
-  const templates = rawTemplates.map(mapTemplate);
+  if (sortBy === "Oldest") {
+    filteredItems.sort((a, b) => new Date(a.createdAt || 0) - new Date(b.createdAt || 0));
+  } else if (sortBy === "Most Popular") {
+    filteredItems.sort((a, b) => b.views - a.views);
+  } else {
+    filteredItems.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+  }
 
-  // Filter dropdown options derived from the real template data
-  const { data: optionsData } = useGetTemplatesQuery({ limit: 1000 });
-  const allTemplates = optionsData?.templates ?? [];
-  const categoryOptions = [ALL_CATEGORIES, ...new Set(allTemplates.map((t) => t.category).filter(Boolean))];
-  const typeOptions = [ALL_TYPES, ...new Set(allTemplates.map((t) => t.tag).filter(Boolean))];
+  const totalPages = Math.max(1, Math.ceil(filteredItems.length / ITEMS_PER_PAGE));
+  const pagination = { page: currentPage, totalPages, total: filteredItems.length };
+  const templates = filteredItems.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
+  const categoryOptions = [ALL_CATEGORIES, ...new Set(allItems.map((item) => item.category).filter(Boolean))];
+  const typeOptions = [ALL_TYPES, ...new Set(allItems.map((item) => item.type).filter(Boolean))];
 
   useEffect(() => {
     const q = searchParams.get("q") || "";
@@ -362,7 +373,7 @@ export default function Templates() {
                           {["bx-link-external", "bx-heart"].map((icon, i) => (
                             <Link
                               key={icon}
-                              to={`/template/${template.slug}`}
+                              to={`/${template.recordType === "software" ? "software" : "template"}/${template.slug}`}
                               className={`w-11 h-11 bg-white text-[#111827] border-2 border-[#111827] rounded-full flex items-center justify-center shadow-[3px_3px_0px_#111827] hover:bg-[#111827] hover:text-white hover:shadow-[1px_1px_0px_#111827] transition-all duration-200 translate-y-3 group-hover:translate-y-0 ${i === 1 ? "delay-75" : ""}`}
                             >
                               <i className={`bx ${icon} text-lg`}></i>
@@ -376,7 +387,7 @@ export default function Templates() {
                         {/* Title + Price */}
                         <div className="flex items-center justify-between gap-3">
                           <h3 className="fontStyle7 font-bold text-[var(--color6)] truncate">
-                            <Link to={`/template/${template.slug}`} className="hover:text-[var(--color4)] transition-colors duration-200">
+                            <Link to={`/${template.recordType === "software" ? "software" : "template"}/${template.slug}`} className="hover:text-[var(--color4)] transition-colors duration-200">
                               {template.title}
                             </Link>
                           </h3>

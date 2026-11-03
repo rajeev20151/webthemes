@@ -104,7 +104,7 @@ export default function TemplateModal({ mode, data, onClose, onSave, saving }) {
           style={{ borderBottom: "1px solid var(--admin-border)" }}
         >
           <p className="fontStyle7 font-semibold m-0" style={{ color: "var(--admin-text)" }}>
-            {mode === "add" ? "Add New Template" : "Edit Template"}
+            {mode === "add" ? "Add New Template" : form._recordType === "software" ? "Edit Software" : "Edit Template"}
           </p>
           <button
             onClick={onClose}
@@ -215,6 +215,28 @@ export default function TemplateModal({ mode, data, onClose, onSave, saving }) {
             <input ref={zipRef} type="file" accept=".zip" className="hidden" onChange={handleZip} />
           </div>
 
+          {mode === "add" && (
+            <div
+              className="rounded-xl px-4 py-3"
+              style={{ border: "1px solid var(--admin-border)", background: "var(--admin-bg)" }}
+            >
+              <label className="flex items-center justify-between cursor-pointer">
+                <span className="fontStyle9 font-semibold" style={{ color: "var(--admin-text)" }}>
+                  Upload as Software / Full-stack Project
+                </span>
+                <input
+                  type="checkbox"
+                  checked={!!form.uploadAsSoftware}
+                  onChange={(e) => set("uploadAsSoftware", e.target.checked)}
+                  className="w-4 h-4 cursor-pointer"
+                />
+              </label>
+              <p className="fs11 m-0 mt-1" style={{ color: "var(--admin-muted)" }}>
+                Checked: save in Software. Unchecked: save as Template.
+              </p>
+            </div>
+          )}
+
           {/* ── Schedule Upload ── */}
           <div
             className="rounded-xl px-4 py-3"
@@ -249,7 +271,7 @@ export default function TemplateModal({ mode, data, onClose, onSave, saving }) {
 
           {/* Template Name */}
           <div>
-            <label className={labelCls}>Template Name</label>
+            <label className={labelCls}>{form._recordType === "software" ? "Software Name" : "Template Name"}</label>
             <input className={inputCls} value={form.name} onChange={(e) => set("name", e.target.value)} placeholder="e.g. Agency Pro" />
           </div>
 
@@ -401,7 +423,7 @@ export default function TemplateModal({ mode, data, onClose, onSave, saving }) {
             onMouseEnter={(e) => { if (!saving) e.currentTarget.style.opacity = "0.88"; }}
             onMouseLeave={(e) => { if (!saving) e.currentTarget.style.opacity = "1"; }}
           >
-            {saving ? "Saving..." : mode === "add" ? "Add Template" : "Save Changes"}
+            {saving ? "Saving..." : mode === "add" ? form.uploadAsSoftware ? "Add Software" : "Add Template" : "Save Changes"}
           </button>
         </div>
 

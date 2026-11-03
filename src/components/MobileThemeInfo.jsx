@@ -8,14 +8,14 @@ import TagPill from "./TagPill";
 import ThemeMetaCard from "./ThemeMetaCard";
 import NewsletterCard from "./NewsletterCard";
 
-export default function MobileThemeInfo({ theme, isFree, resolvedPreviewUrl, resolvedDownloadUrl, email, setEmail }) {
+export default function MobileThemeInfo({ theme, isFree, resolvedPreviewUrl, resolvedDownloadUrl, email, setEmail, showPreview = true, recordType = "template" }) {
   const dispatch = useDispatch();
   const isAuth = useSelector((state) => state.cart.isAuth);
   const [addToCartApi] = useAddToCartApiMutation();
 
   const handleAddToCart = (item) => {
     if (isAuth) {
-      addToCartApi({ templateId: item._id }).unwrap().then((res) => dispatch(setDbCart(res?.cart?.items || []))).catch(() => {});
+      addToCartApi(recordType === "software" ? { softwareId: item._id } : { templateId: item._id }).unwrap().then((res) => dispatch(setDbCart(res?.cart?.items || []))).catch(() => {});
     } else {
       dispatch(addToCart(item));
     }
@@ -33,7 +33,7 @@ export default function MobileThemeInfo({ theme, isFree, resolvedPreviewUrl, res
               License <i className="bx bx-chevron-right text-sm"></i>
             </Link>
           </div>
-          <DownloadButtons isFree={isFree} price={theme.price} link={theme.link} previewUrl={resolvedPreviewUrl} downloadUrl={resolvedDownloadUrl} theme={theme} addToCart={handleAddToCart} />
+          <DownloadButtons isFree={isFree} price={theme.price} link={theme.link} previewUrl={resolvedPreviewUrl} downloadUrl={resolvedDownloadUrl} theme={theme} addToCart={handleAddToCart} showPreview={showPreview} recordType={recordType} />
           <div className="mt-3 flex flex-wrap gap-3">
             {(isFree
               ? ["Open source", "Commercial use", "Free updates"]

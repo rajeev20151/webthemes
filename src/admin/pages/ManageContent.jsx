@@ -1,4 +1,6 @@
 ﻿import { useState, useEffect } from "react";
+import { useDispatch } from "react-redux";
+import { apiSlice } from "../../store/apiSlice";
 import {
   adminGetContentsAPI,
   adminCreateContentAPI,
@@ -454,6 +456,7 @@ function ContentCard({ item, onEdit, onDelete, onViewJson }) {
    MAIN PAGE
 ════════════════════════════════════════ */
 export default function ManageContent() {
+  const dispatch = useDispatch();
   const [items, setItems]               = useState([]);
   const [loading, setLoading]           = useState(true);
   const [search, setSearch]             = useState("");
@@ -504,6 +507,7 @@ export default function ManageContent() {
       }
 
       if (res.success) {
+        dispatch(apiSlice.util.invalidateTags(["Content"]));
         await fetchContents();
         setModal(null);
       } else {

@@ -59,6 +59,15 @@ export default function TemplateCard({ item, onEdit, onDelete }) {
       <div className="p-4 flex flex-col gap-2">
         <div>
           <p className="fontStyle9 font-bold m-0" style={{ color: "var(--admin-text)" }}>{item.name}</p>
+          <span
+            className="inline-block mt-1 px-2 py-0.5 rounded-full fs11 font-semibold"
+            style={{
+              background: item._recordType === "software" ? "var(--admin-success-soft)" : "var(--admin-accent-soft)",
+              color: item._recordType === "software" ? "var(--admin-success)" : "var(--admin-accent)",
+            }}
+          >
+            {item._recordType === "software" ? "Software" : "Template"}
+          </span>
           {item.subtitle && (
             <p className="fontStyle9 m-0 mt-0.5" style={{ color: "var(--admin-muted)" }}>{item.subtitle}</p>
           )}

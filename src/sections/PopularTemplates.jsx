@@ -1,5 +1,10 @@
 import { Link } from "react-router-dom";
-import { useGetLatestTemplatesQuery, useGetTemplatesRatingsQuery, API_URL } from "../store/apiSlice";
+import {
+  useGetLatestTemplatesQuery,
+  useGetLatestSoftwaresQuery,
+  useGetTemplatesRatingsQuery,
+  API_URL,
+} from "../store/apiSlice";
 
 const imgUrl = (path) => {
   if (!path) return "";
@@ -39,12 +44,20 @@ function StarRating({ rating = 0, reviews = 0 }) {
 }
 
 export default function PopularTemplates() {
-const { data: templatesData, isLoading: loading } = useGetLatestTemplatesQuery({ limit: 9 });
+  const { data: templatesData, isLoading: templatesLoading } = useGetLatestTemplatesQuery({ limit: 8 });
+  const { data: softwaresData, isLoading: softwaresLoading } = useGetLatestSoftwaresQuery({ limit: 9 });
 
-const templates = templatesData?.templates ?? [];
+  const items = [
+    ...(templatesData?.templates ?? []).map((item) => ({ ...item, _recordType: "template" })),
+    ...(softwaresData?.softwares ?? []).map((item) => ({ ...item, _recordType: "software" })),
+  ].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  const loading = templatesLoading || softwaresLoading;
 
   // Batch fetch all ratings in ONE call
-  const templateIds = templates.map((t) => t._id).filter(Boolean);
+  const templateIds = items
+    .filter((item) => item._recordType === "template")
+    .map((item) => item._id)
+    .filter(Boolean);
   const { data: ratingsData } = useGetTemplatesRatingsQuery(templateIds, {
     skip: templateIds.length === 0,
   });
@@ -67,59 +80,80 @@ const templates = templatesData?.templates ?? [];
     );
   }
 
-  if (templates.length === 0) return null;
+  if (items.length === 0) return null;
 
   return (
     <section className="py-10 sm:py-12 md:py-16 lg:py-20 xl:py-20">
       <div className="w-width">
         <div className="text-center mb-16">
-          <h2 className="fontStyle4 text-[var(--color6)] font-bold">Pre-created website layouts</h2>
+          <h2 className="fontStyle4 text-[var(--color6)] font-bold">Pre-created website layouts &amp; software</h2>
         </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
-                {templates.map((t) => (
-                  <div key={t._id} className="group cursor-pointer bg-[var(--color5)] rounded-2xl">
+                {items.map((t) => {
+                  const cardContent = (
+                  <div className="group cursor-pointer bg-[var(--color5)] rounded-2xl">
                   <div className="p-4 border-[2px] border-[var(--color6)] rounded-2xl text-center shadow-[8px_8px_0px_var(--color6)] hover:shadow-[3px_3px_0px_var(--color6)] transition-all duration-300">
                   <div className="relative overflow-hidden rounded-2xl mb-5 bg-gray-100 h-[400px] sm:h-[400px] md:h-[400px] lg:h-[430px]">
-                  <img
-                  src={imgUrl(t.images?.[0])}
-                  alt={t.name}
-                  loading="lazy"
-                  className="block w-full h-auto object-contain object-top transition-transform duration-700 ease-out group-hover:scale-105"
-                  />
+                  {t.images?.[0] ? (
+                    <img
+                    src={imgUrl(t.images[0])}
+                    alt={t.name}
+                    loading="lazy"
+                    className="block w-full h-auto object-contain object-top transition-transform duration-700 ease-out group-hover:scale-105"
+                    />
+                  ) : (
+                    <div className="flex h-full flex-col items-center justify-center gap-3 text-[var(--color6)]">
+                      <i className={`bx ${t._recordType === "software" ? "bx-code-alt" : "bx-image"} text-6xl`}></i>
+                      <span className="fontStyle7 font-bold">{t._recordType === "software" ? "Software project" : "Preview unavailable"}</span>
+                    </div>
+                  )}
                   <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-center justify-center gap-4">
                   {/* Template Page */}
-                  <Link
-                  to={`/template/${t.slug}`}
-                  onClick={(e) => e.stopPropagation()}
-                  className="w-12 h-12 rounded-full bg-[var(--color5)] flex items-center justify-center text-[var(--color6)] hover:scale-110 transition-transform duration-300 shadow-lg"
-                  aria-label="Open template"
-                  >
-                  <i className="bx bx-link-external text-2xl"></i>
-                  </Link>
+                  {t._recordType === "template" ? (
+                    <Link
+                    to={`/template/${t.slug}`}
+                    onClick={(e) => e.stopPropagation()}
+                    className="w-12 h-12 rounded-full bg-[var(--color5)] flex items-center justify-center text-[var(--color6)] hover:scale-110 transition-transform duration-300 shadow-lg"
+                    aria-label="Open template"
+                    >
+                    <i className="bx bx-link-external text-2xl"></i>
+                    </Link>
+                  ) : (
+                    <Link
+                    to={`/software/${t.slug}`}
+                    onClick={(e) => e.stopPropagation()}
+                    className="w-12 h-12 rounded-full bg-[var(--color5)] flex items-center justify-center text-[var(--color6)] hover:scale-110 transition-transform duration-300 shadow-lg"
+                    aria-label="View software details"
+                    >
+                    <i className="bx bx-link-external text-2xl"></i>
+                    </Link>
+                  )}
                   
                    {/* Heart / Description */}
                   <Link
-                  to={`/template/${t.slug}`}
-                  onClick={(e) => e.stopPropagation()}
-                  className="w-12 h-12 rounded-full bg-[var(--color5)] flex items-center justify-center text-[var(--color6)] hover:scale-110 transition-transform duration-300 shadow-lg"
-                  aria-label="View template details"
-                  >
-                  <i className="bx bx-heart text-2xl"></i>
+                    to={t._recordType === "software" ? `/software/${t.slug}` : `/template/${t.slug}`}
+                    onClick={(e) => e.stopPropagation()}
+                    className="w-12 h-12 rounded-full bg-[var(--color5)] flex items-center justify-center text-[var(--color6)] hover:scale-110 transition-transform duration-300 shadow-lg"
+                    aria-label={t._recordType === "software" ? "View software details" : "View template details"}
+                    >
+                    <i className="bx bx-heart text-2xl"></i>
                   </Link>
                   </div>
 
                 <div className="absolute top-4 left-4 z-10">
                 <span className="inline-flex items-center gap-1.5 bg-[var(--color5)] text-[var(--color6)] border-2 border-[var(--color6)] px-3 py-1 rounded-full fontStyle10 font-bold uppercase tracking-wider shadow-[3px_3px_0px_var(--color6)] -rotate-3 transition-all duration-300 group-hover:rotate-0 group-hover:shadow-[1px_1px_0px_var(--color6)]">
                 <span className="w-2 h-2 rounded-full bg-[var(--color6)] animate-pulse"></span>
-                {t.subtitle}
+                {t._recordType === "software" ? "Software" : t.subtitle}
                 </span>
                 </div>
                 </div>
 
                 <div className="flex items-center justify-between mb-2">
                 <h3 className="fontStyle7 text-[var(--color6)] font-bold group-hover:text-gray-600 transition-colors duration-300 text-left truncate">
-                <Link to={`/template/${t.slug}`}>{t.name}</Link>
+                <Link to={t._recordType === "software" ? `/software/${t.slug}` : `/template/${t.slug}`}>
+                  {t.name}
+                </Link>
                 </h3>
                   <span className="flex items-center gap-1.5 flex-shrink-0 ml-2">
                     {t.price > 0 ? (
@@ -140,13 +174,15 @@ const templates = templatesData?.templates ?? [];
                     <i className="bx bx-cart text-sm"></i>{t.downloads || 0} Purchases
                   </span> */}
                   <StarRating
-                    rating={ratings[t._id]?.rating || 0}
-                    reviews={ratings[t._id]?.total || 0}
+                    rating={t._recordType === "software" ? t.rating || 0 : ratings[t._id]?.rating || 0}
+                    reviews={t._recordType === "software" ? t.reviews || 0 : ratings[t._id]?.total || 0}
                   />
                 </div>
               </div>
             </div>
-          ))}
+                  );
+                  return <div key={`${t._recordType}-${t._id}`}>{cardContent}</div>;
+                })}
         </div>
       </div>
 

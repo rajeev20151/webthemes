@@ -1,12 +1,21 @@
 ﻿import { useState, useEffect } from "react";
-import { adminGetTemplatesAPI, adminCreateTemplateAPI, adminUpdateTemplateAPI, adminDeleteTemplateAPI } from "../../services/adminApi";
+import {
+  adminGetTemplatesAPI,
+  adminGetSoftwaresAPI,
+  adminCreateTemplateAPI,
+  adminCreateSoftwareAPI,
+  adminUpdateTemplateAPI,
+  adminUpdateSoftwareAPI,
+  adminDeleteTemplateAPI,
+  adminDeleteSoftwareAPI,
+} from "../../services/adminApi";
 import { PageHeader, SearchAndFilters, PaginationControls, TemplateGrid, TemplateModal, DeleteConfirm } from "./components/index.jsx";
 
 const emptyForm = {
   name: "", subtitle: "", tag: "", price: "", originalPrice: "", description: "",
   version: "", updateDate: "", releaseDate: "", category: "",
   frameworks: "", compatible: "", tags: "", keyFeatures: "", inTheBox: "", libraries: "",
-  scheduledAt: "",
+  scheduledAt: "", uploadAsSoftware: false,
 };
 
 const ITEMS_PER_PAGE = 8;
@@ -23,13 +32,23 @@ export default function ManageTemplates() {
   const [showFilters, setShowFilters] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
 
-  /* ── Fetch templates on mount ── */
+  /* ── Fetch templates and software on mount ── */
   const fetchTemplates = async () => {
     try {
-      const res = await adminGetTemplatesAPI();
-      if (res.success) setTemplates(res.templates);
+      const [templateRes, softwareRes] = await Promise.all([
+        adminGetTemplatesAPI(),
+        adminGetSoftwaresAPI(),
+      ]);
+      if (!templateRes.success || !softwareRes.success) {
+        throw new Error(templateRes.message || softwareRes.message || "Failed to fetch uploads");
+      }
+      const items = [
+        ...templateRes.templates.map((item) => ({ ...item, _recordType: "template" })),
+        ...softwareRes.softwares.map((item) => ({ ...item, _recordType: "software" })),
+      ].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+      setTemplates(items);
     } catch (err) {
-      console.error("Failed to fetch templates", err);
+      console.error("Failed to fetch templates and software", err);
     } finally {
       setLoading(false);
     }
@@ -112,9 +131,13 @@ export default function ManageTemplates() {
 
       let res;
       if (modal.mode === "add") {
-        res = await adminCreateTemplateAPI(fd);
+        res = form.uploadAsSoftware
+          ? await adminCreateSoftwareAPI(fd)
+          : await adminCreateTemplateAPI(fd);
       } else {
-        res = await adminUpdateTemplateAPI(form._id, fd);
+        res = form._recordType === "software"
+          ? await adminUpdateSoftwareAPI(form._id, fd)
+          : await adminUpdateTemplateAPI(form._id, fd);
       }
 
       if (res.success) {
@@ -134,7 +157,9 @@ export default function ManageTemplates() {
   /* ── Delete ── */
   const handleDelete = async () => {
     try {
-      const res = await adminDeleteTemplateAPI(deleteTarget._id);
+      const res = deleteTarget._recordType === "software"
+        ? await adminDeleteSoftwareAPI(deleteTarget._id)
+        : await adminDeleteTemplateAPI(deleteTarget._id);
       if (res.success) {
         setTemplates((prev) => prev.filter((t) => t._id !== deleteTarget._id));
       }

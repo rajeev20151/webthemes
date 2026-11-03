@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { addToCart, setDbCart } from "../store/slices/cartSlice";
 import { useAddToCartApiMutation } from "../store/apiSlice";
 
-export default function StickyMobileBar({ theme, isFree, resolvedDownloadUrl, resolvedPreviewUrl }) {
+export default function StickyMobileBar({ theme, isFree, resolvedDownloadUrl, resolvedPreviewUrl, showPreview = true, recordType = "template" }) {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { token } = useSelector((state) => state.auth);
@@ -32,9 +32,10 @@ export default function StickyMobileBar({ theme, isFree, resolvedDownloadUrl, re
       originalPrice: theme.originalPrice,
       image: theme.images?.[0] || "",
       tag: theme.tag,
+      recordType,
     };
     if (isAuth) {
-      addToCartApi({ templateId: theme._id })
+      addToCartApi(recordType === "software" ? { softwareId: theme._id } : { templateId: theme._id })
         .unwrap()
         .then((res) => dispatch(setDbCart(res?.cart?.items || [])))
         .catch(() => {});
@@ -66,12 +67,14 @@ export default function StickyMobileBar({ theme, isFree, resolvedDownloadUrl, re
             ${theme.price}
           </button>
         )}
-        <button
-          onClick={handlePreview}
-          className="flex-shrink-0 w-9 h-9 rounded-xl border-2 border-green-500/30 text-green-500 flex items-center justify-center hover:bg-green-500/8 transition-colors duration-200"
-        >
-          <i className="bx bx-link-external text-base"></i>
-        </button>
+        {showPreview && (
+          <button
+            onClick={handlePreview}
+            className="flex-shrink-0 w-9 h-9 rounded-xl border-2 border-green-500/30 text-green-500 flex items-center justify-center hover:bg-green-500/8 transition-colors duration-200"
+          >
+            <i className="bx bx-link-external text-base"></i>
+          </button>
+        )}
       </div>
     </div>
   );

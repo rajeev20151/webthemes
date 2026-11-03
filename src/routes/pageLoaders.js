@@ -9,6 +9,7 @@ export const pageLoaders = {
   "/blog": () => import("../pages/Blog"),
   "/blog/:slug": () => import("../pages/BlogDetail"),
   "/template/:slug": () => import("../pages/Themes"),
+  "/software/:slug": () => import("../pages/Themes"),
   "/demo": () => import("../pages/DemoPage"),
   "/contact": () => import("../pages/Contact"),
   "/pricing": () => import("../pages/PricingPage"),

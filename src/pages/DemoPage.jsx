@@ -1,6 +1,6 @@
 import { useSearchParams } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { useGetTemplatesQuery } from "../store/apiSlice";
+import { useGetTemplatesQuery, useGetLatestSoftwaresQuery } from "../store/apiSlice";
 import SEOHead from "../components/SEOHead";
 import { SITE_URL } from "../config/siteConfig";
 import BreadCrumb_Nav from "../components/BreadCrumb_Nav";
@@ -15,23 +15,32 @@ import EmptyState from "../components/EmptyState";
 export default function DemoPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const { data: templatesData } = useGetTemplatesQuery({ limit: 1000 });
+  const { data: softwaresData } = useGetLatestSoftwaresQuery({ limit: 1000 });
 
   const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
   const origin = API_BASE.replace(/\/api$/, "");
-  const raw = templatesData ? (Array.isArray(templatesData) ? templatesData : templatesData.templates ?? []) : [];
+  const templates = templatesData ? (Array.isArray(templatesData) ? templatesData : templatesData.templates ?? []) : [];
+  const softwares = softwaresData?.softwares ?? [];
+  const raw = [
+    ...templates.map((item) => ({ ...item, _recordType: "template" })),
+    ...softwares.map((item) => ({ ...item, _recordType: "software" })),
+  ];
   const demos = raw.map((t) => {
     const rawImage = Array.isArray(t.images) && t.images[0] ? t.images[0] : null;
     const image = rawImage ? (rawImage.startsWith("http") ? rawImage : `${origin}${rawImage}`) : null;
     const framework = Array.isArray(t.frameworks) && t.frameworks[0] ? t.frameworks[0].toUpperCase() : "HTML/CSS";
-    const previewUrl = t.previewUrl ? `${origin}${t.previewUrl}` : t.link || "";
+    const previewUrl = t._recordType === "template"
+      ? t.previewUrl ? `${origin}${t.previewUrl}` : t.link || ""
+      : "";
     return {
       id: t._id,
       slug: t.slug,
+      recordType: t._recordType,
       title: t.name || "Untitled",
       category: t.category || t.subtitle || "General",
       type: t.tag || "Multi Page",
       tag: t.price === 0 ? "FREE" : "PRO",
-      tech: framework.includes("WORDPRESS") ? "WORDPRESS" : "Templates",
+      tech: framework.includes("WORDPRESS") ? "WORDPRESS" : t._recordType === "software" ? "Software" : "Templates",
       image,
       frameworks: Array.isArray(t.frameworks) && t.frameworks.length > 0 ? t.frameworks.join(", ") : "",
       views: t.views ?? t.downloads ?? 0,

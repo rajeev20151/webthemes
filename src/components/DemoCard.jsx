@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import TagBadge from "./TagBadge";
 
 export default function DemoCard({ demo }) {
+  const detailsUrl = `/${demo.recordType === "software" ? "software" : "template"}/${demo.slug}`;
   return (
     <div
       className="group flex flex-col h-full bg-[var(--color5)] border-2 border-[var(--color6)] rounded-2xl overflow-hidden cursor-pointer
@@ -42,7 +43,7 @@ export default function DemoCard({ demo }) {
             </a>
           )}
           <Link
-            to={`/template/${demo.slug}`}
+            to={detailsUrl}
             className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl fontStyle8 font-semibold border border-white/30 text-white hover:bg-white/10 transition-colors duration-150 translate-y-4 group-hover:translate-y-0 transition-transform duration-300 delay-75"
           >
             <i className="bx bx-info-circle text-base"></i>
@@ -57,7 +58,7 @@ export default function DemoCard({ demo }) {
         <div className="flex items-center justify-between gap-3">
           <h3 className="fontStyle7 font-bold text-[var(--color6)] leading-snug truncate">
             <Link
-              to={`/template/${demo.slug}`}
+              to={detailsUrl}
               className="hover:text-[var(--color4)] transition-colors duration-200"
             >
               {demo.title}

@@ -7,7 +7,15 @@ import { useGetContentsQuery, useSubscribeNewsletterMutation } from "../store/ap
 export default function Footer(){
   
   const { data: contentsData } = useGetContentsQuery();
-  const contents = contentsData?.success && contentsData?.contents?.length > 0 ? contentsData.contents[0] : null;
+  const contentItems = contentsData?.success ? contentsData.contents : [];
+  const contents = contentsData?.success
+    ? contentItems.find((item) =>
+        item.section?.toLowerCase() === "footer" &&
+        item.socialLinks?.some((social) => social.platform?.trim())
+      ) || contentItems.find((item) =>
+        item.socialLinks?.some((social) => social.platform?.trim())
+      )
+    : null;
 
   const [subscribe, { isLoading }] = useSubscribeNewsletterMutation();
   const [footerEmail, setFooterEmail] = useState("");
@@ -54,20 +62,28 @@ export default function Footer(){
             </div>
          
             <div className="flex gap-3 flex-wrap">
-            {contents?.socialLinks?.map((social) => (
-            <a
-            key={social._id}
-            href={social.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-[var(--color5)] flex items-center justify-center
-            hover:bg-[var(--color9)] hover:scale-110 transition-all duration-300 group"
-            >
-            <i
-            className={`bx bxl-${social.platform} text-[var(--color6)] text-lg sm:text-xl group-hover:text-[var(--color5)]`}
-            ></i>
-            </a>
-            ))}
+            {contents?.socialLinks?.filter((social) => social.platform?.trim()).map((social, index) => {
+              const icon = (
+                <i className={`bx bxl-${social.platform.trim().toLowerCase()} text-[var(--color6)] text-lg sm:text-xl group-hover:text-[var(--color5)]`} />
+              );
+              const className = "w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-[var(--color5)] flex items-center justify-center hover:bg-[var(--color9)] hover:scale-110 transition-all duration-300 group";
+
+              return social.url?.trim() ? (
+                <a
+                  key={social._id || `${social.platform}-${index}`}
+                  href={social.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={className}
+                >
+                  {icon}
+                </a>
+              ) : (
+                <span key={social._id || `${social.platform}-${index}`} className={className}>
+                  {icon}
+                </span>
+              );
+            })}
             </div>
           </div>
 
