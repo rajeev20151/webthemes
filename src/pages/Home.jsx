@@ -13,12 +13,12 @@ export default function Home(){
    return(
     <>
      <SEOHead
-       title="Free & Premium Templates - Download HTML, React, WordPress"
-       description="Download free and premium HTML, React, WordPress templates. Browse 1000+ responsive templates for landing pages, portfolios, e-commerce, and more."
+       title="Free & Premium Templates - Download HTML, React, Next.js Templates"
+       description="Download free and premium HTML, React, Next.js, Vue js templates. Browse responsive templates for landing pages, portfolios, e-commerce, and more."
        jsonLd={{
          "@context": "https://schema.org",
          "@type": "WebSite",
-         "name": SITE_NAME,
+         "name": SITE_NAME, 
          "url": SITE_URL,
          "potentialAction": {
            "@type": "SearchAction",

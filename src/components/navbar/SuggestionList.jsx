@@ -25,7 +25,7 @@ export default function SuggestionList({ suggestions, query, onSelect }) {
             className="w-full flex items-center gap-3 px-4 py-3 hover:bg-[var(--color11)] transition-colors duration-150 text-left border-0 bg-transparent cursor-pointer border-b border-[var(--color6)]/5 last:border-b-0"
           >
             {t.image && (
-              <img src={t.image} alt="" className="w-14 h-10 object-cover rounded-lg shrink-0" />
+              <img src={t.image} alt="" className="w-20 h-20 object-cover rounded-lg shrink-0" />
             )}
             <div className="flex-1 min-w-0">
               <p className="fontStyle9 text-[var(--color6)] truncate">

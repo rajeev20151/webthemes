@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from "react";
 import BreadCrumb_Nav from "../components/BreadCrumb_Nav";
 import SEOHead from "../components/SEOHead";
 import { useGetTemplatesQuery, useGetLatestSoftwaresQuery, API_URL } from "../store/apiSlice";
+import { responsiveImgSrcSet, responsiveImgUrl } from "../utils/themeHelpers";
 
 const ALL_CATEGORIES = "All Industries";
 const ALL_TYPES = "All Types";
@@ -181,7 +182,7 @@ export default function Templates() {
   }
 
   const totalPages = Math.max(1, Math.ceil(filteredItems.length / ITEMS_PER_PAGE));
-  const pagination = { page: currentPage, totalPages, total: filteredItems.length };
+  const pagination = { page: currentPage, limit: ITEMS_PER_PAGE, totalPages, total: filteredItems.length };
   const templates = filteredItems.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
   const categoryOptions = [ALL_CATEGORIES, ...new Set(allItems.map((item) => item.category).filter(Boolean))];
   const typeOptions = [ALL_TYPES, ...new Set(allItems.map((item) => item.type).filter(Boolean))];
@@ -351,7 +352,9 @@ export default function Templates() {
                         style={{ aspectRatio: "13/10" }}
                       >
                         <img
-                          src={template.image}
+                          src={responsiveImgUrl(template.image, 640)}
+                          srcSet={responsiveImgSrcSet(template.image)}
+                          sizes="(max-width: 640px) 100vw, (max-width: 1280px) 50vw, 33vw"
                           alt={template.title}
                           loading="lazy"
                           className="w-full h-full object-cover object-top transition-transform duration-700 ease-out group-hover:scale-105"

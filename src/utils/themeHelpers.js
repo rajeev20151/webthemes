@@ -7,6 +7,17 @@ export const imgUrl = (path) => {
   return `${origin}${path}`;
 };
 
+export const responsiveImgUrl = (path, width = 640) => {
+  const url = imgUrl(path);
+  if (!url || !url.includes("/media/images/")) return url;
+
+  const separator = url.includes("?") ? "&" : "?";
+  return `${url}${separator}w=${width}`;
+};
+
+export const responsiveImgSrcSet = (path, widths = [320, 480, 640, 960, 1280]) =>
+  widths.map((width) => `${responsiveImgUrl(path, width)} ${width}w`).join(", ");
+
 export function buildEditorPicks(all, currentId) {
   return all
     .filter((t) => t._id !== currentId)

@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 import CTA from "../sections/CTA";
 import { useGetContentsQuery, useSubscribeNewsletterMutation } from "../store/apiSlice";
 
-
 export default function Footer(){
   
   const { data: contentsData } = useGetContentsQuery();

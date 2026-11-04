@@ -22,10 +22,10 @@ const FAQS = [
   //   q: "Can I upgrade my plan at any time?",
   //   a: "Absolutely. Upgrade from Single to Bundle, or from Bundle to Agency at any time. We will credit your previous purchase towards the new plan.",
   // },
-  {
-    q: "Do you offer refunds?",
-    a: "Refunds are available only for high-price premium templates. All other templates and plans are final and non-refundable. Please review the template details carefully before purchasing.",
-  },
+  // {
+  //   q: "Do you offer refunds?",
+  //   a: "Refunds are available only for high-price premium templates. All other templates and plans are final and non-refundable. Please review the template details carefully before purchasing.",
+  // },
   {
     q: "Are updates included?",
     a: "Yes — for the duration specified in each plan. Agency plan members receive lifetime updates on every current and future template in the library.",

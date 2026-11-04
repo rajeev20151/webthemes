@@ -56,6 +56,3 @@ export function prefetchPath(href) {
   if (pageLoaders[dynamic]) load(dynamic);
 }
 
-export function prefetchAllPaths() {
-  Object.keys(pageLoaders).forEach(load);
-}

@@ -6,7 +6,7 @@ import {
 } from "recharts";
 import {
   getUsersAPI, adminGetTemplatesAPI, adminGetReviewsAPI,
-  adminGetChatsAPI, adminGetContactsAPI, adminGetBlogsAPI,
+  adminGetSoftwaresAPI, adminGetChatsAPI, adminGetContactsAPI, adminGetBlogsAPI,
 } from "../services/adminApi";
 
 const COLORS = {
@@ -403,7 +403,7 @@ function RecentTable({ users }) {
 export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState({
-    users: [], templates: [], reviews: [],
+    users: [], templates: [], softwares: [], softwareCount: 0, reviews: [],
     chats: [], contacts: [], blogs: [],
   });
 
@@ -411,17 +411,26 @@ export default function Dashboard() {
     Promise.allSettled([
       getUsersAPI().then(r => ({ key: "users", val: r.users || [] })),
       adminGetTemplatesAPI().then(r => ({ key: "templates", val: r.templates || r.data || [] })),
+      adminGetSoftwaresAPI().then(r => ({
+        key: "softwares",
+        val: r.softwares || [],
+        count: Number.isFinite(Number(r.total)) ? Number(r.total) : (r.softwares || []).length,
+      })),
       adminGetReviewsAPI().then(r => ({ key: "reviews", val: r.reviews || [], stats: r.stats })),
       adminGetChatsAPI().then(r => ({ key: "chats", val: r.chats || [], stats: r.stats })),
       adminGetContactsAPI().then(r => ({ key: "contacts", val: r.data || [] })),
       adminGetBlogsAPI().then(r => ({ key: "blogs", val: r.blogs || r.data || [] })),
     ]).then((results) => {
-      const acc = { users: [], templates: [], reviews: [], chats: [], contacts: [], blogs: [] };
+      const acc = {
+        users: [], templates: [], softwares: [], softwareCount: 0,
+        reviews: [], chats: [], contacts: [], blogs: [],
+      };
       let reviewsStats = null;
       results.forEach((res) => {
         if (res.status === "fulfilled") {
-          const { key, val, stats } = res.value;
+          const { key, val, stats, count } = res.value;
           acc[key] = val;
+          if (key === "softwares") acc.softwareCount = count;
           if (stats) reviewsStats = stats;
         }
       });
@@ -448,7 +457,7 @@ export default function Dashboard() {
     );
   }
 
-  const { users, templates, reviews, chats, contacts, blogs, _reviewsStats } = data;
+  const { users, templates, softwares, softwareCount, reviews, chats, contacts, blogs, _reviewsStats } = data;
 
   const totalViews = templates.reduce((sum, t) => sum + (t.views || 0), 0);
 
@@ -499,6 +508,14 @@ export default function Dashboard() {
           gradient="linear-gradient(135deg, #0ea5e9 0%, #38bdf8 100%)"
           sparkData={genSpark(templates)}
           icon={<svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="3" x2="9" y2="21"/></svg>}
+        />
+        <StatCard
+          label="Total Software"
+          value={softwareCount.toLocaleString()}
+          color={COLORS.violet}
+          gradient="linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%)"
+          sparkData={genSpark(softwares)}
+          icon={<svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4M7 9h4M7 12h7" strokeLinecap="round"/></svg>}
         />
         <StatCard
           label="Total Views"

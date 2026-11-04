@@ -3,7 +3,16 @@ import { useGetContentsQuery } from "../store/apiSlice";
 
 export default function CTA(){
   const { data: contentsData } = useGetContentsQuery();
-  const contents = contentsData?.contents?.[0] || null;
+  const contentItems = contentsData?.contents || [];
+  const contents = contentItems.find(
+    (item) =>
+      item.section?.trim().toLowerCase() === "footer" &&
+      item.footerText?.trim()
+  ) || contentItems.find(
+    (item) =>
+      item.section?.trim().toLowerCase() !== "site-settings" &&
+      item.footerText?.trim()
+  ) || null;
 
    return(
      /// =========  cta-section ============ ///

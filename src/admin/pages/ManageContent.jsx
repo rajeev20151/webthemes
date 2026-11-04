@@ -15,6 +15,9 @@ const emptyForm = {
   socialLinks: [],
 };
 
+const normalizeSection = (section = "") =>
+  section.trim().toLowerCase().replace(/[\s_]+/g, "-");
+
 /* ── Section color map ── */
 const sectionColor = (section) => {
   const map = {
@@ -480,7 +483,9 @@ export default function ManageContent() {
   useEffect(() => { fetchContents(); }, []);
 
   /* ── Filter ── */
-  const managedItems = items.filter((item) => item.section !== "site-settings");
+  const managedItems = items.filter(
+    (item) => normalizeSection(item.section) !== "site-settings"
+  );
   const filtered = managedItems.filter((item) => {
     const q = search.toLowerCase();
     return (

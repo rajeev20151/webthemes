@@ -3,14 +3,8 @@ import {
   useGetLatestTemplatesQuery,
   useGetLatestSoftwaresQuery,
   useGetTemplatesRatingsQuery,
-  API_URL,
 } from "../store/apiSlice";
-
-const imgUrl = (path) => {
-  if (!path) return "";
-  if (path.startsWith("http")) return path;
-  return `${API_URL.replace(/\/api\/?$/, "")}${path}`;
-};
+import { responsiveImgSrcSet, responsiveImgUrl } from "../utils/themeHelpers";
 
 /* ── Skeleton Card ── */
 function SkeletonCard() {
@@ -51,7 +45,7 @@ export default function PopularTemplates() {
     ...(templatesData?.templates ?? []).map((item) => ({ ...item, _recordType: "template" })),
     ...(softwaresData?.softwares ?? []).map((item) => ({ ...item, _recordType: "software" })),
   ].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-  const loading = templatesLoading || softwaresLoading;
+  const loading = templatesLoading && softwaresLoading;
 
   // Batch fetch all ratings in ONE call
   const templateIds = items
@@ -90,16 +84,19 @@ export default function PopularTemplates() {
         </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
-                {items.map((t) => {
+                {items.map((t, itemIndex) => {
                   const cardContent = (
                   <div className="group cursor-pointer bg-[var(--color5)] rounded-2xl">
                   <div className="p-4 border-[2px] border-[var(--color6)] rounded-2xl text-center shadow-[8px_8px_0px_var(--color6)] hover:shadow-[3px_3px_0px_var(--color6)] transition-all duration-300">
                   <div className="relative overflow-hidden rounded-2xl mb-5 bg-gray-100 h-[400px] sm:h-[400px] md:h-[400px] lg:h-[430px]">
                   {t.images?.[0] ? (
                     <img
-                    src={imgUrl(t.images[0])}
+                    src={responsiveImgUrl(t.images[0], 640)}
+                    srcSet={responsiveImgSrcSet(t.images[0])}
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                     alt={t.name}
-                    loading="lazy"
+                    loading={itemIndex === 0 ? "eager" : "lazy"}
+                    fetchPriority={itemIndex === 0 ? "high" : "auto"}
                     className="block w-full h-auto object-contain object-top transition-transform duration-700 ease-out group-hover:scale-105"
                     />
                   ) : (

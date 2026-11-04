@@ -41,7 +41,14 @@ const TILES = [
 
 export default function About() {
   const { data: contentsData } = useGetContentsQuery();
-  const contents = contentsData?.contents?.[0] || null;
+  const contentItems = contentsData?.contents || [];
+  const normalizeSection = (section = "") =>
+    section.trim().toLowerCase().replace(/[\s_]+/g, "-");
+  const contents = contentItems.find(
+    (item) => normalizeSection(item.section) === "about"
+  ) || contentItems.find(
+    (item) => normalizeSection(item.section) !== "site-settings"
+  ) || null;
 
   return (
     <>

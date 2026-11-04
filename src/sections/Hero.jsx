@@ -1,19 +1,30 @@
 import { Link } from "react-router-dom";
 import { useGetContentsQuery, useGetTemplatesQuery } from "../store/apiSlice";
-import { imgUrl } from "../utils/themeHelpers";
+import { imgUrl, responsiveImgSrcSet, responsiveImgUrl } from "../utils/themeHelpers";
 
 export default function Hero() {
 
   const { data: contentsData, isLoading } = useGetContentsQuery();
-  const contents = contentsData?.contents?.[0] || null;
+  const contentItems = contentsData?.contents || [];
+  const normalizeSection = (section = "") =>
+    section.trim().toLowerCase().replace(/[\s_]+/g, "-");
+  const contents =
+    contentItems.find((item) => {
+      const section = normalizeSection(item.section);
+      return section === "hero" || section.startsWith("hero-");
+    }) ||
+    contentItems.find(
+      (item) => normalizeSection(item.section) !== "site-settings"
+    ) ||
+    null;
 
-  const { data: templatesData } = useGetTemplatesQuery();
+  const { data: templatesData } = useGetTemplatesQuery({ limit: 6 });
   const templates = [...(templatesData?.templates || [])].sort(
   (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
   );
 
   const heroImages = templates
-    .slice(0, 10)
+    .slice(0, 6)
     .map((t) => imgUrl(t.images?.[0]))
     .filter(Boolean);
 
@@ -38,7 +49,9 @@ export default function Hero() {
                 {duplicatedImages.map((img, index) => (
                   <img
                     key={`col1-${index}`}
-                    src={img}
+                    src={responsiveImgUrl(img, 640)}
+                    srcSet={responsiveImgSrcSet(img)}
+                    sizes="(max-width: 768px) 60vw, 25vw"
                     className="w-full aspect-[970/580] object-cover object-top ring rounded-2xl"
                     width="970"
                     height="580"
@@ -54,7 +67,9 @@ export default function Hero() {
                 {duplicatedImages.map((img, index) => (
                   <img
                     key={`col2-${index}`}
-                    src={img}
+                    src={responsiveImgUrl(img, 640)}
+                    srcSet={responsiveImgSrcSet(img)}
+                    sizes="(max-width: 768px) 60vw, 25vw"
                     className="w-full aspect-[970/580] object-cover object-top ring rounded-2xl"
                     width="970"
                     height="436"
@@ -70,7 +85,9 @@ export default function Hero() {
                 {duplicatedImages.map((img, index) => (
                   <img
                     key={`col3-${index}`}
-                    src={img}
+                    src={responsiveImgUrl(img, 640)}
+                    srcSet={responsiveImgSrcSet(img)}
+                    sizes="(max-width: 768px) 60vw, 25vw"
                     className="w-full aspect-[970/580] object-cover object-top ring rounded-2xl"
                     width="971"
                     height="395"
@@ -86,7 +103,9 @@ export default function Hero() {
                 {duplicatedImages.map((img, index) => (
                   <img
                     key={`col4-${index}`}
-                    src={img}
+                    src={responsiveImgUrl(img, 640)}
+                    srcSet={responsiveImgSrcSet(img)}
+                    sizes="(max-width: 768px) 60vw, 25vw"
                     className="w-full aspect-[970/580] object-cover object-top ring rounded-2xl"
                     width="972"
                     height="854"
